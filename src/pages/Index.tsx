@@ -3,6 +3,7 @@ import ComplianceStats from "@/components/ComplianceStats";
 import AlertPanel from "@/components/AlertPanel";
 import DiagnosticButton from "@/components/DiagnosticButton";
 import QuickActions from "@/components/QuickActions";
+import AgentCards from "@/components/AgentCards";
 
 const Index = () => {
   return (
@@ -38,6 +39,9 @@ const Index = () => {
             <AlertPanel />
           </div>
         </div>
+
+        {/* Multi-Agent System */}
+        <AgentCards />
 
         {/* Quick Actions */}
         <section className="space-y-4">
