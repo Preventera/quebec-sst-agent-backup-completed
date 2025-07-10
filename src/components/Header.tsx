@@ -30,6 +30,13 @@ const Header = () => {
             <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
               Paramètres
             </Button>
+            <Button 
+              variant="ghost" 
+              className="text-primary-foreground hover:bg-primary-glow"
+              onClick={() => window.location.href = '/tests'}
+            >
+              Tests & Démo
+            </Button>
           </nav>
         </div>
       </div>
