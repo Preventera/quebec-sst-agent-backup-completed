@@ -18,6 +18,7 @@ export default function DocumentGeneration() {
     nom: '',
     taille: 0,
     secteur: '',
+    scianCode: '',
     adresse: ''
   });
   
@@ -30,6 +31,7 @@ export default function DocumentGeneration() {
     const nom = searchParams.get('nom');
     const taille = searchParams.get('taille');
     const secteur = searchParams.get('secteur');
+    const scianCode = searchParams.get('scianCode');
     const template = searchParams.get('template');
 
     if (nom || taille || secteur) {
@@ -37,6 +39,7 @@ export default function DocumentGeneration() {
         nom: nom || '',
         taille: taille ? parseInt(taille) : 0,
         secteur: secteur || '',
+        scianCode: scianCode || '',
         adresse: ''
       });
     }
@@ -152,6 +155,19 @@ export default function DocumentGeneration() {
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="scianCode">Code SCIAN (optionnel)</Label>
+                <Input
+                  id="scianCode"
+                  value={entrepriseData.scianCode}
+                  onChange={(e) => setEntrepriseData({...entrepriseData, scianCode: e.target.value})}
+                  placeholder="Ex: 62111 (Médecins)"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Le code SCIAN permet d'identifier des risques spécialisés selon votre activité précise
+                </p>
               </div>
               
               <div>

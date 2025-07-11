@@ -15,6 +15,7 @@ export interface DocumentData {
     nom: string;
     taille: number;
     secteur: string;
+    scianCode?: string;
     adresse?: string;
   };
   diagnostic?: any;
@@ -135,6 +136,7 @@ function genererProgrammePrevention(entreprise: any, diagnostic: any, date: stri
   const params: PreventionProgramParams = {
     companyName: entreprise.nom,
     sector: entreprise.secteur || 'services',
+    scianCode: entreprise.scianCode,
     companySize: entreprise.taille || 1,
     mainActivities: [],
     identifiedRisks: diagnostic?.nonConformités?.map((nc: any) => nc.message) || [],
