@@ -217,7 +217,7 @@ const TestSuite = () => {
       </div>
 
       <Tabs value={selectedAgent} onValueChange={setSelectedAgent} className="space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2">
+        <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 h-auto p-1">
           {testAgents.map((agent) => {
             const IconComponent = agent.icon;
             const stats = getStatsForAgent(agent);
@@ -226,19 +226,19 @@ const TestSuite = () => {
               <TabsTrigger
                 key={agent.name}
                 value={agent.name}
-                className="flex flex-col p-3 h-auto data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="flex flex-col p-3 h-auto"
               >
                 <IconComponent className="h-5 w-5 mb-1" />
                 <span className="text-xs font-medium">{agent.name}</span>
                 <div className="flex gap-1 mt-1">
-                  {stats.passed > 0 && <div className="w-2 h-2 rounded-full bg-success"></div>}
-                  {stats.failed > 0 && <div className="w-2 h-2 rounded-full bg-destructive"></div>}
-                  {stats.running > 0 && <div className="w-2 h-2 rounded-full bg-warning animate-pulse"></div>}
+                  {stats.passed > 0 && <div className="w-2 h-2 rounded-full bg-green-500"></div>}
+                  {stats.failed > 0 && <div className="w-2 h-2 rounded-full bg-red-500"></div>}
+                  {stats.running > 0 && <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>}
                 </div>
               </TabsTrigger>
             );
           })}
-        </div>
+        </TabsList>
 
         {testAgents.map((agent) => (
           <TabsContent key={agent.name} value={agent.name} className="space-y-4">
