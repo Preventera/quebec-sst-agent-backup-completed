@@ -784,15 +784,30 @@ Date : ${new Date().toLocaleDateString('fr-CA')}
   }
 
   static exportToMarkdown(program: PreventionProgram): string {
-    let markdown = `# ${program.title}\n\n`;
-    markdown += `**Entreprise :** ${program.companyInfo.name}\n`;
+    let markdown = `# PROGRAMME DE PRÉVENTION\n\n`;
+    
+    // En-tête officiel conforme CNESST
+    markdown += `**IDENTIFICATION DE L'ÉTABLISSEMENT**\n\n`;
+    markdown += `**Nom de l'entreprise :** ${program.companyInfo.name}\n`;
     markdown += `**Secteur d'activité :** ${program.companyInfo.sector}\n`;
     if (program.companyInfo.scianCode) {
       markdown += `**Code SCIAN :** ${program.companyInfo.scianCode}\n`;
     }
     markdown += `**Taille de l'entreprise :** ${program.companyInfo.size} employés\n`;
-    markdown += `**Date de génération :** ${program.generatedDate}\n`;
-    markdown += `**Dernière mise à jour :** ${program.lastUpdated}\n\n`;
+    markdown += `**Adresse de l'établissement :** _________________________\n`;
+    markdown += `**Date d'élaboration :** ${program.generatedDate}\n`;
+    markdown += `**Date de dernière mise à jour :** ${program.lastUpdated}\n\n`;
+    
+    // Conformité légale obligatoire
+    markdown += `**RÉFÉRENCE LÉGALE :** Loi sur la santé et la sécurité du travail (LSST) - Articles 51 et 59\n\n`;
+    
+    // Collaboration obligatoire selon CNESST
+    markdown += `**ÉLABORATION EN COLLABORATION AVEC :**\n`;
+    markdown += `- Employeur : _________________________\n`;
+    markdown += `- Représentant à la prévention : _________________________\n`;
+    markdown += `- Comité de santé et sécurité : _________________________\n`;
+    markdown += `- Médecin responsable des services de santé : _________________________\n\n`;
+    
     markdown += `---\n\n`;
 
     program.sections.forEach(section => {
@@ -806,6 +821,85 @@ Date : ${new Date().toLocaleDateString('fr-CA')}
         });
       }
     });
+    
+    // Sections obligatoires CNESST ajoutées
+    markdown += `## ÉCHÉANCIER ET MODALITÉS DE RÉALISATION\n\n`;
+    markdown += `*Section obligatoire selon l'article 59 de la LSST*\n\n`;
+    markdown += `| Mesure de prévention | Responsable | Échéance | Ressources requises | Indicateurs de suivi | Statut |\n`;
+    markdown += `|----------------------|-------------|----------|-------------------|-------------------|--------|\n`;
+    markdown += `| À compléter selon l'analyse des risques | | | | | |\n`;
+    markdown += `| | | | | | |\n`;
+    markdown += `| | | | | | |\n\n`;
+    
+    markdown += `## MESURES DE SURVEILLANCE, D'ÉVALUATION ET DE SUIVI\n\n`;
+    markdown += `*Section obligatoire pour assurer l'efficacité et la durabilité des mesures*\n\n`;
+    markdown += `### Surveillance continue\n`;
+    markdown += `- Inspections régulières des lieux de travail (fréquence : _______)\n`;
+    markdown += `- Vérification de l'application des mesures préventives\n`;
+    markdown += `- Suivi des indicateurs de performance en SST\n`;
+    markdown += `- Observation des comportements sécuritaires\n\n`;
+    
+    markdown += `### Évaluation périodique\n`;
+    markdown += `- Révision annuelle complète du programme de prévention\n`;
+    markdown += `- Analyse des accidents, incidents et presqu'accidents\n`;
+    markdown += `- Mise à jour selon l'évolution des activités et des risques\n`;
+    markdown += `- Évaluation de l'efficacité des mesures implantées\n\n`;
+    
+    markdown += `### Modalités de suivi\n`;
+    markdown += `- Réunions du comité de santé et sécurité (fréquence : _______)\n`;
+    markdown += `- Rapports périodiques à la direction\n`;
+    markdown += `- Documentation des corrections et améliorations apportées\n`;
+    markdown += `- Communication des résultats aux travailleurs\n\n`;
+    
+    markdown += `## ÉQUIPEMENTS DE PROTECTION INDIVIDUELLE (EPI)\n\n`;
+    markdown += `*Liste des EPI adaptés aux risques identifiés*\n\n`;
+    markdown += `| Type d'EPI | Norme/Certification | Poste/Activité | Fréquence de remplacement |\n`;
+    markdown += `|------------|---------------------|----------------|---------------------------|\n`;
+    markdown += `| À compléter selon l'analyse des risques | | | |\n\n`;
+    
+    markdown += `## PROGRAMMES DE FORMATION ET D'INFORMATION EN SST\n\n`;
+    markdown += `*Programmes obligatoires selon l'article 51 de la LSST*\n\n`;
+    markdown += `### Formation d'accueil\n`;
+    markdown += `- Sensibilisation aux risques du poste de travail\n`;
+    markdown += `- Procédures de sécurité spécifiques\n`;
+    markdown += `- Utilisation des EPI\n`;
+    markdown += `- Procédures d'urgence\n\n`;
+    
+    markdown += `### Formation continue\n`;
+    markdown += `- Mise à jour des connaissances en SST\n`;
+    markdown += `- Formation sur les nouveaux équipements ou procédés\n`;
+    markdown += `- Recyclage périodique des compétences\n\n`;
+    
+    markdown += `### Formation spécialisée\n`;
+    markdown += `- Formation des superviseurs et gestionnaires\n`;
+    markdown += `- Formation du comité de santé et sécurité\n`;
+    markdown += `- Formation du représentant à la prévention\n\n`;
+    
+    // Signatures officielles obligatoires
+    markdown += `## APPROBATION ET TRANSMISSION\n\n`;
+    markdown += `**APPROUVÉ PAR :**\n\n`;
+    markdown += `**Employeur :** _________________________ **Date :** _________\n`;
+    markdown += `**Signature :** _________________________\n\n`;
+    
+    markdown += `**Représentant à la prévention :** _________________________ **Date :** _________\n`;
+    markdown += `**Signature :** _________________________\n\n`;
+    
+    markdown += `**Médecin responsable :** _________________________ **Date :** _________\n`;
+    markdown += `**Signature :** _________________________\n\n`;
+    
+    markdown += `**TRANSMISSION OBLIGATOIRE À :**\n`;
+    markdown += `☐ CNESST (si requis selon la taille et le secteur)\n`;
+    markdown += `☐ Association accréditée\n`;
+    markdown += `☐ Association sectorielle paritaire\n`;
+    markdown += `☐ Comité de santé et sécurité (si constitué)\n`;
+    markdown += `☐ Représentant à la prévention\n`;
+    markdown += `☐ Médecin responsable des services de santé\n\n`;
+    
+    markdown += `**Date de transmission :** _________________________\n`;
+    markdown += `**Méthode de transmission :** _________________________\n\n`;
+    
+    markdown += `---\n\n`;
+    markdown += `*Document généré conformément aux exigences de la Loi sur la santé et la sécurité du travail (LSST) et aux directives de la CNESST*\n`;
 
     return markdown;
   }
