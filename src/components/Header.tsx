@@ -1,5 +1,6 @@
-import { Shield } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -15,27 +16,36 @@ const Header = () => {
           </div>
           
           <nav className="hidden md:flex items-center gap-6">
-            <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
-              Accueil
-            </Button>
-            <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
-              Diagnostic
-            </Button>
-            <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
-              Alertes
-            </Button>
-            <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
-              Rapports
-            </Button>
+            <Link to="/">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                Accueil
+              </Button>
+            </Link>
+            <Link to="/tests">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                Tests & Démo
+              </Button>
+            </Link>
+            <Link to="/logs">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Logs
+              </Button>
+            </Link>
+            <Link to="/annotation">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Annotation
+              </Button>
+            </Link>
+            <Link to="/learning">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
               Paramètres
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="text-primary-foreground hover:bg-primary-glow"
-              onClick={() => window.location.href = '/tests'}
-            >
-              Tests & Démo
             </Button>
           </nav>
         </div>

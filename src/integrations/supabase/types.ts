@@ -14,7 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      conversation_logs: {
+        Row: {
+          agent_name: string
+          agent_response: string
+          context_data: Json | null
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          user_message: string
+        }
+        Insert: {
+          agent_name: string
+          agent_response: string
+          context_data?: Json | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          user_message: string
+        }
+        Update: {
+          agent_name?: string
+          agent_response?: string
+          context_data?: Json | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          user_message?: string
+        }
+        Relationships: []
+      }
+      learning_metrics: {
+        Row: {
+          accuracy_percentage: number
+          agent_name: string
+          compliant_responses: number
+          id: string
+          last_updated: string
+          total_annotations: number
+        }
+        Insert: {
+          accuracy_percentage?: number
+          agent_name: string
+          compliant_responses?: number
+          id?: string
+          last_updated?: string
+          total_annotations?: number
+        }
+        Update: {
+          accuracy_percentage?: number
+          agent_name?: string
+          compliant_responses?: number
+          id?: string
+          last_updated?: string
+          total_annotations?: number
+        }
+        Relationships: []
+      }
+      response_annotations: {
+        Row: {
+          annotated_by: string
+          annotation_notes: string | null
+          conversation_log_id: string
+          created_at: string
+          id: string
+          is_compliant: boolean
+          updated_at: string
+        }
+        Insert: {
+          annotated_by: string
+          annotation_notes?: string | null
+          conversation_log_id: string
+          created_at?: string
+          id?: string
+          is_compliant: boolean
+          updated_at?: string
+        }
+        Update: {
+          annotated_by?: string
+          annotation_notes?: string | null
+          conversation_log_id?: string
+          created_at?: string
+          id?: string
+          is_compliant?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "response_annotations_conversation_log_id_fkey"
+            columns: ["conversation_log_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
