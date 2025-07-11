@@ -1,0 +1,972 @@
+{
+  "Hugo": {
+    "fullScenarios": {
+      "emergency_routing_sentinelle": {
+        "title": "Routage d'urgence vers Sentinelle",
+        "description": "Hugo détecte une situation d'urgence et active immédiatement Sentinelle",
+        "conversation": [
+          { "sender": "user", "content": "URGENT: Accident grave sur chantier, travailleur inconscient!" },
+          { "sender": "agent", "agentName": "Hugo", "content": "URGENCE DÉTECTÉE. Activation immédiate de Sentinelle." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🚨 PROTOCOLE D'URGENCE ACTIVÉ. Contactez le 911 immédiatement. Je guide les prochaines étapes." }
+        ]
+      },
+      "multi_agent_coordination": {
+        "title": "Coordination multi-agents",
+        "description": "Hugo orchestre plusieurs agents pour un cas complexe",
+        "conversation": [
+          { "sender": "user", "content": "Entreprise 200 employés, incident chimique hier, audit CNESST demain." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Situation complexe détectée. Activation de DiagSST, LexiNorm et DocuGen en parallèle." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Analyse de l'incident en cours..." },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Vérification conformité réglementaire..." },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Préparation dossier audit automatique..." }
+        ]
+      },
+      "learning_from_feedback": {
+        "title": "Apprentissage par feedback",
+        "description": "Hugo s'adapte selon les retours utilisateur",
+        "conversation": [
+          { "sender": "user", "content": "Le dernier diagnostic était trop détaillé pour notre PME." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Feedback enregistré. J'adapte mes recommandations aux PME. Prochaine fois, diagnostic simplifié." }
+        ]
+      },
+      "sector_specific_routing": {
+        "title": "Routage sectoriel santé",
+        "description": "Hugo adapte le routage selon le secteur de la santé",
+        "conversation": [
+          { "sender": "user", "content": "Je gère une clinique dentaire de 8 employés." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Secteur santé détecté. Routage spécialisé vers ALSS avec protocoles biomédicaux." },
+          { "sender": "agent", "agentName": "ALSS", "content": "Bonjour! Je connais bien les défis SST spécifiques aux cliniques dentaires." }
+        ]
+      },
+      "preventive_maintenance_alert": {
+        "title": "Alerte maintenance préventive",
+        "description": "Hugo suggère proactivement un diagnostic de maintenance",
+        "conversation": [
+          { "sender": "agent", "agentName": "Hugo", "content": "Il y a 6 mois depuis votre dernier diagnostic. Révision préventive recommandée?" },
+          { "sender": "user", "content": "Bonne idée, on a eu quelques changements d'équipement." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Parfait! J'active DiagSST en mode mise à jour." }
+        ]
+      },
+      "compliance_deadline_tracking": {
+        "title": "Suivi échéances conformité",
+        "description": "Hugo surveille les dates limites réglementaires",
+        "conversation": [
+          { "sender": "agent", "agentName": "Hugo", "content": "Rappel: Formation comité SST expire dans 30 jours. Planification nécessaire." },
+          { "sender": "user", "content": "Comment procéder?" },
+          { "sender": "agent", "agentName": "Hugo", "content": "Je vous connecte avec LexiNorm pour les exigences, puis Prioris pour planification." }
+        ]
+      },
+      "cross_language_support": {
+        "title": "Support multilingue",
+        "description": "Hugo gère des demandes en anglais et français",
+        "conversation": [
+          { "sender": "user", "content": "Hello, I need help with workplace safety compliance." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Hello! I can assist in English. I'm connecting you with our compliance agent." },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Bonjour! Je peux répondre en français ou anglais selon votre préférence." }
+        ]
+      },
+      "integration_third_party": {
+        "title": "Intégration système tiers",
+        "description": "Hugo s'interface avec des logiciels externes",
+        "conversation": [
+          { "sender": "user", "content": "Peux-tu analyser les données de mon logiciel SIRH?" },
+          { "sender": "agent", "agentName": "Hugo", "content": "Connexion API établie. Analyse des données RH en cours pour identification des risques SST." }
+        ]
+      },
+      "escalation_to_human": {
+        "title": "Escalade vers humain",
+        "description": "Hugo reconnaît ses limites et propose assistance humaine",
+        "conversation": [
+          { "sender": "user", "content": "Situation très complexe avec aspects juridiques délicats..." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Cette situation dépasse mes capacités actuelles. Je recommande une consultation avec un expert SST humain." }
+        ]
+      },
+      "performance_analytics": {
+        "title": "Analytiques de performance",
+        "description": "Hugo fournit des statistiques sur l'utilisation du système",
+        "conversation": [
+          { "sender": "user", "content": "Quelles sont nos métriques SST ce mois?" },
+          { "sender": "agent", "agentName": "Hugo", "content": "15 diagnostics, 8 rapports générés, 95% de conformité atteinte. 3 non-conformités résolues." }
+        ]
+      },
+      "seasonal_reminders": {
+        "title": "Rappels saisonniers",
+        "description": "Hugo adapte ses conseils selon la saison",
+        "conversation": [
+          { "sender": "agent", "agentName": "Hugo", "content": "L'hiver approche. Révision des protocoles glace/neige et chauffage d'appoint recommandée." },
+          { "sender": "user", "content": "Bonne idée, on a eu des incidents l'an passé." }
+        ]
+      },
+      "mobile_accessibility": {
+        "title": "Accessibilité mobile",
+        "description": "Hugo optimise l'expérience pour appareils mobiles",
+        "conversation": [
+          { "sender": "user", "content": "Je suis sur chantier avec mon téléphone." },
+          { "sender": "agent", "agentName": "Hugo", "content": "Interface mobile activée. Formulaires simplifiés et commandes vocales disponibles." }
+        ]
+      },
+      "historical_data_analysis": {
+        "title": "Analyse données historiques",
+        "description": "Hugo utilise l'historique pour améliorer les prédictions",
+        "conversation": [
+          { "sender": "agent", "agentName": "Hugo", "content": "Basé sur vos données des 2 dernières années, risque élevé d'incidents en fin d'année. Prévention renforcée?" }
+        ]
+      },
+      "custom_workflow_creation": {
+        "title": "Création workflow personnalisé",
+        "description": "Hugo apprend et crée des workflows sur mesure",
+        "conversation": [
+          { "sender": "user", "content": "Peux-tu créer un processus spécifique à notre entreprise?" },
+          { "sender": "agent", "agentName": "Hugo", "content": "Workflow personnalisé créé basé sur votre secteur et historique. Voulez-vous le tester?" }
+        ]
+      }
+    }
+  },
+
+  "DiagSST": {
+    "fullScenarios": {
+      "comprehensive_manufacturing_audit": {
+        "title": "Audit complet manufacturier",
+        "description": "Diagnostic approfondi d'une usine de fabrication",
+        "conversation": [
+          { "sender": "user", "content": "Usine 150 employés, machines-outils, produits chimiques, 3 équipes." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Analyse complète initiée. Évaluation: machines (cadenassage), chimie (FDS), horaires (fatigue). 23 points vérifiés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Résultat: 3 non-conformités majeures, 7 mineures. Priorisation: 1) Cadenassage, 2) Ventilation, 3) Formation." }
+        ]
+      },
+      "construction_site_evaluation": {
+        "title": "Évaluation chantier construction",
+        "description": "Diagnostic spécialisé pour chantier de construction",
+        "conversation": [
+          { "sender": "user", "content": "Chantier résidentiel, 25 employés, travail en hauteur, excavation." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Protocole construction activé. Vérification: EPI, échafaudages, tranchées, grues." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "CRITIQUE: Harnais manquants, tranchée non étayée. Arrêt immédiat recommandé zones à risque." }
+        ]
+      },
+      "office_environment_assessment": {
+        "title": "Évaluation environnement bureau",
+        "description": "Diagnostic ergonomique et qualité de l'air bureau",
+        "conversation": [
+          { "sender": "user", "content": "Bureau 40 personnes, plaintes maux de dos, air sec." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Diagnostic bureau: ergonomie postes, qualité air, éclairage, bruit évalués." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Recommandations: supports lombaires, humidificateurs, pauses actives. Conformité: 78%." }
+        ]
+      },
+      "chemical_exposure_analysis": {
+        "title": "Analyse exposition chimique",
+        "description": "Évaluation détaillée des risques chimiques",
+        "conversation": [
+          { "sender": "user", "content": "Laboratoire, manipulation solvants, 12 techniciens." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Analyse chimique: FDS vérifiées, systèmes ventilation testés, EPI évalués." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Détection: Ventilation insuffisante poste 3, FDS périmées. Mesures correctives urgentes." }
+        ]
+      },
+      "noise_vibration_study": {
+        "title": "Étude bruit et vibrations",
+        "description": "Mesure et analyse exposition bruit/vibrations",
+        "conversation": [
+          { "sender": "user", "content": "Atelier mécanique, plaintes acouphènes, marteaux-piqueurs." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Audiométrie programmée. Mesures décibels: Zone A: 95dB, Zone B: 87dB." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Dépassement seuils. Actions: protections auditives renforcées, rotation postes, surveillance médicale." }
+        ]
+      },
+      "ergonomic_workstation_review": {
+        "title": "Révision postes ergonomiques",
+        "description": "Analyse ergonomique détaillée des postes de travail",
+        "conversation": [
+          { "sender": "user", "content": "Chaîne assemblage, gestes répétitifs, 8h/jour." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Analyse biomécanique: angles articulaires, forces, fréquence mesurés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "TMS prédits: épaules, poignets. Solutions: rotation, outils ergonomiques, micro-pauses." }
+        ]
+      },
+      "machinery_safety_inspection": {
+        "title": "Inspection sécurité machines",
+        "description": "Vérification conformité sécurité équipements",
+        "conversation": [
+          { "sender": "user", "content": "Presses hydrauliques, scies circulaires, convoyeurs." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Inspection machines: protecteurs, dispositifs arrêt urgence, cadenassage vérifié." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Non-conformités: 2 protecteurs défaillants, 1 bouton urgence hors service. Maintenance requise." }
+        ]
+      },
+      "confined_space_evaluation": {
+        "title": "Évaluation espaces clos",
+        "description": "Analyse risques espaces confinés",
+        "conversation": [
+          { "sender": "user", "content": "Cuves, silos, maintenance tunnels." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Protocole espaces clos: atmosphère, ventilation, surveillance, équipement sauvetage." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "DANGER: Gaz détectés cuve 2. Interdiction entrée. Purge et test requis." }
+        ]
+      },
+      "fire_safety_audit": {
+        "title": "Audit sécurité incendie",
+        "description": "Vérification systèmes prévention incendie",
+        "conversation": [
+          { "sender": "user", "content": "Entrepôt 5000m², matières inflammables, 30 employés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Audit incendie: détecteurs, extincteurs, issues, plan évacuation vérifiés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Lacunes: 2 détecteurs HS, issue secours bloquée, formation évacuation obsolète." }
+        ]
+      },
+      "biological_hazard_assessment": {
+        "title": "Évaluation risques biologiques",
+        "description": "Analyse exposition agents biologiques",
+        "conversation": [
+          { "sender": "user", "content": "Laboratoire médical, manipulation échantillons sang." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Risques bio: protocoles décontamination, gestion déchets, vaccination vérifiés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Amélioration: contenants perforants insuffisants, formation hépatite B manquante." }
+        ]
+      },
+      "electrical_safety_check": {
+        "title": "Vérification sécurité électrique",
+        "description": "Inspection installation et équipements électriques",
+        "conversation": [
+          { "sender": "user", "content": "Atelier soudage, haute tension, environnement humide." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Sécurité électrique: mise à terre, disjoncteurs, protection IP vérifiée." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "URGENT: Défaut isolation ligne 2, protection différentielle absente. Coupure immédiate." }
+        ]
+      },
+      "psychological_hazard_screening": {
+        "title": "Dépistage risques psychosociaux",
+        "description": "Évaluation facteurs stress et harcèlement",
+        "conversation": [
+          { "sender": "user", "content": "Centre d'appels, turnover élevé, plaintes stress." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Risques psychosociaux: charge travail, autonomie, relations, reconnaissance évaluées." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Alertes: surcharge 85% postes, conflits équipe B. Programme bien-être recommandé." }
+        ]
+      },
+      "temperature_climate_analysis": {
+        "title": "Analyse climat température",
+        "description": "Évaluation conditions thermiques travail",
+        "conversation": [
+          { "sender": "user", "content": "Fonderie, four 1200°C, été 35°C." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Contrainte thermique: WBGT, hydratation, vêtements refroidissants évalués." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Dépassement seuils. Actions: cycles travail/repos, station rafraîchissement, surveillance médicale." }
+        ]
+      },
+      "lighting_visual_assessment": {
+        "title": "Évaluation éclairage visuel",
+        "description": "Analyse qualité éclairage et fatigue visuelle",
+        "conversation": [
+          { "sender": "user", "content": "Contrôle qualité, travail précision, plaintes yeux." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Éclairage: lux, uniformité, éblouissement, contraste mesurés." },
+          { "sender": "agent", "agentName": "DiagSST", "content": "Insuffisances: 200 lux vs 500 requis, reflets écrans. Éclairage d'appoint nécessaire." }
+        ]
+      }
+    }
+  },
+
+  "LexiNorm": {
+    "fullScenarios": {
+      "complex_interpretation_article_90": {
+        "title": "Interprétation complexe article 90",
+        "description": "Clarification nuances obligations RSS multi-établissements",
+        "conversation": [
+          { "sender": "user", "content": "J'ai 3 établissements: 15, 25 et 30 employés. Combien de RSS?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Article 90: RSS requis par établissement >20 employés. Donc 2 RSS minimum (25 et 30). L'établissement de 15 peut partager un RSS." }
+        ]
+      },
+      "regulatory_update_notification": {
+        "title": "Notification mise à jour réglementaire",
+        "description": "Information sur changements récents LMRSST",
+        "conversation": [
+          { "sender": "agent", "agentName": "LexiNorm", "content": "NOUVEAU: Règlement modifié article 156 - délai formation comité SST réduit à 6 mois." },
+          { "sender": "user", "content": "Ça affecte notre prochaine formation?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Si vos membres sont nommés après janvier 2024, oui. Sinon, ancien délai 12 mois maintenu." }
+        ]
+      },
+      "cross_reference_CSTC_LMRSST": {
+        "title": "Référence croisée CSTC-LMRSST",
+        "description": "Articulation entre Code et Loi sécurité",
+        "conversation": [
+          { "sender": "user", "content": "Différence article 2.4.1 CSTC et article 51 LMRSST?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 51 LMRSST = principe général information. Art 2.4.1 CSTC = modalités spécifiques formation EPI. Complémentaires." }
+        ]
+      },
+      "sectoral_regulation_mining": {
+        "title": "Réglementation sectorielle mines",
+        "description": "Spécificités légales secteur minier",
+        "conversation": [
+          { "sender": "user", "content": "Mine souterraine, obligations spéciales?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Oui: Règlement mines (S-2.1, r.14), certificats compétence obligatoires, surveillance médicale renforcée." }
+        ]
+      },
+      "penalty_calculation_framework": {
+        "title": "Calcul pénalités infractions",
+        "description": "Barème amendes selon gravité infractions",
+        "conversation": [
+          { "sender": "user", "content": "Quelles amendes si pas de comité SST?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 236 LMRSST: Employeur 1400-7000$, dirigeant 350-1750$. Récidive: double. Facteurs: gravité, négligence." }
+        ]
+      },
+      "international_standards_ISO45001": {
+        "title": "Normes internationales ISO 45001",
+        "description": "Correspondance ISO 45001 et législation québécoise",
+        "conversation": [
+          { "sender": "user", "content": "ISO 45001 vs obligations LMRSST?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "ISO 45001 = standard volontaire international. LMRSST = obligation légale QC. Compatibles, ISO plus exigeant." }
+        ]
+      },
+      "discrimination_retaliation_protection": {
+        "title": "Protection discrimination représailles",
+        "description": "Droits travailleurs signalement dangers",
+        "conversation": [
+          { "sender": "user", "content": "Employé licencié après refus travail dangereux. Recours?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 30 LMRSST protège refus justifié. Recours: plainte CNESST sous 30 jours, réintégration possible." }
+        ]
+      },
+      "joint_liability_subcontractors": {
+        "title": "Responsabilité solidaire sous-traitants",
+        "description": "Obligations légales donneurs d'ordre",
+        "conversation": [
+          { "sender": "user", "content": "Responsabilité si accident chez sous-traitant?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 19.1 LMRSST: Maître d'œuvre responsable coordination SST. Peut être tenu responsable si manquement." }
+        ]
+      },
+      "workplace_investigation_rights": {
+        "title": "Droits enquête lieu travail",
+        "description": "Pouvoirs inspecteurs CNESST et obligations employeurs",
+        "conversation": [
+          { "sender": "user", "content": "Inspecteur demande documents confidentiels. Obligation?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 179 LMRSST: Inspecteur peut exiger tout document pertinent SST. Refus = infraction." }
+        ]
+      },
+      "medical_surveillance_requirements": {
+        "title": "Exigences surveillance médicale",
+        "description": "Obligations légales suivi santé travailleurs",
+        "conversation": [
+          { "sender": "user", "content": "Surveillance médicale obligatoire quand?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 112-113 LMRSST: Exposition substances réglementées, travail isolé, conditions spécifiées règlements sectoriels." }
+        ]
+      },
+      "first_aid_certification_rules": {
+        "title": "Règles certification premiers soins",
+        "description": "Obligations formation secourisme par taille établissement",
+        "conversation": [
+          { "sender": "user", "content": "15 employés, combien de secouristes?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Règlement 1-20 employés: 1 secouriste. 21-50: 2 secouristes. Formation 16h minimum, recyclage 8h/3ans." }
+        ]
+      },
+      "hazardous_products_labeling": {
+        "title": "Étiquetage produits dangereux",
+        "description": "Obligations SIMDUT classification étiquetage",
+        "conversation": [
+          { "sender": "user", "content": "Produit maison, étiquetage obligatoire?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Oui si dangereux. SIMDUT 2015: classification GHS, étiquetage bilingue, FDS à jour obligatoires." }
+        ]
+      },
+      "machine_guarding_standards": {
+        "title": "Normes protecteurs machines",
+        "description": "Exigences techniques sécurité équipements",
+        "conversation": [
+          { "sender": "user", "content": "Hauteur minimum protecteur scie?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 173 CSTC: 2,4m ou hors portée. Norme CSA Z432: protecteurs fixes privilégiés, interlockage requis." }
+        ]
+      },
+      "workplace_violence_framework": {
+        "title": "Cadre violence au travail",
+        "description": "Obligations prévention violence et harcèlement",
+        "conversation": [
+          { "sender": "user", "content": "Politique violence obligatoire?" },
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Art 51 LMRSST: Information dangers inclut violence. Loi 27: politique harcèlement obligatoire >20 employés." }
+        ]
+      }
+    }
+  },
+
+  "Prioris": {
+    "fullScenarios": {
+      "multi_site_action_plan": {
+        "title": "Plan d'action multi-sites",
+        "description": "Coordination amélioration SST plusieurs établissements",
+        "conversation": [
+          { "sender": "user", "content": "5 sites, budgets différents, priorités par urgence?" },
+          { "sender": "agent", "agentName": "Prioris", "content": "Matrice risque/coût créée. Site A: critique (EPI), Site B: modéré (formation), Sites C-D-E: préventif." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Échéancier: Mois 1-2: Site A (15k$), Mois 3-4: Site B (8k$), Mois 5-12: Sites C-D-E (20k$)." }
+        ]
+      },
+      "budget_optimization_strategy": {
+        "title": "Stratégie optimisation budget",
+        "description": "Maximisation impact SST selon ressources disponibles",
+        "conversation": [
+          { "sender": "user", "content": "Budget 50k$, maximum d'amélioration possible?" },
+          { "sender": "agent", "agentName": "Prioris", "content": "Analyse coût-bénéfice: 1) Formation (20k$, -60% accidents), 2) EPI (15k$, -40%), 3) Maintenance (15k$, -25%)." }
+        ]
+      },
+      "seasonal_planning_construction": {
+        "title": "Planification saisonnière construction",
+        "description": "Adaptation plan SST cycles saisonniers",
+        "conversation": [
+          { "sender": "user", "content": "Chantier avril-novembre, comment planifier SST?" },
+          { "sender": "agent", "agentName": "Prioris", "content": "Plan saisonnier: Avril (formation), Mai-Août (surveillance chaleur), Sept-Nov (protection chutes feuilles)." }
+        ]
+      },
+      "resource_allocation_emergency": {
+        "title": "Allocation ressources urgence",
+        "description": "Redistribution priorités suite incident grave",
+        "conversation": [
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Accident grave machine X. Révision priorités requise." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Plan révisé: Report formation B, concentration sur machines similaires. Budget urgence activé." }
+        ]
+      },
+      "compliance_gap_analysis": {
+        "title": "Analyse écarts conformité",
+        "description": "Identification priorités selon non-conformités",
+        "conversation": [
+          { "sender": "agent", "agentName": "DiagSST", "content": "15 non-conformités identifiées, budget limité." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Priorisation: 5 critiques (impact élevé), 7 importantes (délai 6 mois), 3 mineures (an prochain)." }
+        ]
+      },
+      "training_schedule_optimization": {
+        "title": "Optimisation calendrier formation",
+        "description": "Planification formations minimisant impact production",
+        "conversation": [
+          { "sender": "user", "content": "120 employés à former, production continue." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Calendrier: 3 groupes/40, rotation par quart, formations courtes répétées. Impact production: <5%." }
+        ]
+      },
+      "vendor_selection_criteria": {
+        "title": "Critères sélection fournisseurs",
+        "description": "Matrice choix consultants et équipements SST",
+        "conversation": [
+          { "sender": "user", "content": "Choix consultant formation, 4 soumissions reçues." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Évaluation: Consultant B recommandé (85/100). Critères: expertise (40%), coût (30%), disponibilité (30%)." }
+        ]
+      },
+      "change_management_protocol": {
+        "title": "Protocole gestion changement",
+        "description": "Plan transition nouvelles mesures SST",
+        "conversation": [
+          { "sender": "user", "content": "Résistance employés nouvelles procédures." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Plan changement: 1) Communication (pourquoi), 2) Formation graduelle, 3) Champions locaux, 4) Feedback continu." }
+        ]
+      },
+      "roi_calculation_investments": {
+        "title": "Calcul ROI investissements",
+        "description": "Justification financière mesures préventives",
+        "conversation": [
+          { "sender": "user", "content": "Investissement 100k$ ventilation, rentable?" },
+          { "sender": "agent", "agentName": "Prioris", "content": "ROI calculé: Économies maladies (80k$/an) + productivité (+15k$/an). Retour: 14 mois." }
+        ]
+      },
+      "milestone_tracking_system": {
+        "title": "Système suivi jalons",
+        "description": "Monitoring avancement plan d'action",
+        "conversation": [
+          { "sender": "agent", "agentName": "Prioris", "content": "Rapport étape: 3/5 jalons atteints, retard formation équipe C (COVID). Ajustement échéancier?" },
+          { "sender": "user", "content": "Oui, reporte 2 semaines." }
+        ]
+      },
+      "risk_matrix_prioritization": {
+        "title": "Priorisation matrice risques",
+        "description": "Classement actions selon probabilité/gravité",
+        "conversation": [
+          { "sender": "agent", "agentName": "DiagSST", "content": "Matrice complétée: 12 risques évalués." },
+          { "sender": "agent", "agentName": "Prioris", "content": "Priorité 1: Chute hauteur (prob: élevée, gravité: très élevée). Action immédiate requise." }
+        ]
+      },
+      "continuous_improvement_cycle": {
+        "title": "Cycle amélioration continue",
+        "description": "Planification révisions périodiques mesures",
+        "conversation": [
+          { "sender": "agent", "agentName": "Prioris", "content": "Cycle PDCA programmé: Plan (T1), Do (T2), Check (T3), Act (T4). Révision annuelle complète." }
+        ]
+      },
+      "cross_training_matrix": {
+        "title": "Matrice formation croisée",
+        "description": "Planification polyvalence équipes SST",
+        "conversation": [
+          { "sender": "user", "content": "Comment assurer continuité si RSS absent?" },
+          { "sender": "agent", "agentName": "Prioris", "content": "Matrice formation croisée: RSS adjoint formé (50% compétences), 2 superviseurs formés urgence (25%)." }
+        ]
+      },
+      "performance_indicator_dashboard": {
+        "title": "Tableau bord indicateurs",
+        "description": "Suivi KPI performance SST",
+        "conversation": [
+          { "sender": "agent", "agentName": "Prioris", "content": "Dashboard mis à jour: Fréquence accidents: -25%, Formation: 95% complétée, Budget: 78% utilisé." }
+        ]
+      }
+    }
+  },
+
+  "DocuGen": {
+    "fullScenarios": {
+      "multilingual_report_generation": {
+        "title": "Génération rapport multilingue",
+        "description": "Documents SST français/anglais selon client",
+        "conversation": [
+          { "sender": "user", "content": "Client anglophone, rapport audit en anglais?" },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Rapport généré en anglais: 'Occupational Health & Safety Audit Report'. Conformité article traduits." }
+        ]
+      },
+      "automated_cnesst_submission": {
+        "title": "Soumission automatique CNESST",
+        "description": "Transmission directe rapports obligation légale",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Rapport accident grave généré. Transmission automatique CNESST dans 24h (art. 62)?" },
+          { "sender": "user", "content": "Oui, procède." },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Transmission effectuée. Numéro confirmation: CST-2024-0456." }
+        ]
+      },
+      "custom_template_creation": {
+        "title": "Création template personnalisé",
+        "description": "Modèles documents adaptés secteur/entreprise",
+        "conversation": [
+          { "sender": "user", "content": "Template spécifique restauration?" },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Template créé: cuisine (brûlures, coupures), service (glissades), hygiène (HACCP). Logo entreprise intégré." }
+        ]
+      },
+      "real_time_collaborative_editing": {
+        "title": "Édition collaborative temps réel",
+        "description": "Plusieurs utilisateurs modifient simultanément",
+        "conversation": [
+          { "sender": "user", "content": "RSS et directeur veulent modifier rapport ensemble." },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Mode collaboration activé. Modifications en temps réel, historique versions conservé." }
+        ]
+      },
+      "audit_trail_documentation": {
+        "title": "Documentation piste audit",
+        "description": "Traçabilité complète modifications documents",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Piste audit: v1.0 (J. Tremblay, 14h30), v1.1 (M. Dubois, 15h45), v2.0 (validation finale)." }
+        ]
+      },
+      "smart_form_auto_population": {
+        "title": "Auto-complétion formulaires intelligente",
+        "description": "Remplissage automatique basé données entreprise",
+        "conversation": [
+          { "sender": "user", "content": "Formulaire CNESST à remplir." },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Formulaire pré-rempli: nom entreprise, NEQ, secteur, RSS. Reste à compléter: détails incident." }
+        ]
+      },
+      "digital_signature_integration": {
+        "title": "Intégration signature numérique",
+        "description": "Signature électronique sécurisée documents",
+        "conversation": [
+          { "sender": "user", "content": "Rapport doit être signé par 3 personnes." },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Workflow signature créé. Notifications envoyées: RSS → Directeur → Représentant employés." }
+        ]
+      },
+      "automated_backup_versioning": {
+        "title": "Sauvegarde versioning automatique",
+        "description": "Gestion versions et sauvegardes documents",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Sauvegarde automatique activée: cloud sécurisé, 3 copies, rétention 7 ans (conformité légale)." }
+        ]
+      },
+      "integration_external_systems": {
+        "title": "Intégration systèmes externes",
+        "description": "Connexion ERP, SIRH, systèmes qualité",
+        "conversation": [
+          { "sender": "user", "content": "Intégrer données SAP dans rapport?" },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Connexion SAP établie. Import automatique: effectifs, postes, heures travaillées, incidents déclarés." }
+        ]
+      },
+      "mobile_document_capture": {
+        "title": "Capture documents mobile",
+        "description": "Photos, notes terrain intégrées rapports",
+        "conversation": [
+          { "sender": "user", "content": "Photos chantier depuis téléphone?" },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Module mobile activé. Photos géolocalisées, annotations vocales, intégration automatique rapport." }
+        ]
+      },
+      "compliance_matrix_generator": {
+        "title": "Générateur matrice conformité",
+        "description": "Tableau conformité articles vs statut",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Matrice conformité générée: 23 articles vérifiés, 18 conformes, 5 non-conformes. Export Excel inclus." }
+        ]
+      },
+      "trend_analysis_reporting": {
+        "title": "Rapport analyse tendances",
+        "description": "Évolution indicateurs SST dans le temps",
+        "conversation": [
+          { "sender": "user", "content": "Évolution accidents 3 dernières années?" },
+          { "sender": "agent", "agentName": "DocuGen", "content": "Rapport tendances: -15% accidents 2022-2024. Graphiques inclus: fréquence, gravité, coûts." }
+        ]
+      },
+      "regulatory_update_tracking": {
+        "title": "Suivi mises à jour réglementaires",
+        "description": "Identification impacts changements légaux",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Nouvelle réglementation détectée. Rapport impact: 3 procédures à modifier, formation mise à jour requise." }
+        ]
+      },
+      "executive_summary_automation": {
+        "title": "Résumé exécutif automatique",
+        "description": "Synthèse automatique pour direction",
+        "conversation": [
+          { "sender": "agent", "agentName": "DocuGen", "content": "Résumé exécutif généré: 2 pages, points clés, recommandations prioritaires, budget estimé." }
+        ]
+      }
+    }
+  },
+
+  "CoSS": {
+    "fullScenarios": {
+      "virtual_meeting_facilitation": {
+        "title": "Animation réunion virtuelle",
+        "description": "Facilitation réunion comité SST à distance",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Réunion CoSS virtuelle débutée. Ordre du jour: 1) Suivi actions, 2) Nouveaux risques, 3) Formation." },
+          { "sender": "user", "content": "Point 2: nouveau produit chimique introduit." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Motion: Évaluation risque chimique avant utilisation. Vote: Pour (4), Contre (0), Abstention (1). Adoptée." }
+        ]
+      },
+      "consensus_building_process": {
+        "title": "Processus recherche consensus",
+        "description": "Médiation désaccords comité SST",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Désaccord détecté: employeur vs représentants sur budget EPI. Recherche de compromis..." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Proposition consensus: Budget initial + 20%, échelonné 6 mois. Accord obtenu." }
+        ]
+      },
+      "action_item_tracking": {
+        "title": "Suivi éléments d'action",
+        "description": "Monitoring engagement et réalisation",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Suivi actions réunion précédente: Formation EPI (complétée), Réparation ventilation (en cours), Audit externe (retardé)." },
+          { "sender": "user", "content": "Audit externe reporté pourquoi?" },
+          { "sender": "agent", "agentName": "CoSS", "content": "Consultant indisponible. Nouvelle date proposée: 15 mars. Acceptée par comité." }
+        ]
+      },
+      "regulatory_compliance_review": {
+        "title": "Révision conformité réglementaire",
+        "description": "Évaluation collective obligations légales",
+        "conversation": [
+          { "sender": "agent", "agentName": "LexiNorm", "content": "Nouvelle obligation: formation comité SST dans 6 mois." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Comité examine obligation. Décision: Formation groupée avec comité usine B. Budget approuvé." }
+        ]
+      },
+      "incident_investigation_coordination": {
+        "title": "Coordination enquête incident",
+        "description": "Organisation enquête collective accident",
+        "conversation": [
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Incident machines-outils hier. Enquête requise." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Comité d'enquête formé: RSS (chef), représentant employés, superviseur. Délai: 72h." }
+        ]
+      },
+      "policy_development_workshop": {
+        "title": "Atelier développement politique",
+        "description": "Création collaborative politiques SST",
+        "conversation": [
+          { "sender": "user", "content": "Besoin politique télétravail ergonomie." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Atelier planifié: 2h, 6 participants. Ordre: besoins, bonnes pratiques, rédaction, validation." }
+        ]
+      },
+      "budget_allocation_committee": {
+        "title": "Comité allocation budget",
+        "description": "Décisions collectives investissements SST",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Budget SST 2025: 150k$ disponible. Priorités proposées: EPI (40k$), formation (60k$), équipement (50k$)." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Vote budget: Approuvé à l'unanimité. Révision trimestrielle programmée." }
+        ]
+      },
+      "knowledge_sharing_session": {
+        "title": "Session partage connaissances",
+        "description": "Échange bonnes pratiques entre sites",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Session inter-sites: Site A partage succès réduction TMS (-40%). Techniques applicables autres sites?" },
+          { "sender": "user", "content": "Rotation postes intéressante pour nous." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Plan pilote rotation approuvé site B. Évaluation dans 3 mois." }
+        ]
+      },
+      "emergency_response_planning": {
+        "title": "Planification réponse urgence",
+        "description": "Développement procédures d'urgence",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Révision plan urgence nécessaire. Nouveaux risques: livraison gaz, construction voisine." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Plan actualisé: nouvelles voies évacuation, points rassemblement, communication externe." }
+        ]
+      },
+      "performance_metrics_review": {
+        "title": "Révision métriques performance",
+        "description": "Analyse collective indicateurs SST",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Métriques T3: Fréquence accidents: 2.1 (cible: 1.5), Formation: 88% (cible: 95%). Actions correctives?" },
+          { "sender": "agent", "agentName": "CoSS", "content": "Plan correction: sensibilisation renforcée, formation rattrapage programmée novembre." }
+        ]
+      },
+      "continuous_improvement_initiatives": {
+        "title": "Initiatives amélioration continue",
+        "description": "Projets d'amélioration portés par comité",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Projet mois: 'Zéro accident'. Objectifs: engagement 100%, suggestions employés, reconnaissance." },
+          { "sender": "user", "content": "Concours idées sécurité?" },
+          { "sender": "agent", "agentName": "CoSS", "content": "Excellent! Concours approuvé. Prix: formation, équipement personnel, reconnaissance publique." }
+        ]
+      },
+      "conflict_resolution_mediation": {
+        "title": "Médiation résolution conflits",
+        "description": "Gestion mésententes SST employeur-employés",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Tension détectée: employés refusent nouveaux EPI (inconfortables). Médiation nécessaire." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Solution négociée: test 3 marques EPI, choix collectif, période adaptation 2 semaines." }
+        ]
+      },
+      "stakeholder_communication_strategy": {
+        "title": "Stratégie communication parties prenantes",
+        "description": "Plan communication SST tous niveaux",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Plan communication 2025: Direction (trimestriel), Employés (mensuel), Syndicat (biannuel), CNESST (selon besoins)." }
+        ]
+      },
+      "training_needs_assessment": {
+        "title": "Évaluation besoins formation",
+        "description": "Analyse collective lacunes formation",
+        "conversation": [
+          { "sender": "agent", "agentName": "CoSS", "content": "Sondage formation complété. Besoins prioritaires: espaces clos (60%), produits chimiques (40%), secourisme (35%)." },
+          { "sender": "agent", "agentName": "CoSS", "content": "Calendrier formation validé: Espaces clos (janvier), Chimie (mars), Secourisme (mai)." }
+        ]
+      }
+    }
+  },
+
+  "ALSS": {
+    "fullScenarios": {
+      "small_business_personalized_guidance": {
+        "title": "Accompagnement personnalisé PME",
+        "description": "Support adapté réalité petite entreprise",
+        "conversation": [
+          { "sender": "user", "content": "Garage 6 employés, par où commencer SST?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Démarche PME: 1) Identifiez dangers (huiles, vapeurs), 2) EPI de base, 3) Formation simple, 4) Registre incidents." },
+          { "sender": "agent", "agentName": "ALSS", "content": "Outils gratuits CNESST disponibles. Accompagnement sur 3 mois. Prochaine étape?" }
+        ]
+      },
+      "cost_effective_solutions": {
+        "title": "Solutions économiques adaptées",
+        "description": "Mesures SST abordables pour petites entreprises",
+        "conversation": [
+          { "sender": "user", "content": "Budget serré, solutions prioritaires?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Solutions <1000$: 1) EPI essentiels (300$), 2) Affiches sécurité (50$), 3) Trousse premiers soins (150$), 4) Formation en ligne (200$)." }
+        ]
+      },
+      "regulatory_simplification": {
+        "title": "Simplification réglementaire",
+        "description": "Vulgarisation obligations légales pour PME",
+        "conversation": [
+          { "sender": "user", "content": "Réglementation trop complexe, aide?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Guide PME créé: 5 obligations essentielles, langage simple, exemples concrets, checklist vérification." }
+        ]
+      },
+      "family_business_dynamics": {
+        "title": "Dynamiques entreprise familiale",
+        "description": "Défis SST spécifiques entreprises familiales",
+        "conversation": [
+          { "sender": "user", "content": "Difficile imposer règles à la famille." },
+          { "sender": "agent", "agentName": "ALSS", "content": "Stratégie famille: 1) Exemplarité dirigeants, 2) Règles égales tous, 3) Communication bienveillante, 4) Responsabilisation graduelle." }
+        ]
+      },
+      "rural_business_challenges": {
+        "title": "Défis entreprises rurales",
+        "description": "Réalités spécifiques entreprises éloignées",
+        "conversation": [
+          { "sender": "user", "content": "Région éloignée, services d'urgence distants." },
+          { "sender": "agent", "agentName": "ALSS", "content": "Plan rural: 1) Secouristes avancés, 2) Équipement urgence renforcé, 3) Protocole évacuation, 4) Communication satellite." }
+        ]
+      },
+      "seasonal_worker_integration": {
+        "title": "Intégration travailleurs saisonniers",
+        "description": "Accueil sécuritaire employés temporaires",
+        "conversation": [
+          { "sender": "user", "content": "Employés saisonniers agriculture, formation rapide?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Kit saisonnier: 1) Accueil sécurité (2h), 2) Formation machines (4h), 3) Buddy system, 4) Évaluation 1 semaine." }
+        ]
+      },
+      "language_barrier_solutions": {
+        "title": "Solutions barrières linguistiques",
+        "description": "Communication SST employés non-francophones",
+        "conversation": [
+          { "sender": "user", "content": "Employés parlent peu français, sécurité?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Outils multilingues: 1) Pictogrammes universels, 2) Vidéos langues d'origine, 3) Traducteur sécurité, 4) Mentor bilingue." }
+        ]
+      },
+      "technology_adoption_barriers": {
+        "title": "Adoption technologique limitée",
+        "description": "SST pour entreprises peu technologiques",
+        "conversation": [
+          { "sender": "user", "content": "Pas d'ordinateur, comment documenter?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Solutions papier: 1) Registres imprimés, 2) Affiches visuelles, 3) Checklist plastifiées, 4) Formation présentielle." }
+        ]
+      },
+      "multi_generational_workforce": {
+        "title": "Main-d'œuvre multigénérationnelle",
+        "description": "Gestion SST équipes d'âges variés",
+        "conversation": [
+          { "sender": "user", "content": "Employés 20-65 ans, approches différentes?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Stratégie générationnelle: Jeunes (technologie, vidéos), Expérimentés (mentorat), Seniors (adaptation postes)." }
+        ]
+      },
+      "startup_culture_adaptation": {
+        "title": "Adaptation culture startup",
+        "description": "SST dans environnement innovation rapide",
+        "conversation": [
+          { "sender": "user", "content": "Startup tech, culture informelle, comment intégrer SST?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "SST startup: 1) Sécurité cool (gamification), 2) Intégration naturelle, 3) Leaders influenceurs, 4) Feedback continu." }
+        ]
+      },
+      "home_based_business_safety": {
+        "title": "Sécurité entreprise domicile",
+        "description": "SST pour activités commerciales à domicile",
+        "conversation": [
+          { "sender": "user", "content": "Atelier menuiserie sous-sol, obligations?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Domicile professionnel: 1) Séparation espaces, 2) Ventilation adéquate, 3) Extincteur, 4) Assurance adaptée." }
+        ]
+      },
+      "subcontractor_coordination": {
+        "title": "Coordination sous-traitants",
+        "description": "Gestion SST avec sous-traitants PME",
+        "conversation": [
+          { "sender": "user", "content": "Sous-traitants occasionnels, responsabilités?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Protocole sous-traitance: 1) Qualification SST vérifiée, 2) Accueil sécurité, 3) Supervision, 4) Responsabilités claires." }
+        ]
+      },
+      "mental_health_awareness": {
+        "title": "Sensibilisation santé mentale",
+        "description": "Prévention risques psychosociaux PME",
+        "conversation": [
+          { "sender": "user", "content": "Stress élevé petite équipe, que faire?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Santé mentale PME: 1) Écoute active, 2) Charge travail réaliste, 3) Pauses régulières, 4) Ressources PAE gratuites." }
+        ]
+      },
+      "succession_planning_safety": {
+        "title": "Planification succession sécuritaire",
+        "description": "Transfert connaissances SST lors transitions",
+        "conversation": [
+          { "sender": "user", "content": "Propriétaire retraite, comment transférer connaissances SST?" },
+          { "sender": "agent", "agentName": "ALSS", "content": "Plan succession SST: 1) Documentation procédures, 2) Formation successeur, 3) Période transition, 4) Support externe." }
+        ]
+      }
+    }
+  },
+
+  "Sentinelle": {
+    "fullScenarios": {
+      "chemical_spill_emergency": {
+        "title": "Urgence déversement chimique",
+        "description": "Protocole intervention déversement produits dangereux",
+        "conversation": [
+          { "sender": "user", "content": "URGENCE: Déversement acide sulfurique laboratoire!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🚨 URGENCE CHIMIQUE ACTIVÉE. 1) Évacuez zone immédiatement, 2) Appelez 911, 3) N'intervenez PAS directement." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Instructions: Ventilation OFF, portes fermées, rassemblement point A. Équipe HAZMAT en route." }
+        ]
+      },
+      "cardiac_arrest_response": {
+        "title": "Réponse arrêt cardiaque",
+        "description": "Protocole urgence médicale arrêt cardiaque",
+        "conversation": [
+          { "sender": "user", "content": "Employé effondré, ne respire plus!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🚨 ARRÊT CARDIAQUE. 1) 911 IMMÉDIATEMENT, 2) Défibrillateur bureau 12, 3) RCR si formé." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Guidage RCR: 30 compressions-2 insufflations. Rythme: 100-120/min. Continuez jusqu'ambulance." }
+        ]
+      },
+      "fire_evacuation_coordination": {
+        "title": "Coordination évacuation incendie",
+        "description": "Orchestration évacuation complète bâtiment",
+        "conversation": [
+          { "sender": "user", "content": "Feu atelier principal, fumée importante!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🔥 ÉVACUATION GÉNÉRALE. Alarme activée. Issues: Nord, Sud, Est ouvertes. Ouest FERMÉE (fumée)." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Rassemblement parking nord. Responsables étages: comptez équipes. Pompiers ETA: 6 minutes." }
+        ]
+      },
+      "confined_space_rescue": {
+        "title": "Sauvetage espace confiné",
+        "description": "Intervention urgence espace clos",
+        "conversation": [
+          { "sender": "user", "content": "Travailleur inconscient dans cuve!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🚨 URGENCE ESPACE CONFINÉ. INTERDICTION d'entrée. 911 + équipe sauvetage spécialisée." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Ventilation forcée activée. Surveillance atmosphère. Équipe rescue ETA: 12 minutes. Maintenez périmètre." }
+        ]
+      },
+      "electrical_emergency_response": {
+        "title": "Réponse urgence électrique",
+        "description": "Intervention accident électrique",
+        "conversation": [
+          { "sender": "user", "content": "Électrocution! Travailleur accroché équipement!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "⚡ URGENCE ÉLECTRIQUE. 1) N'APPROCHEZ PAS, 2) Coupure générale panneau B, 3) 911 immédiat." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Alimentation coupée confirmée. Approche sécuritaire possible. Vérifiez signes vitaux, RCR si nécessaire." }
+        ]
+      },
+      "hazmat_incident_management": {
+        "title": "Gestion incident matières dangereuses",
+        "description": "Coordination intervention HAZMAT complète",
+        "conversation": [
+          { "sender": "user", "content": "Fuite gaz toxique, plusieurs employés malaises!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🧪 INCIDENT HAZMAT MAJEUR. Évacuation rayon 200m. Vent du sud - évacuez vers nord." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Décontamination préventive activée. Équipe HAZMAT + paramédics en route. Maintenez liste exposés." }
+        ]
+      },
+      "machinery_entrapment_rescue": {
+        "title": "Sauvetage coincement machine",
+        "description": "Libération travailleur coincé équipement",
+        "conversation": [
+          { "sender": "user", "content": "Main coincée presse hydraulique!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🔧 COINCEMENT MACHINE. 1) NE FORCEZ RIEN, 2) Coupure énergies machine, 3) 911 + équipe rescue." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Cadenassage confirmé. Pompiers outillage spécialisé en route. Surveillez état victime, préparez accès." }
+        ]
+      },
+      "mass_casualty_coordination": {
+        "title": "Coordination victimes multiples",
+        "description": "Gestion incident victimes nombreuses",
+        "conversation": [
+          { "sender": "user", "content": "Explosion chantier, 8 blessés!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🆘 VICTIMES MULTIPLES. Plan catastrophe activé. Triage médical initié. Zones: Rouge, Jaune, Verte." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Commandement unifié établi. 4 ambulances, hélico médical en route. Maintenez accès voie principale." }
+        ]
+      },
+      "toxic_gas_exposure": {
+        "title": "Exposition gaz toxiques",
+        "description": "Intervention intoxication gazeuse",
+        "conversation": [
+          { "sender": "user", "content": "Détecteur CO alarme, employé étourdi!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "☠️ INTOXICATION CO. Évacuation immédiate. Air frais, position récupération. 911 + oxygène." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Ventilation forcée activée. Surveillance autres exposés. Paramédics avec oxygénothérapie arrivent." }
+        ]
+      },
+      "structural_collapse_response": {
+        "title": "Réponse effondrement structure",
+        "description": "Intervention effondrement partiel bâtiment",
+        "conversation": [
+          { "sender": "user", "content": "Effondrement plafond zone stock!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🏗️ EFFONDREMENT STRUCTURAL. Évacuation bâtiment complet. Risque cascade. Périmètre sécurité 50m." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Ingénieur structure + équipe rescue technique alertés. Comptage personnel, recherche possibles coincés." }
+        ]
+      },
+      "severe_weather_emergency": {
+        "title": "Urgence météo sévère",
+        "description": "Protocole conditions météorologiques dangereuses",
+        "conversation": [
+          { "sender": "user", "content": "Tornade aperçue, que faire?" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🌪️ ALERTE TORNADE. Mise à l'abri immédiate: sous-sol, centre bâtiment, loin fenêtres." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Position protection: accroupi, mains sur tête. Surveillance radio météo. Attendre signal fin alerte." }
+        ]
+      },
+      "radiation_exposure_incident": {
+        "title": "Incident exposition radiologique",
+        "description": "Intervention exposition radioactive",
+        "conversation": [
+          { "sender": "user", "content": "Dosimètre alarme, source radioactive exposée!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "☢️ URGENCE RADIOLOGIQUE. Évacuation rayon 100m. Décontamination vêtements, douche si contact." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Équipe radiologique provinciale alertée. Confinement source, surveillance exposition, registre exposés." }
+        ]
+      },
+      "workplace_violence_response": {
+        "title": "Réponse violence au travail",
+        "description": "Intervention situation violence active",
+        "conversation": [
+          { "sender": "user", "content": "Individu agressif avec arme bureau!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🚨 VIOLENCE ACTIVE. Code 911 immédiat. Confinement: portes verrouillées, lumières éteintes, silence." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Police en route. Options: cacher, fuir si sécuritaire, résister en dernier recours. Restez calmes." }
+        ]
+      },
+      "pandemic_emergency_protocol": {
+        "title": "Protocole urgence pandémique",
+        "description": "Activation mesures sanitaires d'urgence",
+        "conversation": [
+          { "sender": "user", "content": "Cas COVID confirmé, exposition massive!" },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "🦠 URGENCE SANITAIRE. Isolement cas contact, désinfection zones, traçage contacts immédiat." },
+          { "sender": "agent", "agentName": "Sentinelle", "content": "Santé publique alertée. Test personnel exposé, quarantaine préventive. Plan continuité activé." }
+        ]
+      }
+    }
+  }
+}
