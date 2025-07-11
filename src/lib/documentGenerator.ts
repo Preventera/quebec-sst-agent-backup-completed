@@ -17,6 +17,7 @@ export interface DocumentData {
     secteur: string;
     scianCode?: string;
     adresse?: string;
+    selectedScianActions?: string[];
   };
   diagnostic?: any;
   dateGeneration: string;

@@ -1,3 +1,6 @@
+import { ScianAction } from '@/types/prevention';
+import scianActionsData from '@/data/scianActionsData.json';
+
 export interface PreventionProgramParams {
   companyName: string;
   sector: string;
@@ -361,6 +364,65 @@ export function identifyRisksByScian(scianCode?: string, sector?: string): strin
   return [...new Set(risks)];
 }
 
+// Function to get SCIAN actions for a specific sector and company size
+export function getScianActions(sector?: string, companySize?: number): ScianAction[] {
+  const actions = scianActionsData as ScianAction[];
+  
+  return actions.filter(action => {
+    // Filter by sector
+    if (sector) {
+      const sectorMatch = action.scianCategorie.toLowerCase().includes(sector.toLowerCase()) ||
+                         sector.toLowerCase().includes(action.scianCategorie.toLowerCase());
+      if (!sectorMatch) return false;
+    }
+    
+    // Filter by company size (large companies get more comprehensive actions)
+    if (companySize && companySize >= 500) {
+      // Large companies get all applicable actions
+      return true;
+    } else if (companySize && companySize >= 100) {
+      // Medium companies get essential actions
+      return action.categorieProgramme.includes('Contrôle du risque') ||
+             action.categorieProgramme.includes('Identification des risques');
+    } else if (companySize && companySize >= 20) {
+      // Small companies get basic mandatory actions
+      return action.categorieProgramme.includes('Identification des risques');
+    }
+    
+    return true;
+  });
+}
+
+// Function to prioritize actions based on risk and company profile
+export function prioritizeScianActions(actions: ScianAction[], sector: string, companySize: number): ScianAction[] {
+  return actions.sort((a, b) => {
+    // Priority scoring (higher = more important)
+    let scoreA = 0;
+    let scoreB = 0;
+    
+    // Risk severity scoring
+    const highRiskTerms = ['écrasement', 'électrocution', 'chute', 'asphyxie'];
+    const mediumRiskTerms = ['troubles musculo-squelettiques', 'fatigue', 'bruit'];
+    
+    if (highRiskTerms.some(term => a.risque.toLowerCase().includes(term))) scoreA += 10;
+    if (mediumRiskTerms.some(term => a.risque.toLowerCase().includes(term))) scoreA += 5;
+    if (highRiskTerms.some(term => b.risque.toLowerCase().includes(term))) scoreB += 10;
+    if (mediumRiskTerms.some(term => b.risque.toLowerCase().includes(term))) scoreB += 5;
+    
+    // Company size relevance
+    if (companySize >= 500) {
+      if (a.categorieProgramme.includes('Hygiène du travail')) scoreA += 3;
+      if (b.categorieProgramme.includes('Hygiène du travail')) scoreB += 3;
+    }
+    
+    // Sector match bonus
+    if (a.scianCategorie.toLowerCase().includes(sector.toLowerCase())) scoreA += 5;
+    if (b.scianCategorie.toLowerCase().includes(sector.toLowerCase())) scoreB += 5;
+    
+    return scoreB - scoreA;
+  });
+}
+
 // Mesures de prévention enrichies par type de risque (basées sur les recommandations CNESST)
 const PREVENTION_MEASURES: Record<string, string[]> = {
   // === RISQUES DE CHUTES ET HAUTEUR === //
@@ -518,6 +580,185 @@ const PREVENTION_MEASURES: Record<string, string[]> = {
 export class PreventionProgramGenerator {
   
   static generateProgram(params: PreventionProgramParams): PreventionProgram {
+    const identifiedRisks = identifyRisksByScian(params.scianCode, params.sector);
+    const preventionMeasures = identifiedRisks.flatMap(risk => 
+      PREVENTION_MEASURES[risk] || []
+    );
+
+    // Get and prioritize SCIAN actions
+    const scianActions = getScianActions(params.sector, params.companySize);
+    const prioritizedActions = prioritizeScianActions(scianActions, params.sector, params.companySize);
+
+    const sections: PreventionProgramSection[] = [
+      {
+        title: "1. ENGAGEMENT DE LA DIRECTION",
+        content: `La direction de ${params.companyName} s'engage formellement à mettre en place et maintenir un programme de prévention efficace conformément à la LSST.
+
+**Entreprise:** ${params.companyName}
+**Secteur d'activité:** ${params.sector}
+**Nombre d'employés:** ${params.companySize}
+**Code SCIAN:** ${params.scianCode || 'À déterminer'}
+
+**Objectifs prioritaires:**
+• Éliminer à la source les dangers identifiés
+• Assurer la formation et l'information des travailleurs
+• Maintenir un environnement de travail sécuritaire
+• Respecter les exigences réglementaires applicables`
+      },
+
+      {
+        title: "2. POLITIQUE DE SANTÉ ET SÉCURITÉ",
+        content: `${params.companyName} reconnaît que la santé et la sécurité constituent une priorité absolue et une responsabilité partagée.
+
+**Nos engagements:**
+• Fournir un environnement de travail sécuritaire et sain
+• Respecter toutes les lois et règlements applicables
+• Impliquer les travailleurs dans l'identification des dangers
+• Fournir les ressources nécessaires pour la sécurité
+• Améliorer continuellement notre performance SST
+
+**Responsabilités:**
+- **Direction:** Leadership, ressources, conformité réglementaire
+- **Superviseurs:** Application des règles, formation, surveillance
+- **Travailleurs:** Respect des procédures, signalement des dangers`
+      },
+
+      {
+        title: "3. IDENTIFICATION DES RISQUES",
+        content: `Les risques suivants ont été identifiés pour le secteur ${params.sector} selon les données CNESST :
+
+${identifiedRisks.slice(0, 15).map((risk, index) => `${index + 1}. ${risk}`).join('\n')}
+
+**Méthode d'évaluation:** Analyse des postes de travail, consultation des données sectorielles CNESST, retour d'expérience des travailleurs.
+
+**Mise à jour:** Cette identification est révisée annuellement ou suite à tout changement significatif des conditions de travail.`
+      },
+
+      {
+        title: "4. MESURES DE PRÉVENTION",
+        content: `Les mesures de prévention suivantes ont été identifiées selon la hiérarchie des mesures de contrôle (art. 58 LSST) :
+
+${preventionMeasures.slice(0, 20).map((measure, index) => `${index + 1}. ${measure}`).join('\n')}
+
+Ces mesures doivent être appliquées en priorité selon leur niveau dans la hiérarchie des contrôles.`
+      },
+      
+      {
+        title: `5. ACTIONS SPÉCIALISÉES SECTEUR ${params.sector.toUpperCase()}`,
+        content: `Actions spécifiques identifiées pour le secteur d'activité (${params.companySize} employés) :
+
+${prioritizedActions.slice(0, 8).map((action, index) => 
+  `${index + 1}. **${action.actionRapide}**
+   - Risque ciblé: ${action.risque}
+   - But: ${action.but}
+   - Références: ${action.referentiels.join(', ')}
+   - Étapes: ${action.sousEtapes.join(' → ')}`
+).join('\n\n')}
+
+${params.companySize >= 500 ? 
+  `\n**Actions supplémentaires pour grande entreprise (500+ employés):**\n${prioritizedActions.slice(8, 12).map((action, index) => 
+    `${index + 9}. ${action.actionRapide} (${action.risque})`
+  ).join('\n')}` : ''}`
+      },
+
+      {
+        title: "6. FORMATION ET INFORMATION",
+        content: `Programme de formation obligatoire selon l'article 27 de la LSST :
+
+**Formation générale (tous les employés):**
+• Politique et procédures de santé et sécurité
+• Droits et obligations des travailleurs
+• Identification et signalement des dangers
+• Utilisation des équipements de protection individuelle
+• Procédures d'urgence et d'évacuation
+
+**Formation spécialisée (selon les postes):**
+• Formation spécifique aux risques du secteur ${params.sector}
+• Utilisation sécuritaire des équipements et machines
+• Manipulation des substances dangereuses (SIMDUT)
+• Travail en hauteur, espaces clos (si applicable)
+
+**Responsable de la formation:** À désigner
+**Fréquence:** Formation initiale + mise à jour annuelle`
+      },
+
+      {
+        title: params.companySize >= 20 ? "7. COMITÉ DE SANTÉ ET SÉCURITÉ" : "7. AGENT DE LIAISON SST",
+        content: params.companySize >= 20 ? 
+          `Composition du comité SST (obligatoire pour ${params.companySize} employés) :
+
+**Représentants de l'employeur:** ${Math.ceil(params.companySize / 100)}
+**Représentants des travailleurs:** ${Math.ceil(params.companySize / 100)}
+
+**Mandat du comité:**
+• Participer à l'identification et à l'analyse des risques
+• Établir et maintenir le programme de prévention
+• Participer à l'élaboration des politiques et procédures
+• Recevoir et analyser les rapports d'incidents
+• Recommander des mesures correctives
+
+**Réunions:** Minimalement 4 fois par année
+**Formation:** Formation obligatoire de 6 jours (art. 27 LSST)` :
+          `Désignation d'un agent de liaison SST (ALSS) :
+
+**Agent désigné:** [Nom à compléter]
+**Responsabilités:**
+• Recevoir les suggestions et plaintes relatives à la SST
+• Accompagner l'inspecteur lors de ses visites
+• Identifier les situations dangereuses
+• Transmettre les recommandations à l'employeur
+
+**Formation:** Formation obligatoire selon l'article 27 de la LMRSST`
+      },
+
+      {
+        title: "8. SURVEILLANCE ET ÉVALUATION",
+        content: `Mécanismes de surveillance du programme :
+
+**Inspections régulières:**
+• Inspection hebdomadaire des lieux de travail
+• Vérification mensuelle des équipements de sécurité
+• Audit annuel du programme de prévention
+
+**Indicateurs de performance:**
+• Nombre d'accidents et d'incidents
+• Taux de fréquence et de gravité
+• Pourcentage de conformité aux procédures
+• Nombre de situations dangereuses corrigées
+
+**Révision du programme:**
+• Révision annuelle obligatoire
+• Mise à jour suite à tout changement significatif
+• Intégration des leçons apprises des incidents`
+      },
+
+      {
+        title: "9. PROCÉDURES D'URGENCE",
+        content: `Procédures d'urgence établies pour ${params.companyName} :
+
+**Plan d'évacuation:**
+• Points de rassemblement identifiés
+• Responsables d'évacuation désignés
+• Exercices d'évacuation semestriels
+
+**Premiers secours:**
+• Secouristes formés disponibles sur chaque quart
+• Trousses de premiers secours accessibles
+• Numéros d'urgence affichés clairement
+
+**Situations d'urgence spécifiques:**
+• Incendie et explosion
+• Déversement de substances dangereuses
+• Accident grave ou décès
+• Conditions météorologiques extrêmes
+
+**Communications d'urgence:**
+• 911 (urgences)
+• CNESST: 1-844-838-0808
+• Info-Santé: 811`
+      }
+    ];
+
     const currentDate = new Date().toLocaleDateString('fr-CA');
     
     return {
@@ -528,16 +769,7 @@ export class PreventionProgramGenerator {
         scianCode: params.scianCode,
         size: params.companySize
       },
-      sections: [
-        this.generateIntroductionSection(params),
-        this.generatePolicySection(params),
-        this.generateRiskAnalysisSection(params),
-        this.generatePreventionMeasuresSection(params),
-        this.generateTrainingSection(params),
-        this.generateEmergencySection(params),
-        this.generateMonitoringSection(params),
-        this.generateDocumentationSection(params)
-      ],
+      sections,
       generatedDate: currentDate,
       lastUpdated: currentDate
     };

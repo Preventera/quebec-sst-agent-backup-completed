@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Download, AlertCircle, CheckCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { FileText, Download, AlertCircle, CheckCircle, Settings2, Star } from "lucide-react";
 import Header from "@/components/Header";
 import { DOCUMENT_TEMPLATES, filtrerTemplatesParTaille, genererDocument, type DocumentTemplate, type DocumentData } from "@/lib/documentGenerator";
+import { getScianActions, prioritizeScianActions } from "@/lib/preventionProgramGenerator";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DocumentGeneration() {
@@ -24,6 +26,7 @@ export default function DocumentGeneration() {
   
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const [generatedDocument, setGeneratedDocument] = useState<string>('');
+  const [selectedScianActions, setSelectedScianActions] = useState<string[]>([]);
   const { toast } = useToast();
 
   // Initialiser les données depuis les paramètres URL
@@ -54,6 +57,15 @@ export default function DocumentGeneration() {
   }, [searchParams]);
 
   const templatesDisponibles = filtrerTemplatesParTaille(entrepriseData.taille);
+  
+  // Get SCIAN actions for the current company profile
+  const availableScianActions = entrepriseData.secteur && entrepriseData.taille > 0 
+    ? prioritizeScianActions(
+        getScianActions(entrepriseData.secteur, entrepriseData.taille),
+        entrepriseData.secteur,
+        entrepriseData.taille
+      )
+    : [];
 
   const handleGenererDocument = () => {
     if (!selectedTemplate || !entrepriseData.nom || !entrepriseData.taille) {
@@ -66,16 +78,20 @@ export default function DocumentGeneration() {
     }
 
     const documentData: DocumentData = {
-      entreprise: entrepriseData,
+      entreprise: {
+        ...entrepriseData,
+        selectedScianActions: selectedScianActions
+      },
       dateGeneration: new Date().toLocaleDateString('fr-CA')
     };
 
     const document = genererDocument(selectedTemplate, documentData);
     setGeneratedDocument(document);
     
+    const actionCount = selectedScianActions.length;
     toast({
       title: "Document généré",
-      description: `${selectedTemplate.nom} généré avec succès`,
+      description: `${selectedTemplate.nom} généré avec succès${actionCount > 0 ? ` avec ${actionCount} actions SCIAN spécialisées` : ''}`,
     });
   };
 
@@ -107,7 +123,7 @@ export default function DocumentGeneration() {
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Formulaire entreprise */}
           <Card>
             <CardHeader>
@@ -143,7 +159,10 @@ export default function DocumentGeneration() {
               
               <div>
                 <Label htmlFor="secteur">Secteur d'activité</Label>
-                <Select onValueChange={(value) => setEntrepriseData({...entrepriseData, secteur: value})}>
+                <Select 
+                  value={entrepriseData.secteur}
+                  onValueChange={(value) => setEntrepriseData({...entrepriseData, secteur: value})}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez un secteur" />
                   </SelectTrigger>
@@ -151,7 +170,9 @@ export default function DocumentGeneration() {
                     <SelectItem value="construction">Construction</SelectItem>
                     <SelectItem value="manufacturier">Manufacturier</SelectItem>
                     <SelectItem value="services">Services</SelectItem>
-                    <SelectItem value="transport">Transport</SelectItem>
+                    <SelectItem value="transport">Transport et entreposage</SelectItem>
+                    <SelectItem value="santé">Santé et services sociaux</SelectItem>
+                    <SelectItem value="commerce">Commerce de détail</SelectItem>
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>
@@ -182,6 +203,69 @@ export default function DocumentGeneration() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Actions SCIAN spécialisées */}
+          {availableScianActions.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings2 className="h-5 w-5" />
+                  Actions SCIAN - {entrepriseData.secteur}
+                </CardTitle>
+                <CardDescription>
+                  Actions spécialisées pour entreprise de {entrepriseData.taille} employés
+                  {entrepriseData.taille >= 500 && (
+                    <Badge variant="secondary" className="ml-2">
+                      <Star className="h-3 w-3 mr-1" />
+                      Grande entreprise
+                    </Badge>
+                  )}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {availableScianActions.slice(0, 12).map((action) => (
+                    <div
+                      key={action.id}
+                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                        selectedScianActions.includes(action.id)
+                          ? 'border-primary bg-primary/5' 
+                          : 'border-border hover:border-primary/50'
+                      }`}
+                      onClick={() => {
+                        setSelectedScianActions(prev => 
+                          prev.includes(action.id)
+                            ? prev.filter(id => id !== action.id)
+                            : [...prev, action.id]
+                        );
+                      }}
+                    >
+                      <h4 className="font-medium text-sm mb-1">{action.actionRapide}</h4>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        <strong>Risque:</strong> {action.risque} | <strong>But:</strong> {action.but}
+                      </p>
+                      <div className="flex flex-wrap gap-1">
+                        <Badge variant="outline" className="text-xs">
+                          {action.scenarioPhase}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {action.etapeWorkflow}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {selectedScianActions.length > 0 && (
+                  <div className="mt-4 pt-3 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      {selectedScianActions.length} action(s) sélectionnée(s) pour intégration
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {/* Sélection de document */}
           <Card>
