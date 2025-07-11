@@ -143,6 +143,7 @@ const TestSuite = () => {
   const [selectedAgent, setSelectedAgent] = useState<string>("Hugo");
   const [runningTests, setRunningTests] = useState<Set<number>>(new Set());
   const [testResults, setTestResults] = useState<Map<number, 'passed' | 'failed'>>(new Map());
+  const [testProcessDetails, setTestProcessDetails] = useState<Map<number, string[]>>(new Map());
   const { toast } = useToast();
 
   const selectedAgentData = testAgents.find(agent => agent.name === selectedAgent);
@@ -150,10 +151,37 @@ const TestSuite = () => {
   const runTest = async (testId: number, testTitle: string) => {
     setRunningTests(prev => new Set([...prev, testId]));
     
-    // Simulation d'un test
-    await new Promise(resolve => setTimeout(resolve, 2000 + Math.random() * 3000));
+    // Simulation du processus détaillé
+    const processSteps: string[] = [];
+    setTestProcessDetails(prev => new Map([...prev, [testId, ["🔄 Initialisation du test..."]]]));
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    processSteps.push("✅ Connexion aux agents établie");
+    setTestProcessDetails(prev => new Map([...prev, [testId, [...processSteps]]]));
+    
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    processSteps.push("🔍 Analyse des paramètres d'entrée");
+    setTestProcessDetails(prev => new Map([...prev, [testId, [...processSteps]]]));
+    
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    processSteps.push("⚙️ Exécution de la logique métier");
+    setTestProcessDetails(prev => new Map([...prev, [testId, [...processSteps]]]));
+    
+    await new Promise(resolve => setTimeout(resolve, 800));
+    processSteps.push("📊 Génération des résultats");
+    setTestProcessDetails(prev => new Map([...prev, [testId, [...processSteps]]]));
     
     const passed = Math.random() > 0.3; // 70% de chance de réussite
+    
+    if (passed) {
+      processSteps.push("✅ Test complété avec succès");
+      processSteps.push("📋 Résultat conforme aux attentes");
+    } else {
+      processSteps.push("❌ Échec détecté dans le processus");
+      processSteps.push("🔍 Analyse des erreurs en cours...");
+    }
+    
+    setTestProcessDetails(prev => new Map([...prev, [testId, [...processSteps]]]));
     setTestResults(prev => new Map([...prev, [testId, passed ? 'passed' : 'failed']]));
     setRunningTests(prev => {
       const newSet = new Set(prev);
@@ -299,12 +327,39 @@ const TestSuite = () => {
                               <h4 className="font-medium mb-2">Résultat attendu</h4>
                               <p className="text-sm text-muted-foreground">{scenario.expectedResult}</p>
                             </div>
+                            
+                            {/* Affichage du processus en temps réel */}
+                            {(status === 'running' || testProcessDetails.has(scenario.id)) && (
+                              <div className="border rounded-lg p-4 bg-muted/30">
+                                <h4 className="font-medium mb-3 flex items-center gap-2">
+                                  {status === 'running' ? (
+                                    <Clock className="h-4 w-4 animate-spin text-warning" />
+                                  ) : (
+                                    <CheckCircle className="h-4 w-4 text-success" />
+                                  )}
+                                  Processus d'exécution
+                                </h4>
+                                <div className="space-y-2 max-h-40 overflow-y-auto">
+                                  {testProcessDetails.get(scenario.id)?.map((step, index) => (
+                                    <div key={index} className="text-sm font-mono bg-background/50 p-2 rounded border-l-2 border-primary/20">
+                                      {step}
+                                    </div>
+                                  ))}
+                                  {status === 'running' && (
+                                    <div className="text-sm font-mono bg-background/50 p-2 rounded border-l-2 border-warning/50 animate-pulse">
+                                      ⏳ En cours...
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
                             <div className="flex justify-end">
                               <Button
                                 onClick={() => runTest(scenario.id, scenario.title)}
                                 disabled={status === 'running'}
                                 size="sm"
-                                variant={status === 'passed' ? 'success' : status === 'failed' ? 'destructive' : 'default'}
+                                variant={status === 'passed' ? 'default' : status === 'failed' ? 'destructive' : 'default'}
                               >
                                 {status === 'running' ? (
                                   <>
@@ -314,12 +369,12 @@ const TestSuite = () => {
                                 ) : status === 'passed' ? (
                                   <>
                                     <CheckCircle className="h-4 w-4 mr-2" />
-                                    Réussi
+                                    Réexécuter
                                   </>
                                 ) : status === 'failed' ? (
                                   <>
                                     <XCircle className="h-4 w-4 mr-2" />
-                                    Relancer
+                                    Réessayer
                                   </>
                                 ) : (
                                   <>
