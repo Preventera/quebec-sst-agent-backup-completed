@@ -1,8 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, ArrowRight, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const DiagnosticButton = () => {
+  const navigate = useNavigate();
+
+  const handleStartDiagnostic = () => {
+    navigate('/diagnostic');
+  };
+
   return (
     <Card className="bg-gradient-to-br from-primary to-primary-glow text-primary-foreground">
       <CardHeader>
@@ -25,6 +32,7 @@ const DiagnosticButton = () => {
         <Button 
           size="lg" 
           className="w-full bg-white text-primary hover:bg-white/90 font-semibold"
+          onClick={handleStartDiagnostic}
         >
           Commencer le diagnostic
           <ArrowRight className="ml-2 h-4 w-4" />

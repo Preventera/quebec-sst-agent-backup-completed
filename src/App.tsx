@@ -9,6 +9,7 @@ import ConversationLogs from "./pages/ConversationLogs";
 import AnnotationInterface from "./pages/AnnotationInterface";
 import LearningDashboard from "./pages/LearningDashboard";
 import PromptManagement from "./pages/PromptManagement";
+import Diagnostic from "./pages/Diagnostic";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/annotation" element={<AnnotationInterface />} />
           <Route path="/learning" element={<LearningDashboard />} />
           <Route path="/prompts" element={<PromptManagement />} />
+          <Route path="/diagnostic" element={<Diagnostic />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
