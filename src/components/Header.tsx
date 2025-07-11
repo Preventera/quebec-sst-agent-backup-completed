@@ -7,13 +7,13 @@ const Header = () => {
     <header className="bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3">
             <Shield className="h-8 w-8" />
             <div>
               <h1 className="text-xl font-bold">AgenticSST Québec™</h1>
               <p className="text-sm opacity-90">Conformité LMRSST intelligente</p>
             </div>
-          </div>
+          </Link>
           
           <nav className="hidden md:flex items-center gap-6">
             <Link to="/">

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
 import { TrendingUp, Bot, CheckCircle, XCircle, Target, Award, Calendar, Users } from "lucide-react";
+import Header from "@/components/Header";
 
 interface LearningMetric {
   id: string;
@@ -149,6 +150,7 @@ const LearningDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="flex items-center justify-between mb-8">

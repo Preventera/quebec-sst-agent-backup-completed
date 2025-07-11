@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import Header from "@/components/Header";
 
 interface ConversationLog {
   id: string;
@@ -233,6 +234,7 @@ const AnnotationInterface = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header />
       <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="flex items-center justify-between mb-8">
