@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { DOCUMENT_TEMPLATES, filtrerTemplatesParTaille, genererDocument, type Do
 import { useToast } from "@/hooks/use-toast";
 
 export default function DocumentGeneration() {
+  const [searchParams] = useSearchParams();
   const [entrepriseData, setEntrepriseData] = useState({
     nom: '',
     taille: 0,
@@ -22,6 +24,31 @@ export default function DocumentGeneration() {
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const [generatedDocument, setGeneratedDocument] = useState<string>('');
   const { toast } = useToast();
+
+  // Initialiser les données depuis les paramètres URL
+  useEffect(() => {
+    const nom = searchParams.get('nom');
+    const taille = searchParams.get('taille');
+    const secteur = searchParams.get('secteur');
+    const template = searchParams.get('template');
+
+    if (nom || taille || secteur) {
+      setEntrepriseData({
+        nom: nom || '',
+        taille: taille ? parseInt(taille) : 0,
+        secteur: secteur || '',
+        adresse: ''
+      });
+    }
+
+    // Auto-sélectionner le template si spécifié
+    if (template) {
+      const foundTemplate = DOCUMENT_TEMPLATES.find(t => t.id === template);
+      if (foundTemplate) {
+        setSelectedTemplate(foundTemplate);
+      }
+    }
+  }, [searchParams]);
 
   const templatesDisponibles = filtrerTemplatesParTaille(entrepriseData.taille);
 
