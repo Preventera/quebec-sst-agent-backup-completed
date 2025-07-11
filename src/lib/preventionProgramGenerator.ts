@@ -77,6 +77,55 @@ const SECTOR_RISKS: Record<string, string[]> = {
   ]
 };
 
+// Base de données spécialisée par code SCIAN précis
+const SCIAN_SPECIFIC_RISKS: Record<string, string[]> = {
+  // Construction spécialisée
+  "2361": ["Travail en hauteur", "Charpente", "Couverture", "Échafaudages"],
+  "2362": ["Plomberie", "Soudage", "Espaces confinés", "Gaz et vapeurs"],
+  "2383": ["Électricité haute tension", "Arc électrique", "Travail sous tension"],
+  
+  // Fabrication alimentaire
+  "3111": ["Machines de boucherie", "Températures froides", "Lames et couteaux", "Sols glissants"],
+  "3112": ["Poussières de grain", "Espaces confinés", "Machinerie agricole"],
+  
+  // Fabrication métallique
+  "3321": ["Métaux en fusion", "Radiations thermiques", "Monoxyde de carbone"],
+  "3322": ["Outils de coupe", "Copeaux métalliques", "Fluides de coupe"],
+  
+  // Transport
+  "4841": ["Marchandises dangereuses", "Manutention lourde", "Conduite longue distance"],
+  "4842": ["Entrepôt frigorifique", "Chariots élévateurs", "Stockage en hauteur"],
+  
+  // Services de santé
+  "6211": ["Agents pathogènes", "Aiguilles souillées", "Radiations médicales"],
+  "6212": ["Produits pharmaceutiques", "Chimiothérapie", "Manipulation précise"],
+  
+  // Restauration
+  "7221": ["Surfaces chaudes", "Huiles de friture", "Sols glissants", "Coupures"],
+  "7222": ["Service rapide", "Stress temporel", "Brûlures", "Équipement électrique"]
+};
+
+// Fonction pour identifier les risques selon le code SCIAN
+export function identifyRisksByScian(scianCode?: string, sector?: string): string[] {
+  const risks: string[] = [];
+  
+  // 1. Risques spécifiques au code SCIAN exact
+  if (scianCode && SCIAN_SPECIFIC_RISKS[scianCode]) {
+    risks.push(...SCIAN_SPECIFIC_RISKS[scianCode]);
+  }
+  
+  // 2. Risques sectoriels généraux
+  const sectorKey = sector?.toLowerCase() || 'default';
+  if (SECTOR_RISKS[sectorKey]) {
+    risks.push(...SECTOR_RISKS[sectorKey]);
+  } else {
+    risks.push(...SECTOR_RISKS.default);
+  }
+  
+  // 3. Retourner les risques uniques
+  return [...new Set(risks)];
+}
+
 // Mesures de prévention par type de risque
 const PREVENTION_MEASURES: Record<string, string[]> = {
   "Chutes de hauteur": [
@@ -192,8 +241,9 @@ Cette politique est signée par la direction et communiquée à tous les employ�
   }
 
   private static generateRiskAnalysisSection(params: PreventionProgramParams): PreventionProgramSection {
-    const sectorRisks = SECTOR_RISKS[params.sector.toLowerCase()] || SECTOR_RISKS.default;
-    const identifiedRisks = [...new Set([...params.identifiedRisks, ...sectorRisks])];
+    // Utiliser la nouvelle fonction d'identification des risques
+    const scianRisks = identifyRisksByScian(params.scianCode, params.sector);
+    const identifiedRisks = [...new Set([...params.identifiedRisks, ...scianRisks])];
 
     return {
       title: "3. Identification et analyse des risques",
@@ -205,7 +255,9 @@ Cette politique est signée par la direction et communiquée à tous les employ�
 - Analyse des accidents et incidents
 - Évaluation des agents de risque (chimiques, physiques, biologiques, ergonomiques)
 
-**Risques identifiés dans notre secteur d'activité (${params.sector}) :**
+**Secteur d'activité :** ${params.sector}${params.scianCode ? ` (Code SCIAN: ${params.scianCode})` : ''}
+
+**Risques identifiés :**
       `,
       subsections: identifiedRisks.map(risk => ({
         title: `• ${risk}`,
