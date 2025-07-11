@@ -11,6 +11,7 @@ import LearningDashboard from "./pages/LearningDashboard";
 import PromptManagement from "./pages/PromptManagement";
 import Diagnostic from "./pages/Diagnostic";
 import DocumentGeneration from "./pages/DocumentGeneration";
+import AgentDemo from "./components/AgentDemo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/prompts" element={<PromptManagement />} />
           <Route path="/diagnostic" element={<Diagnostic />} />
           <Route path="/documents" element={<DocumentGeneration />} />
+          <Route path="/demo" element={<AgentDemo />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

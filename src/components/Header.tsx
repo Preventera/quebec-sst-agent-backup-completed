@@ -56,6 +56,12 @@ const Header = () => {
                 Documents
               </Button>
             </Link>
+            <Link to="/demo">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Démo Agents
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
               Paramètres
             </Button>
