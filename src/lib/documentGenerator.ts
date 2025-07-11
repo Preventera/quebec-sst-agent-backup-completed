@@ -1,3 +1,5 @@
+import { PreventionProgramGenerator, type PreventionProgramParams } from './preventionProgramGenerator';
+
 export interface DocumentTemplate {
   id: string;
   nom: string;
@@ -129,7 +131,24 @@ Selon l'article 123 de la LMRSST, l'employeur doit tenir un registre des inciden
 }
 
 function genererProgrammePrevention(entreprise: any, diagnostic: any, date: string): string {
-  return `# PROGRAMME DE PRÉVENTION
+  // Utiliser le générateur automatisé pour créer un programme complet
+  const params: PreventionProgramParams = {
+    companyName: entreprise.nom,
+    sector: entreprise.secteur || 'services',
+    companySize: entreprise.taille || 1,
+    mainActivities: [],
+    identifiedRisks: diagnostic?.nonConformités?.map((nc: any) => nc.message) || [],
+    existingMeasures: diagnostic?.recommandations?.map((rec: any) => rec.message) || [],
+    diagnosticResults: diagnostic
+  };
+
+  try {
+    const program = PreventionProgramGenerator.generateProgram(params);
+    return PreventionProgramGenerator.exportToMarkdown(program);
+  } catch (error) {
+    console.error('Erreur génération programme:', error);
+    // Fallback vers l'ancien format
+    return `# PROGRAMME DE PRÉVENTION
 
 **Entreprise:** ${entreprise.nom} (${entreprise.taille} employés)
 **Secteur:** ${entreprise.secteur}
@@ -162,6 +181,7 @@ ${diagnostic?.recommandations?.length > 0 ?
 
 **Validé par le Comité SST le:** _________________________
 **Signature du président du comité:** _________________________`;
+  }
 }
 
 function genererPlanAction(entreprise: any, diagnostic: any, date: string): string {
