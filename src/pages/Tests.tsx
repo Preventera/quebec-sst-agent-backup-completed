@@ -139,6 +139,32 @@ const Tests = () => {
                             <li>• Interaction avec autres agents</li>
                           </ul>
                         </div>
+
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline">LexiNorm - 10 scénarios</Badge>
+                          </div>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• Recherche articles formation comité</li>
+                            <li>• Obligations RSS par taille</li>
+                            <li>• Documentation analyses risques</li>
+                            <li>• Conditions mise en place ALSS</li>
+                            <li>• Délais légaux et sanctions</li>
+                          </ul>
+                        </div>
+
+                        <div className="border rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="outline">Prioris - 10 scénarios</Badge>
+                          </div>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• Plans pour non-conformités critiques</li>
+                            <li>• Actions coordonnées multiples</li>
+                            <li>• Adaptation sectorielle</li>
+                            <li>• Plans simplifiés PME</li>
+                            <li>• Personnalisation manuelle</li>
+                          </ul>
+                        </div>
                       </div>
                     </div>
 
@@ -166,7 +192,84 @@ const Tests = () => {
                             <li>• Tester les cas d'erreur</li>
                           </ul>
                         </div>
+
+                        <div className="border rounded-lg p-4">
+                          <h4 className="font-medium mb-2">3. Test de Performance</h4>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• Mesurer temps de réponse</li>
+                            <li>• Tester montée en charge</li>
+                            <li>• Valider la robustesse</li>
+                            <li>• Optimiser les goulots</li>
+                          </ul>
+                        </div>
+
+                        <div className="border rounded-lg p-4">
+                          <h4 className="font-medium mb-2">4. Test Utilisateur</h4>
+                          <ul className="text-sm text-muted-foreground space-y-1">
+                            <li>• Utiliser le mode démo</li>
+                            <li>• Tester scénarios réels</li>
+                            <li>• Valider l'expérience UX</li>
+                            <li>• Recueillir feedback</li>
+                          </ul>
+                        </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Matrice de couverture */}
+                  <div className="mt-8">
+                    <h3 className="text-lg font-semibold mb-4">Matrice de Couverture des Tests</h3>
+                    <div className="overflow-x-auto">
+                      <table className="w-full border-collapse border border-muted">
+                        <thead>
+                          <tr className="bg-muted/50">
+                            <th className="border border-muted p-2 text-left">Agent</th>
+                            <th className="border border-muted p-2 text-center">Scénarios</th>
+                            <th className="border border-muted p-2 text-center">Unitaires</th>
+                            <th className="border border-muted p-2 text-center">Intégration</th>
+                            <th className="border border-muted p-2 text-center">Performance</th>
+                            <th className="border border-muted p-2 text-center">Utilisateur</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { name: "Hugo", scenarios: 10 },
+                            { name: "DiagSST", scenarios: 10 },
+                            { name: "LexiNorm", scenarios: 10 },
+                            { name: "Prioris", scenarios: 10 },
+                            { name: "Sentinelle", scenarios: 10 },
+                            { name: "DocuGen", scenarios: 10 },
+                            { name: "CoSS", scenarios: 10 },
+                            { name: "ALSS", scenarios: 10 },
+                            { name: "Scénarios croisés", scenarios: 20 }
+                          ].map((agent, index) => (
+                            <tr key={index}>
+                              <td className="border border-muted p-2 font-medium">{agent.name}</td>
+                              <td className="border border-muted p-2 text-center">{agent.scenarios}</td>
+                              <td className="border border-muted p-2 text-center">✅</td>
+                              <td className="border border-muted p-2 text-center">✅</td>
+                              <td className="border border-muted p-2 text-center">⏳</td>
+                              <td className="border border-muted p-2 text-center">✅</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  {/* Légende */}
+                  <div className="flex gap-4 text-sm">
+                    <div className="flex items-center gap-1">
+                      <span>✅</span>
+                      <span>Implémenté</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>⏳</span>
+                      <span>En cours</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>❌</span>
+                      <span>Non implémenté</span>
                     </div>
                   </div>
                 </CardContent>
