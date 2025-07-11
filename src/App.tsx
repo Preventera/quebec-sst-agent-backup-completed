@@ -8,6 +8,7 @@ import Tests from "./pages/Tests";
 import ConversationLogs from "./pages/ConversationLogs";
 import AnnotationInterface from "./pages/AnnotationInterface";
 import LearningDashboard from "./pages/LearningDashboard";
+import PromptManagement from "./pages/PromptManagement";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/logs" element={<ConversationLogs />} />
           <Route path="/annotation" element={<AnnotationInterface />} />
           <Route path="/learning" element={<LearningDashboard />} />
+          <Route path="/prompts" element={<PromptManagement />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

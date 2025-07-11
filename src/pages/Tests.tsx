@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { TestTube, Bot, FileText } from "lucide-react";
 import TestSuite from "@/components/TestSuite";
 import AgentDemo from "@/components/AgentDemo";
+import AgentSimulator from "@/components/AgentSimulator";
 
 const Tests = () => {
   return (
@@ -64,7 +65,7 @@ const Tests = () => {
 
         {/* Interface principale à onglets */}
         <Tabs defaultValue="suite" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="suite" className="flex items-center gap-2">
               <TestTube className="h-4 w-4" />
               Suite de Tests
@@ -72,6 +73,10 @@ const Tests = () => {
             <TabsTrigger value="demo" className="flex items-center gap-2">
               <Bot className="h-4 w-4" />
               Mode Démo
+            </TabsTrigger>
+            <TabsTrigger value="simulator" className="flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              Simulateur
             </TabsTrigger>
             <TabsTrigger value="docs" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -85,6 +90,10 @@ const Tests = () => {
 
           <TabsContent value="demo" className="space-y-6">
             <AgentDemo />
+          </TabsContent>
+
+          <TabsContent value="simulator" className="space-y-6">
+            <AgentSimulator />
           </TabsContent>
 
           <TabsContent value="docs" className="space-y-6">
