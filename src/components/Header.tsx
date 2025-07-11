@@ -50,6 +50,12 @@ const Header = () => {
                 Prompts
               </Button>
             </Link>
+            <Link to="/documents">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <FileText className="h-4 w-4 mr-2" />
+                Documents
+              </Button>
+            </Link>
             <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
               Paramètres
             </Button>
