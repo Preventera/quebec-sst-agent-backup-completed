@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, AlertTriangle, FileText } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, FileText, Download } from "lucide-react";
 import { diagnosticLMRSST, DiagnosticParams, DiagnosticResult } from "@/lib/diagnosticLMRSST";
 
 const Diagnostic = () => {
@@ -52,6 +52,17 @@ const Diagnostic = () => {
       programmePrevention: false,
       secteur: ""
     });
+  };
+
+  const handleGenerateDocument = () => {
+    // Naviguer vers la page de génération avec les paramètres pré-remplis
+    const params = new URLSearchParams({
+      nom: `Entreprise ${results?.secteur}`,
+      taille: results?.taille.toString() || '',
+      secteur: results?.secteur.toLowerCase() || '',
+      template: 'programme-prevention'
+    });
+    navigate(`/documents?${params.toString()}`);
   };
 
   if (currentStep === 'results' && results) {
@@ -100,14 +111,24 @@ const Diagnostic = () => {
                     Non-conformités identifiées ({results.nonConformités.length})
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {results.nonConformités.map((item, index) => (
-                    <div key={index} className="p-4 border border-destructive/20 rounded-lg bg-destructive/5">
-                      <p className="font-medium text-destructive">{item.message}</p>
-                      <p className="text-sm text-muted-foreground mt-1">Référence: {item.article}</p>
-                    </div>
-                  ))}
-                </CardContent>
+                 <CardContent className="space-y-4">
+                   {results.nonConformités.map((item, index) => (
+                     <div key={index} className="p-4 border border-destructive/20 rounded-lg bg-destructive/5">
+                       <p className="font-medium text-destructive">{item.message}</p>
+                       <p className="text-sm text-muted-foreground mt-1">Référence: {item.article}</p>
+                       {item.message.includes("programme de prévention") && (
+                         <Button 
+                           size="sm" 
+                           className="mt-2"
+                           onClick={handleGenerateDocument}
+                         >
+                           <Download className="h-4 w-4 mr-2" />
+                           Générer le programme de prévention
+                         </Button>
+                       )}
+                     </div>
+                   ))}
+                 </CardContent>
               </Card>
             )}
 
