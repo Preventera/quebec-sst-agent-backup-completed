@@ -1,219 +1,193 @@
 {
   "metadata": {
-    "title": "Matrice d'analyse de risques - Construction (EPCM)",
-    "description": "Analyse détaillée des risques par étape de réalisation",
+    "title": "Matrice générique d'analyse de risques",
+    "description": "Template d'analyse des risques applicable à différents secteurs d'activité",
     "lastUpdated": "2025-07-12",
     "version": "1.0"
   },
-  "riskCategories": [
+  "workPhases": [
     {
-      "id": "RC1",
-      "name": "Véhicules en mouvement"
+      "id": "PHASE_01",
+      "name": "Préparation et installation"
     },
     {
-      "id": "RC2", 
+      "id": "PHASE_02",
+      "name": "Travaux de démantèlement"
+    },
+    {
+      "id": "PHASE_03",
+      "name": "Construction et assemblage"
+    },
+    {
+      "id": "PHASE_04",
+      "name": "Travaux d'excavation"
+    }
+  ],
+  "riskCategories": [
+    {
+      "id": "CAT_VEH",
+      "name": "Véhicules et équipements mobiles"
+    },
+    {
+      "id": "CAT_ENER", 
       "name": "Sources d'énergie"
     },
     {
-      "id": "RC3",
+      "id": "CAT_HAUT",
       "name": "Travaux en hauteur"
     },
     {
-      "id": "RC4",
-      "name": "Opérations de levage"
+      "id": "CAT_LEV",
+      "name": "Opérations de manutention et levage"
     },
     {
-      "id": "RC5",
-      "name": "Présence d'eau"
+      "id": "CAT_EAU",
+      "name": "Environnements aquatiques"
     },
     {
-      "id": "RC7",
-      "name": "Excavation et/ou sols instables"
+      "id": "CAT_SOL",
+      "name": "Sols instables et excavations"
     },
     {
-      "id": "RC8",
-      "name": "Objets instables ou en hauteur"
+      "id": "CAT_OBJ",
+      "name": "Objets en hauteur et instables"
     },
     {
-      "id": "RC9",
-      "name": "Substances dangereuses"
+      "id": "CAT_CHIM",
+      "name": "Substances et produits dangereux"
     }
   ],
   "riskAnalysis": [
     {
-      "id": "1.1",
-      "sector": "Construction (EPCM)",
-      "phase": "Mobilisation Démobilisation",
-      "dangerousSituation": "Installation de roulottes et de conteneurs: risque d'écrasement, renversement, chute",
+      "id": "RISK_001",
+      "sector": "Générique",
+      "phase": "PHASE_01",
+      "dangerousSituation": "Installation d'équipements temporaires: risque d'écrasement, renversement, chute",
       "danger": "Équipement mobile en mouvement",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement (coincement, écrasement, heurt, etc.)",
-      "criticalDanger": "RC8 – Objets instables ou en hauteur",
-      "injuryDamage": "Mortalité",
+      "risk": "Possibilité d'être dans la trajectoire d'un équipement",
+      "criticalDanger": "CAT_OBJ",
+      "injuryDamage": "Blessure grave",
       "initialRisk": {
         "probability": 4,
         "severity": 5,
         "score": 20
       },
-      "controlMeasures": "Formation (personnel qualifié), méthode de travail, information (pauses sécurité)",
-      "criticalControlMeasures": "Installer des dispositifs de sécurité de façon à empêcher la chute d'objet aux niveaux inférieurs. Délimiter une zone de sécurité aux niveaux inférieurs. Assurer la stabilité du matériel entreposé en conformité avec les recommandations du fabricant.",
-      "applicableFrameworks": ["3", "6", "7"],
+      "controlMeasures": "Formation du personnel, méthodes de travail sécuritaires, communication des risques",
+      "criticalControlMeasures": "Installer des dispositifs de sécurité pour empêcher la chute d'objets. Délimiter les zones de sécurité. Assurer la stabilité du matériel entreposé selon les recommandations du fabricant.",
+      "applicableFrameworks": ["Formation", "Procédures", "Supervision"],
       "residualRisk": {
         "reduction": 0.5,
         "score": 10
       }
     },
     {
-      "id": "1.2",
-      "sector": "Construction (EPCM)",
-      "phase": "Mobilisation Démobilisation",
-      "dangerousSituation": "Risque d'insalubrité dans les installations des travailleurs: eau potable, toilette, nourriture",
+      "id": "RISK_002",
+      "sector": "Générique",
+      "phase": "PHASE_01",
+      "dangerousSituation": "Conditions d'hygiène inadéquates dans les installations",
       "danger": "Contamination biologique",
-      "risk": "Possibilité d'être contaminé",
-      "criticalDanger": "",
-      "injuryDamage": "Intoxication",
-      "initialRisk": {
-        "probability": 1,
-        "severity": 3,
-        "score": 3
-      },
-      "controlMeasures": "PP, Information (pauses sécurité)",
-      "criticalControlMeasures": "",
-      "applicableFrameworks": [],
-      "residualRisk": {
-        "reduction": 0.25,
-        "score": 2.25
-      }
-    },
-    {
-      "id": "1.3",
-      "sector": "Construction (EPCM)",
-      "phase": "Mobilisation Démobilisation",
-      "dangerousSituation": "Risques liés aux appareils de levage: instabilité du sol, non-conformité de l'équipement, compétence de l'opérateur, gréage inadéquat, etc.",
-      "danger": "Instabilité (renversement d'équipements ou de matériaux)",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement (coincement, écrasement, heurt, etc.)",
-      "criticalDanger": "RC4 – Opérations de levage",
-      "injuryDamage": "Coincement, écrasement",
-      "initialRisk": {
-        "probability": 2,
-        "severity": 5,
-        "score": 10
-      },
-      "controlMeasures": "Délimitation , signalisation, information (pauses sécurité), attestations d'équipements, fiches techniques",
-      "criticalControlMeasures": "Remplir le formulaire HQIESP de chargement/déchargement et faire le signer par un représentant HQ avant toute opération. S'assurer que le poids de la charge à soulever est indiqué ou connu. Vérifier quotidiennement l'état des équipements et accessoires de levage. Baliser la zone de levage avant le début des opérations. Soumettre une méthode de travail et un plan de levage approuvés par un ingénieur pour un levage à risque élevé. Inspecter les grues avant chaque quart de travail et obtenir une attestation de conformité annuelle par un ingénieur. Interdiction de se situer sur ou sous une charge.",
-      "applicableFrameworks": ["20", "23"],
-      "residualRisk": {
-        "reduction": 0.25,
-        "score": 7.5
-      }
-    },
-    {
-      "id": "1.4",
-      "sector": "Construction (EPCM)",
-      "phase": "Mobilisation Démobilisation",
-      "dangerousSituation": "Risques liés à la manutention de charge",
-      "danger": "Équipement avec charge en mouvement",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement (coincement, écrasement, heurt, etc.)",
-      "criticalDanger": "RC4 – Opérations de levage",
-      "injuryDamage": "Fracture",
+      "risk": "Possibilité d'exposition à des contaminants",
+      "criticalDanger": "CAT_CHIM",
+      "injuryDamage": "Maladie professionnelle",
       "initialRisk": {
         "probability": 2,
         "severity": 3,
         "score": 6
       },
-      "controlMeasures": "Délimitation des aires de travail et de l'équipement, Information (pauses sécurité), signaleur",
-      "criticalControlMeasures": "Remplir le formulaire HQIESP de chargement/déchargement et faire le signer par un représentant HQ avant toute opération. S'assurer que le poids de la charge à soulever est indiqué ou connu. Vérifier quotidiennement l'état des équipements et accessoires de levage. Baliser la zone de levage avant le début des opérations. Soumettre une méthode de travail et un plan de levage approuvés par un ingénieur pour un levage à risque élevé. Inspecter les grues avant chaque quart de travail et obtenir une attestation de conformité annuelle par un ingénieur. Interdiction de se situer sur ou sous une charge.",
-      "applicableFrameworks": ["3", "6", "7", "18"],
+      "controlMeasures": "Équipements de protection individuelle, procédures d'hygiène",
+      "criticalControlMeasures": "Maintenir des standards d'hygiène appropriés. Fournir des installations sanitaires conformes. Former le personnel aux bonnes pratiques d'hygiène.",
+      "applicableFrameworks": ["Hygiène", "Formation"],
       "residualRisk": {
         "reduction": 0.25,
         "score": 4.5
       }
     },
     {
-      "id": "1.5",
-      "sector": "Construction (EPCM)",
-      "phase": "Mobilisation Démobilisation",
-      "dangerousSituation": "Risques liés aux déplacements du personnel ou des équipements",
-      "danger": "Équipement mobile en mouvement",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement (coincement, écrasement, heurt, etc.)",
-      "criticalDanger": "RC1 – Véhicules en mouvement",
-      "injuryDamage": "Mortalité",
+      "id": "RISK_003",
+      "sector": "Générique",
+      "phase": "PHASE_01",
+      "dangerousSituation": "Opérations de levage: instabilité, équipement défaillant, opérateur non qualifié",
+      "danger": "Instabilité d'équipements ou de matériaux",
+      "risk": "Possibilité d'être dans la trajectoire d'un équipement",
+      "criticalDanger": "CAT_LEV",
+      "injuryDamage": "Coincement, écrasement",
       "initialRisk": {
-        "probability": 4,
+        "probability": 3,
         "severity": 5,
-        "score": 20
+        "score": 15
       },
-      "controlMeasures": "Plan de circulation, procédures, formation, encadrements, délimitation, PP, information (pauses sécurité)",
-      "criticalControlMeasures": "Porter la ceinture de sécurité. Ne pas utiliser de cellulaire au volant, même en mode mains libres, sur le site des travaux. Respecter les limites de vitesse. Stationner de façon à repartir de l'avant. Communiquer le plan de circulation aux travailleurs. Délimiter et respecter les zones piétonnes. Ne jamais reculer sauf dans les zones spécifiquement identifiées ou en présence d'un signaleur formé. Fournir un certificat de conformité mécanique avant l'arrivée au chantier. Vérification des véhicules et équipements avant le début du quart de travail.",
-      "applicableFrameworks": ["18"],
+      "controlMeasures": "Délimitation, signalisation, formation, certifications d'équipements",
+      "criticalControlMeasures": "Compléter les documents de levage avant toute opération. Vérifier le poids des charges. Inspecter quotidiennement les équipements de levage. Délimiter les zones de levage. Faire approuver les plans de levage complexes par un professionnel qualifié.",
+      "applicableFrameworks": ["Certification", "Inspection"],
       "residualRisk": {
-        "reduction": 0.5,
-        "score": 10
+        "reduction": 0.3,
+        "score": 10.5
       }
     },
     {
-      "id": "2.1",
-      "sector": "Construction (EPCM)",
-      "phase": "Démolition",
-      "dangerousSituation": "Écroulement de bâtiments",
-      "danger": "Chute de matériel, d'objet",
-      "risk": "Possibilité d'effondrement, d'éboulement",
-      "criticalDanger": "",
+      "id": "RISK_004",
+      "sector": "Générique",
+      "phase": "PHASE_02",
+      "dangerousSituation": "Effondrement de structures",
+      "danger": "Chute de matériel ou d'objets",
+      "risk": "Possibilité d'effondrement ou d'éboulement",
+      "criticalDanger": "CAT_OBJ",
       "injuryDamage": "Coincement, écrasement",
       "initialRisk": {
         "probability": 2,
         "severity": 4,
         "score": 8
       },
-      "controlMeasures": "Fiches d'information (CNESST), méthodes de travail sécuritaires, information (pauses sécurité)",
-      "criticalControlMeasures": "",
-      "applicableFrameworks": ["3", "6", "7", "12"],
+      "controlMeasures": "Méthodes de travail sécuritaires, évaluation structurelle, formation",
+      "criticalControlMeasures": "Évaluer la stabilité des structures avant intervention. Mettre en place des supports temporaires si nécessaire. Délimiter les zones à risque.",
+      "applicableFrameworks": ["Évaluation", "Ingénierie", "Supervision"],
       "residualRisk": {
         "reduction": 0.5,
         "score": 4
       }
     },
     {
-      "id": "3.1",
-      "sector": "Construction (EPCM)",
-      "phase": "Construction du chemin d'accès",
-      "dangerousSituation": "Risques liés à la manutention de charge (pont temporaire)",
-      "danger": "Équipement avec charge en mouvement",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement (coincement, écrasement, heurt, etc.)",
-      "criticalDanger": "RC4 – Opérations de levage",
-      "injuryDamage": "Fracture",
+      "id": "RISK_005",
+      "sector": "Générique", 
+      "phase": "PHASE_03",
+      "dangerousSituation": "Circulation d'équipements lourds et déplacements de personnel",
+      "danger": "Équipement mobile en mouvement",
+      "risk": "Possibilité d'être heurté par un véhicule",
+      "criticalDanger": "CAT_VEH",
+      "injuryDamage": "Blessure grave",
+      "initialRisk": {
+        "probability": 3,
+        "severity": 5,
+        "score": 15
+      },
+      "controlMeasures": "Plan de circulation, formation, équipements de protection, délimitation",
+      "criticalControlMeasures": "Utiliser les équipements de sécurité des véhicules. Respecter les limites de vitesse. Mettre en place un plan de circulation. Délimiter les zones piétonnes. Utiliser des signaleurs qualifiés. Effectuer l'entretien préventif des véhicules.",
+      "applicableFrameworks": ["Circulation", "Formation"],
+      "residualRisk": {
+        "reduction": 0.4,
+        "score": 9
+      }
+    },
+    {
+      "id": "RISK_006",
+      "sector": "Générique",
+      "phase": "PHASE_04",
+      "dangerousSituation": "Travaux d'excavation: pentes instables, conditions météorologiques",
+      "danger": "Surface déformée, glissante ou instable",
+      "risk": "Possibilité d'effondrement ou d'éboulement",
+      "criticalDanger": "CAT_SOL",
+      "injuryDamage": "Ensevelissement",
       "initialRisk": {
         "probability": 3,
         "severity": 4,
         "score": 12
       },
-      "controlMeasures": "Plan de levage (si requis voir programme de prévention), supervision adéquate, formation, signalisation, EPI, information (pauses sécurité), attestation d'ingénieur, attestations d'équipements",
-      "criticalControlMeasures": "Remplir le formulaire HQIESP de chargement/déchargement et faire le signer par un représentant HQ avant toute opération. S'assurer que le poids de la charge à soulever est indiqué ou connu. Vérifier quotidiennement l'état des équipements et accessoires de levage. Baliser la zone de levage avant le début des opérations. Soumettre une méthode de travail et un plan de levage approuvés par un ingénieur pour un levage à risque élevé. Inspecter les grues avant chaque quart de travail et obtenir une attestation de conformité annuelle par un ingénieur. Interdiction de se situer sur ou sous une charge.",
-      "applicableFrameworks": ["3", "6", "7", "18"],
+      "controlMeasures": "Surveillance météorologique, arrêt des travaux si nécessaire, évaluation des sols",
+      "criticalControlMeasures": "Maintenir des pentes d'excavation sécuritaires ou utiliser un étançonnement certifié. Assurer le drainage des excavations. Respecter les distances d'entreposage et de circulation près des excavations.",
+      "applicableFrameworks": ["Géotechnique", "Surveillance"],
       "residualRisk": {
-        "reduction": 0.5,
-        "score": 6
-      }
-    },
-    {
-      "id": "4.1",
-      "sector": "Construction (EPCM)",
-      "phase": "Excavation (Drainage- clôture et grille de terre- fondation)",
-      "dangerousSituation": "Pentes d'excavation: risques liés aux conditions météorologiques (forte pluie)",
-      "danger": "Surface déformée, glissante, rugueuse, escarpée (terrain)",
-      "risk": "Possibilité d'effondrement, d'éboulement",
-      "criticalDanger": "RC7 – Excavation et/ou sols instables",
-      "injuryDamage": "Dommages matériels",
-      "initialRisk": {
-        "probability": 3,
-        "severity": 2,
-        "score": 6
-      },
-      "controlMeasures": "Contrôle administratif (arrêt des travaux en cas de pluie), information (pauses sécurité)",
-      "criticalControlMeasures": "Avoir des pentes d'excavations à 45° ou moins selon les conditions du terrain ou un étançonnement attesté par un ingénieur. Assécher les excavations en permanence. Prévoir une distance minimale de 1,2 m entre le sommet des parois et les matériaux entreposés. Prévoir une distance minimale de 3 m pour la circulation et le stationnement de véhicules. Ne jamais s'approcher d'une paroi verticale excavée dans le roc dont la surface n'est pas protégée par un treillis métallique jusqu'à 2 m au-dessus du fond de l'excavation.",
-      "applicableFrameworks": ["3", "6", "7"],
-      "residualRisk": {
-        "reduction": 0.75,
-        "score": 1.5
+        "reduction": 0.6,
+        "score": 4.8
       }
     }
   ]
