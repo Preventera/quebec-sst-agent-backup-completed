@@ -1,4 +1,4 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -48,6 +48,12 @@ const Header = () => {
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
                 <FileText className="h-4 w-4 mr-2" />
                 Prompts
+              </Button>
+            </Link>
+            <Link to="/assistant-vocal">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow">
+                <Mic className="h-4 w-4 mr-2" />
+                Assistant Vocal
               </Button>
             </Link>
             <Link to="/documents">

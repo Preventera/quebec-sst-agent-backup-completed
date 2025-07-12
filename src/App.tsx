@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import AssistantVocal from "./pages/AssistantVocal";
 import Tests from "./pages/Tests";
 import ConversationLogs from "./pages/ConversationLogs";
 import AnnotationInterface from "./pages/AnnotationInterface";
@@ -13,6 +14,7 @@ import Diagnostic from "./pages/Diagnostic";
 import DocumentGeneration from "./pages/DocumentGeneration";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
 import AgentDemo from "./components/AgentDemo";
+import VoiceWidget from "./components/VoiceWidget";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +27,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/assistant-vocal" element={<AssistantVocal />} />
           <Route path="/tests" element={<Tests />} />
           <Route path="/logs" element={<ConversationLogs />} />
           <Route path="/annotation" element={<AnnotationInterface />} />
@@ -37,6 +40,9 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        
+        {/* Widget vocal flottant global */}
+        <VoiceWidget />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
