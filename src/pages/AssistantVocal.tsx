@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Mic, MicOff, Volume2, VolumeX, Settings, History, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -29,6 +30,9 @@ const AssistantVocal = () => {
   ]);
   const [volume, setVolume] = useState(0.8);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const conversationContext = useRef<Array<{role: string, content: string}>>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -40,19 +44,127 @@ const AssistantVocal = () => {
 
   const handleStartListening = async () => {
     try {
-      setIsListening(true);
-      toast({
-        title: "Écoute en cours...",
-        description: "Parlez maintenant, je vous écoute.",
-      });
-      
-      // Simulation - remplacer par vraie capture audio
-      setTimeout(() => {
+      // Démarrer l'enregistrement audio
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = async () => {
         setIsListening(false);
         setIsProcessing(true);
-        handleStopListening();
-      }, 3000);
-    } catch (error) {
+        
+        try {
+          // Convertir l'audio en base64
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const reader = new FileReader();
+          
+          reader.onloadend = async () => {
+            const base64Audio = (reader.result as string).split(',')[1];
+            
+            // Transcription avec voice-to-text
+            const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('voice-to-text', {
+              body: { audio: base64Audio }
+            });
+            
+            if (transcriptionError) throw transcriptionError;
+            
+            const userMessage: Message = {
+              id: Date.now().toString(),
+              type: 'user',
+              content: transcriptionData.text,
+              timestamp: new Date()
+            };
+            
+            setMessages(prev => [...prev, userMessage]);
+            
+            // Ajouter au contexte de conversation
+            conversationContext.current.push({
+              role: 'user',
+              content: transcriptionData.text
+            });
+            
+            // Obtenir la réponse de l'assistant SST
+            const { data: assistantData, error: assistantError } = await supabase.functions.invoke('sst-assistant', {
+              body: { 
+                message: transcriptionData.text, 
+                context: conversationContext.current 
+              }
+            });
+            
+            if (assistantError) throw assistantError;
+            
+            const assistantMessage: Message = {
+              id: (Date.now() + 1).toString(),
+              type: 'assistant',
+              content: assistantData.response,
+              timestamp: new Date()
+            };
+            
+            setMessages(prev => [...prev, assistantMessage]);
+            
+            // Ajouter au contexte de conversation
+            conversationContext.current.push({
+              role: 'assistant',
+              content: assistantData.response
+            });
+            
+            setIsProcessing(false);
+            
+            // Lecture audio automatique de la réponse
+            try {
+              setIsSpeaking(true);
+              const { data: voiceData, error: voiceError } = await supabase.functions.invoke('text-to-voice', {
+                body: { text: assistantData.response, voice: 'alloy' }
+              });
+              
+              if (!voiceError) {
+                const audio = new Audio(`data:audio/mp3;base64,${voiceData.audioContent}`);
+                audio.volume = volume;
+                await audio.play();
+                
+                audio.onended = () => {
+                  setIsSpeaking(false);
+                };
+              } else {
+                setIsSpeaking(false);
+              }
+            } catch (voiceError) {
+              console.error('Erreur lecture audio:', voiceError);
+              setIsSpeaking(false);
+            }
+          };
+          
+          reader.readAsDataURL(audioBlob);
+        } catch (error: any) {
+          console.error('Erreur traitement audio:', error);
+          toast({
+            title: "Erreur",
+            description: error.message || "Erreur lors du traitement audio",
+            variant: "destructive",
+          });
+          setIsProcessing(false);
+        }
+        
+        // Arrêter le flux audio
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      setIsListening(true);
+      mediaRecorder.start();
+      
+      toast({
+        title: "Écoute en cours...",
+        description: "Parlez maintenant, cliquez à nouveau pour arrêter",
+      });
+
+    } catch (error: any) {
       toast({
         title: "Erreur",
         description: "Impossible d'accéder au microphone",
@@ -63,42 +175,14 @@ const AssistantVocal = () => {
   };
 
   const handleStopListening = () => {
-    setIsProcessing(true);
-    
-    // Simulation de transcription et traitement
-    setTimeout(() => {
-      const userMessage: Message = {
-        id: Date.now().toString(),
-        type: 'user',
-        content: "Quelles sont les obligations SST pour une PME de 50 employés ?",
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, userMessage]);
-      setIsProcessing(false);
-      
-      // Simulation réponse IA
-      setTimeout(() => {
-        setIsSpeaking(true);
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          type: 'assistant',
-          content: "Pour une PME de 50 employés, vous devez : 1) Désigner un responsable SST, 2) Mettre en place un comité de santé-sécurité, 3) Effectuer une évaluation des risques annuelle, 4) Organiser des formations obligatoires pour tous les employés.",
-          timestamp: new Date()
-        };
-        
-        setMessages(prev => [...prev, assistantMessage]);
-        
-        // Simulation lecture audio
-        setTimeout(() => {
-          setIsSpeaking(false);
-        }, 4000);
-      }, 1000);
-    }, 2000);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop();
+    }
   };
 
   const handleClearHistory = () => {
     setMessages([messages[0]]); // Garde le message de bienvenue
+    conversationContext.current = []; // Réinitialiser le contexte
     toast({
       title: "Historique effacé",
       description: "La conversation a été réinitialisée",
@@ -182,7 +266,7 @@ const AssistantVocal = () => {
                 <div className="flex items-center justify-center gap-4">
                   <Button
                     size="lg"
-                    onClick={isListening ? () => setIsListening(false) : handleStartListening}
+                    onClick={isListening ? handleStopListening : handleStartListening}
                     disabled={isProcessing || isSpeaking}
                     className={`h-16 w-16 rounded-full ${
                       isListening ? 'bg-red-500 hover:bg-red-600' : ''
