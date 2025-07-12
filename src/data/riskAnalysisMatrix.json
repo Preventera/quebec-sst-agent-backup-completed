@@ -1,72 +1,116 @@
 {
   "metadata": {
-    "title": "Matrice générique d'analyse de risques",
-    "description": "Template d'analyse des risques applicable à différents secteurs d'activité",
+    "title": "Template d'analyse de risques - Construction",
+    "description": "Matrice personnalisable selon le code SCIAN et les spécificités de l'entreprise",
     "lastUpdated": "2025-07-12",
-    "version": "1.0"
+    "version": "1.0",
+    "sector": "Construction de bâtiments",
+    "scianCode": "236xxx",
+    "customizable": true
   },
-  "workPhases": [
+  "defaultWorkPhases": {
+    "construction": [
+      {
+        "id": "MOBILISATION",
+        "name": "Mobilisation et préparation du chantier",
+        "description": "Installation des équipements temporaires, délimitation du site"
+      },
+      {
+        "id": "DEMOLITION", 
+        "name": "Démolition et démantèlement",
+        "description": "Travaux de démolition, enlèvement de structures existantes"
+      },
+      {
+        "id": "INFRASTRUCTURE",
+        "name": "Travaux d'infrastructure",
+        "description": "Excavation, fondations, services souterrains"
+      },
+      {
+        "id": "SUPERSTRUCTURE",
+        "name": "Construction de la superstructure", 
+        "description": "Charpente, murs, toiture"
+      },
+      {
+        "id": "FINITION",
+        "name": "Travaux de finition",
+        "description": "Revêtements, systèmes mécaniques, électriques"
+      }
+    ]
+  },
+  "cnsstDangerCategories": [
     {
-      "id": "PHASE_01",
-      "name": "Préparation et installation"
+      "id": "MECANIQUES",
+      "name": "Dangers mécaniques",
+      "description": "Pièces en mouvement, écrasement, coincement, coupure, projection"
     },
     {
-      "id": "PHASE_02",
-      "name": "Travaux de démantèlement"
+      "id": "ELECTRIQUES",
+      "name": "Dangers électriques", 
+      "description": "Contact direct/indirect, arc électrique, électrocution"
     },
     {
-      "id": "PHASE_03",
-      "name": "Construction et assemblage"
+      "id": "CHIMIQUES",
+      "name": "Dangers chimiques",
+      "description": "Substances toxiques, corrosives, inflammables, explosives"
     },
     {
-      "id": "PHASE_04",
-      "name": "Travaux d'excavation"
+      "id": "BIOLOGIQUES",
+      "name": "Dangers biologiques",
+      "description": "Micro-organismes, virus, bactéries, moisissures"
+    },
+    {
+      "id": "PHYSIQUES",
+      "name": "Dangers physiques",
+      "description": "Bruit, vibrations, températures extrêmes, radiations"
+    },
+    {
+      "id": "ERGONOMIQUES",
+      "name": "Dangers ergonomiques",
+      "description": "Manutention, postures, mouvements répétitifs"
+    },
+    {
+      "id": "CHUTES",
+      "name": "Risques de chutes",
+      "description": "Chutes de hauteur, chutes de plain-pied, dénivellations"
+    },
+    {
+      "id": "INCENDIE_EXPLOSION",
+      "name": "Incendie et explosion",
+      "description": "Combustibles, comburants, sources d'ignition"
+    },
+    {
+      "id": "PSYCHOSOCIAUX",
+      "name": "Dangers psychosociaux",
+      "description": "Stress, harcèlement, violence, charge de travail"
+    },
+    {
+      "id": "ENVIRONNEMENTAUX",
+      "name": "Dangers environnementaux",
+      "description": "Conditions météorologiques, terrain instable, espaces confinés"
     }
   ],
-  "riskCategories": [
-    {
-      "id": "CAT_VEH",
-      "name": "Véhicules et équipements mobiles"
+  "customizationOptions": {
+    "byScian": {
+      "236110": "Construction résidentielle unifamiliale",
+      "236210": "Construction résidentielle multifamiliale", 
+      "236220": "Construction d'immeubles commerciaux et institutionnels",
+      "237110": "Construction d'installations d'alimentation en eau et d'égout",
+      "237120": "Construction d'installations pétrolières et gazières",
+      "237130": "Construction de réseaux électriques et de télécommunications"
     },
+    "workPhaseCustomization": "Les phases peuvent être adaptées selon les spécificités du projet et de l'entreprise",
+    "taskCustomization": "Chaque phase peut inclure des tâches spécifiques au secteur SCIAN"
+  },
+  "riskAnalysisExamples": [
     {
-      "id": "CAT_ENER", 
-      "name": "Sources d'énergie"
-    },
-    {
-      "id": "CAT_HAUT",
-      "name": "Travaux en hauteur"
-    },
-    {
-      "id": "CAT_LEV",
-      "name": "Opérations de manutention et levage"
-    },
-    {
-      "id": "CAT_EAU",
-      "name": "Environnements aquatiques"
-    },
-    {
-      "id": "CAT_SOL",
-      "name": "Sols instables et excavations"
-    },
-    {
-      "id": "CAT_OBJ",
-      "name": "Objets en hauteur et instables"
-    },
-    {
-      "id": "CAT_CHIM",
-      "name": "Substances et produits dangereux"
-    }
-  ],
-  "riskAnalysis": [
-    {
-      "id": "RISK_001",
-      "sector": "Générique",
-      "phase": "PHASE_01",
+      "id": "CONST_001",
+      "sector": "Construction",
+      "phase": "MOBILISATION",
       "dangerousSituation": "Installation d'équipements temporaires: risque d'écrasement, renversement, chute",
       "danger": "Équipement mobile en mouvement",
       "risk": "Possibilité d'être dans la trajectoire d'un équipement",
-      "criticalDanger": "CAT_OBJ",
-      "injuryDamage": "Blessure grave",
+      "criticalDanger": "MECANIQUES",
+      "injuryDamage": "Écrasement, coincement",
       "initialRisk": {
         "probability": 4,
         "severity": 5,
@@ -81,114 +125,77 @@
       }
     },
     {
-      "id": "RISK_002",
-      "sector": "Générique",
-      "phase": "PHASE_01",
-      "dangerousSituation": "Conditions d'hygiène inadéquates dans les installations",
-      "danger": "Contamination biologique",
-      "risk": "Possibilité d'exposition à des contaminants",
-      "criticalDanger": "CAT_CHIM",
-      "injuryDamage": "Maladie professionnelle",
-      "initialRisk": {
-        "probability": 2,
-        "severity": 3,
-        "score": 6
-      },
-      "controlMeasures": "Équipements de protection individuelle, procédures d'hygiène",
-      "criticalControlMeasures": "Maintenir des standards d'hygiène appropriés. Fournir des installations sanitaires conformes. Former le personnel aux bonnes pratiques d'hygiène.",
-      "applicableFrameworks": ["Hygiène", "Formation"],
-      "residualRisk": {
-        "reduction": 0.25,
-        "score": 4.5
-      }
-    },
-    {
-      "id": "RISK_003",
-      "sector": "Générique",
-      "phase": "PHASE_01",
-      "dangerousSituation": "Opérations de levage: instabilité, équipement défaillant, opérateur non qualifié",
-      "danger": "Instabilité d'équipements ou de matériaux",
-      "risk": "Possibilité d'être dans la trajectoire d'un équipement",
-      "criticalDanger": "CAT_LEV",
-      "injuryDamage": "Coincement, écrasement",
+      "id": "CONST_002",
+      "sector": "Construction",
+      "phase": "INFRASTRUCTURE",
+      "dangerousSituation": "Travaux d'excavation: pentes instables, présence d'eau",
+      "danger": "Sol instable, effondrement",
+      "risk": "Possibilité d'ensevelissement ou de chute",
+      "criticalDanger": "ENVIRONNEMENTAUX",
+      "injuryDamage": "Ensevelissement, fractures",
       "initialRisk": {
         "probability": 3,
         "severity": 5,
         "score": 15
       },
-      "controlMeasures": "Délimitation, signalisation, formation, certifications d'équipements",
-      "criticalControlMeasures": "Compléter les documents de levage avant toute opération. Vérifier le poids des charges. Inspecter quotidiennement les équipements de levage. Délimiter les zones de levage. Faire approuver les plans de levage complexes par un professionnel qualifié.",
-      "applicableFrameworks": ["Certification", "Inspection"],
-      "residualRisk": {
-        "reduction": 0.3,
-        "score": 10.5
-      }
-    },
-    {
-      "id": "RISK_004",
-      "sector": "Générique",
-      "phase": "PHASE_02",
-      "dangerousSituation": "Effondrement de structures",
-      "danger": "Chute de matériel ou d'objets",
-      "risk": "Possibilité d'effondrement ou d'éboulement",
-      "criticalDanger": "CAT_OBJ",
-      "injuryDamage": "Coincement, écrasement",
-      "initialRisk": {
-        "probability": 2,
-        "severity": 4,
-        "score": 8
-      },
-      "controlMeasures": "Méthodes de travail sécuritaires, évaluation structurelle, formation",
-      "criticalControlMeasures": "Évaluer la stabilité des structures avant intervention. Mettre en place des supports temporaires si nécessaire. Délimiter les zones à risque.",
-      "applicableFrameworks": ["Évaluation", "Ingénierie", "Supervision"],
-      "residualRisk": {
-        "reduction": 0.5,
-        "score": 4
-      }
-    },
-    {
-      "id": "RISK_005",
-      "sector": "Générique", 
-      "phase": "PHASE_03",
-      "dangerousSituation": "Circulation d'équipements lourds et déplacements de personnel",
-      "danger": "Équipement mobile en mouvement",
-      "risk": "Possibilité d'être heurté par un véhicule",
-      "criticalDanger": "CAT_VEH",
-      "injuryDamage": "Blessure grave",
-      "initialRisk": {
-        "probability": 3,
-        "severity": 5,
-        "score": 15
-      },
-      "controlMeasures": "Plan de circulation, formation, équipements de protection, délimitation",
-      "criticalControlMeasures": "Utiliser les équipements de sécurité des véhicules. Respecter les limites de vitesse. Mettre en place un plan de circulation. Délimiter les zones piétonnes. Utiliser des signaleurs qualifiés. Effectuer l'entretien préventif des véhicules.",
-      "applicableFrameworks": ["Circulation", "Formation"],
-      "residualRisk": {
-        "reduction": 0.4,
-        "score": 9
-      }
-    },
-    {
-      "id": "RISK_006",
-      "sector": "Générique",
-      "phase": "PHASE_04",
-      "dangerousSituation": "Travaux d'excavation: pentes instables, conditions météorologiques",
-      "danger": "Surface déformée, glissante ou instable",
-      "risk": "Possibilité d'effondrement ou d'éboulement",
-      "criticalDanger": "CAT_SOL",
-      "injuryDamage": "Ensevelissement",
-      "initialRisk": {
-        "probability": 3,
-        "severity": 4,
-        "score": 12
-      },
-      "controlMeasures": "Surveillance météorologique, arrêt des travaux si nécessaire, évaluation des sols",
-      "criticalControlMeasures": "Maintenir des pentes d'excavation sécuritaires ou utiliser un étançonnement certifié. Assurer le drainage des excavations. Respecter les distances d'entreposage et de circulation près des excavations.",
-      "applicableFrameworks": ["Géotechnique", "Surveillance"],
+      "controlMeasures": "Surveillance géotechnique, étançonnement, drainage",
+      "criticalControlMeasures": "Maintenir des pentes d'excavation selon les normes. Assurer le drainage permanent. Respecter les distances de sécurité pour l'entreposage et la circulation.",
+      "applicableFrameworks": ["Géotechnique", "Surveillance", "Ingénierie"],
       "residualRisk": {
         "reduction": 0.6,
-        "score": 4.8
+        "score": 6
+      }
+    },
+    {
+      "id": "CONST_003",
+      "sector": "Construction",
+      "phase": "SUPERSTRUCTURE",
+      "dangerousSituation": "Travaux en hauteur: charpente, toiture",
+      "danger": "Chute de hauteur",
+      "risk": "Possibilité de chute lors des travaux élevés",
+      "criticalDanger": "CHUTES",
+      "injuryDamage": "Traumatismes graves, décès",
+      "initialRisk": {
+        "probability": 4,
+        "severity": 5,
+        "score": 20
+      },
+      "controlMeasures": "Systèmes antichute, plateformes de travail, formation",
+      "criticalControlMeasures": "Utiliser des dispositifs antichute homologués. Inspecter les équipements avant usage. Installer des garde-corps permanents. Former le personnel aux techniques de travail en hauteur.",
+      "applicableFrameworks": ["Protection antichute", "Formation", "Inspection"],
+      "residualRisk": {
+        "reduction": 0.7,
+        "score": 6
+      }
+    },
+    {
+      "id": "CONST_004",
+      "sector": "Construction",
+      "phase": "FINITION",
+      "dangerousSituation": "Installation électrique: contact avec conducteurs",
+      "danger": "Source d'énergie électrique",
+      "risk": "Possibilité d'électrocution ou d'électrisation",
+      "criticalDanger": "ELECTRIQUES",
+      "injuryDamage": "Électrocution, brûlures électriques",
+      "initialRisk": {
+        "probability": 3,
+        "severity": 5,
+        "score": 15
+      },
+      "controlMeasures": "Cadenassage, vérification d'absence de tension, équipements de protection",
+      "criticalControlMeasures": "Appliquer les procédures de cadenassage/étiquetage. Vérifier l'absence de tension avant intervention. Utiliser des outils isolés. Former le personnel aux risques électriques.",
+      "applicableFrameworks": ["Cadenassage", "Formation électrique", "EPI"],
+      "residualRisk": {
+        "reduction": 0.8,
+        "score": 3
       }
     }
-  ]
+  ],
+  "templateInstructions": {
+    "usage": "Ce template doit être personnalisé selon le code SCIAN de l'entreprise",
+    "phaseCustomization": "Adapter les phases de travail aux spécificités du projet",
+    "dangerAssessment": "Utiliser les catégories de dangers CNESST appropriées",
+    "riskEvaluation": "Évaluer probabilité (1-5) × gravité (1-5) = indice de risque",
+    "controlHierarchy": "Appliquer la hiérarchie des mesures de prévention"
+  }
 }
