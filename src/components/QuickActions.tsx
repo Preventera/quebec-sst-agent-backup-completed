@@ -1,8 +1,31 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, MessageSquare, Settings, Download } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const QuickActions = () => {
+  const navigate = useNavigate();
+
+  const handleAction = (index: number) => {
+    switch (index) {
+      case 0: // Générer rapport
+        navigate('/document-generation');
+        break;
+      case 1: // Consulter Conversa
+        toast.info("Fonctionnalité Conversa en cours de développement");
+        break;
+      case 2: // Configuration
+        toast.info("Page de configuration en cours de développement");
+        break;
+      case 3: // Export données
+        navigate('/conversation-logs');
+        break;
+      default:
+        break;
+    }
+  };
+
   const actions = [
     {
       icon: FileText,
@@ -42,6 +65,7 @@ const QuickActions = () => {
               key={index}
               variant="outline"
               className="h-auto p-4 flex items-start gap-3 justify-start"
+              onClick={() => handleAction(index)}
             >
               <action.icon className="h-5 w-5 text-primary mt-0.5" />
               <div className="text-left">
