@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Mic, MicOff, Volume2, VolumeX, Settings, History, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import Header from "@/components/Header";
 
 interface Message {
   id: string;
@@ -204,34 +205,37 @@ const AssistantVocal = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5">
-      {/* Header */}
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`w-3 h-3 rounded-full ${getStatusColor()}`} />
-                <h1 className="text-2xl font-bold">Assistant Vocal SST</h1>
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <div className="min-h-[calc(100vh-80px)] bg-gradient-to-br from-primary/5 to-secondary/5">
+        {/* Page Header */}
+        <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${getStatusColor()}`} />
+                  <h1 className="text-2xl font-bold">Assistant Vocal SST</h1>
+                </div>
+                <Badge variant="secondary">{getStatusText()}</Badge>
               </div>
-              <Badge variant="secondary">{getStatusText()}</Badge>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handleClearHistory}>
-                <Trash2 className="h-4 w-4 mr-2" />
-                Effacer
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Paramètres
-              </Button>
+              
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={handleClearHistory}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Effacer
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Paramètres
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[calc(100vh-200px)]">
           
           {/* Zone de conversation principale */}
@@ -335,6 +339,7 @@ const AssistantVocal = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
         </div>
       </div>
     </div>
