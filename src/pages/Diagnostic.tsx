@@ -7,13 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, AlertTriangle, FileText, Download } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, FileText, Download, Zap, Brain } from "lucide-react";
 import { diagnosticLMRSST, DiagnosticParams, DiagnosticResult } from "@/lib/diagnosticLMRSST";
+import { DetailedDiagnostic } from "@/components/DetailedDiagnostic";
 
 const Diagnostic = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<'form' | 'results'>('form');
+  const [currentStep, setCurrentStep] = useState<'menu' | 'form' | 'detailed' | 'results'>('menu');
   const [results, setResults] = useState<DiagnosticResult | null>(null);
+  const [selectedSector, setSelectedSector] = useState<string>("");
   
   const [formData, setFormData] = useState<DiagnosticParams>({
     taille: 0,
@@ -43,8 +45,9 @@ const Diagnostic = () => {
   };
 
   const resetDiagnostic = () => {
-    setCurrentStep('form');
+    setCurrentStep('menu');
     setResults(null);
+    setSelectedSector("");
     setFormData({
       taille: 0,
       registreIncidents: false,
@@ -64,6 +67,30 @@ const Diagnostic = () => {
     });
     navigate(`/documents?${params.toString()}`);
   };
+
+  const startQuickDiagnostic = () => {
+    setCurrentStep('form');
+  };
+
+  const startDetailedDiagnostic = (sector?: string) => {
+    setSelectedSector(sector || "");
+    setCurrentStep('detailed');
+  };
+
+  if (currentStep === 'detailed') {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto">
+            <DetailedDiagnostic 
+              selectedSector={selectedSector}
+              onBack={() => setCurrentStep('menu')}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (currentStep === 'results' && results) {
     return (
@@ -163,6 +190,110 @@ const Diagnostic = () => {
     );
   }
 
+  if (currentStep === 'menu') {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center gap-4 mb-6">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/')}
+                className="gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Retour à l'accueil
+              </Button>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Choisissez votre type de diagnostic</CardTitle>
+                <p className="text-muted-foreground">
+                  Sélectionnez le niveau de détail souhaité pour votre évaluation LMRSST
+                </p>
+              </CardHeader>
+            </Card>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-6 w-6 text-primary" />
+                    Diagnostic Rapide
+                  </CardTitle>
+                  <p className="text-muted-foreground">
+                    Évaluation express en 5 questions essentielles
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Badge variant="secondary">5 minutes</Badge>
+                    <Badge variant="outline">Questions essentielles</Badge>
+                  </div>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Secteur d'activité</li>
+                    <li>• Nombre d'employés</li>
+                    <li>• Formation SST</li>
+                    <li>• Registre incidents</li>
+                    <li>• Programme prévention</li>
+                  </ul>
+                  <Button onClick={startQuickDiagnostic} className="w-full">
+                    Commencer le diagnostic rapide
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-6 w-6 text-primary" />
+                    Diagnostic Détaillé
+                  </CardTitle>
+                  <p className="text-muted-foreground">
+                    Évaluation complète par secteur avec 72 questions spécialisées
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Badge variant="secondary">15-30 minutes</Badge>
+                    <Badge variant="outline">Questions sectorielles</Badge>
+                  </div>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Profil organisationnel</li>
+                    <li>• Risques professionnels</li>
+                    <li>• Documentation SST</li>
+                    <li>• Formations</li>
+                  </ul>
+                  <div className="space-y-2">
+                    <Label>Secteur (optionnel)</Label>
+                    <Select value={selectedSector} onValueChange={setSelectedSector}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Tous secteurs" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Tous secteurs</SelectItem>
+                        <SelectItem value="Manufacturier">Manufacturier</SelectItem>
+                        <SelectItem value="Construction">Construction</SelectItem>
+                        <SelectItem value="Services professionnels">Services professionnels</SelectItem>
+                        <SelectItem value="Transport">Transport</SelectItem>
+                        <SelectItem value="Soins de santé">Soins de santé</SelectItem>
+                        <SelectItem value="Commerce de détail">Commerce de détail</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={() => startDetailedDiagnostic(selectedSector)} className="w-full">
+                    Commencer le diagnostic détaillé
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
@@ -170,11 +301,11 @@ const Diagnostic = () => {
           <div className="flex items-center gap-4 mb-6">
             <Button 
               variant="outline" 
-              onClick={() => navigate('/')}
+              onClick={() => setCurrentStep('menu')}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              Retour à l'accueil
+              Retour au menu
             </Button>
           </div>
 
