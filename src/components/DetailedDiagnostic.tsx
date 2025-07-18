@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,80 +67,136 @@ export const DetailedDiagnostic = ({ selectedSector, onBack }: DetailedDiagnosti
     
     const response = responses[currentPrompt.id];
     
-    switch (currentPrompt.expected_response) {
-      case "text":
-        return typeof response === "string" && response.trim().length > 0;
-      case "boolean":
-        return typeof response === "boolean";
-      case "date":
-        return typeof response === "string" && response.length > 0;
-      case "multi_choice":
-        return typeof response === "string" && response.length > 0;
-      default:
-        return response !== undefined && response !== null && response !== "";
+    // Pour les questions qui demandent du texte libre
+    if (currentPrompt.input.toLowerCase().includes("quel") || 
+        currentPrompt.input.toLowerCase().includes("combien") ||
+        currentPrompt.input.toLowerCase().includes("dans quel")) {
+      return typeof response === "string" && response.trim().length > 0;
     }
+    
+    // Pour les questions oui/non
+    if (currentPrompt.input.toLowerCase().includes("disposez-vous") ||
+        currentPrompt.input.toLowerCase().includes("tenez-vous") ||
+        currentPrompt.input.toLowerCase().includes("avez-vous")) {
+      return response === true || response === false;
+    }
+    
+    // Pour les questions de date
+    if (currentPrompt.input.toLowerCase().includes("quand") ||
+        currentPrompt.input.toLowerCase().includes("date")) {
+      return typeof response === "string" && response.length > 0;
+    }
+    
+    // Pour les questions à choix multiples sur les risques
+    if (currentPrompt.input.toLowerCase().includes("risques") ||
+        currentPrompt.input.toLowerCase().includes("cartographie") ||
+        currentPrompt.input.toLowerCase().includes("documentez")) {
+      return typeof response === "string" && response.length > 0;
+    }
+    
+    // Validation par défaut
+    return response !== undefined && response !== null && response !== "";
   };
 
   const renderResponseInput = () => {
     if (!currentPrompt) return null;
 
-    switch (currentPrompt.expected_response) {
-      case "text":
-        return (
-          <Input
-            value={responses[currentPrompt.id] || ""}
-            onChange={(e) => handleResponse(e.target.value)}
-            placeholder="Votre réponse..."
-            className="w-full"
-          />
-        );
-      
-      case "boolean":
-        return (
+    // Questions texte libre (nombre d'employés, secteur SCIAN)
+    if (currentPrompt.input.toLowerCase().includes("nombre d'employés") ||
+        currentPrompt.input.toLowerCase().includes("secteur scian")) {
+      return (
+        <Input
+          value={responses[currentPrompt.id] || ""}
+          onChange={(e) => handleResponse(e.target.value)}
+          placeholder="Votre réponse..."
+          className="w-full"
+        />
+      );
+    }
+    
+    // Questions oui/non
+    if (currentPrompt.input.toLowerCase().includes("disposez-vous") ||
+        currentPrompt.input.toLowerCase().includes("tenez-vous") ||
+        currentPrompt.input.toLowerCase().includes("avez-vous")) {
+      return (
+        <div className="flex gap-4">
           <div className="flex items-center space-x-2">
             <Checkbox
-              checked={responses[currentPrompt.id] || false}
-              onCheckedChange={handleResponse}
+              checked={responses[currentPrompt.id] === true}
+              onCheckedChange={(checked) => handleResponse(checked ? true : undefined)}
             />
             <Label>Oui</Label>
           </div>
-        );
-      
-      case "date":
-        return (
-          <Input
-            type="date"
-            value={responses[currentPrompt.id] || ""}
-            onChange={(e) => handleResponse(e.target.value)}
-            className="w-full"
-          />
-        );
-      
-      case "multi_choice":
-        return (
-          <Select value={responses[currentPrompt.id] || ""} onValueChange={handleResponse}>
-            <SelectTrigger>
-              <SelectValue placeholder="Sélectionnez une option" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="elevé">Risque élevé</SelectItem>
-              <SelectItem value="moyen">Risque moyen</SelectItem>
-              <SelectItem value="faible">Risque faible</SelectItem>
-              <SelectItem value="inexistant">Inexistant</SelectItem>
-            </SelectContent>
-          </Select>
-        );
-      
-      default:
-        return (
-          <Input
-            value={responses[currentPrompt.id] || ""}
-            onChange={(e) => handleResponse(e.target.value)}
-            placeholder="Votre réponse..."
-            className="w-full"
-          />
-        );
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              checked={responses[currentPrompt.id] === false}
+              onCheckedChange={(checked) => handleResponse(checked ? false : undefined)}
+            />
+            <Label>Non</Label>
+          </div>
+        </div>
+      );
     }
+    
+    // Questions de date
+    if (currentPrompt.input.toLowerCase().includes("quand") ||
+        currentPrompt.input.toLowerCase().includes("date")) {
+      return (
+        <Input
+          type="date"
+          value={responses[currentPrompt.id] || ""}
+          onChange={(e) => handleResponse(e.target.value)}
+          className="w-full"
+        />
+      );
+    }
+    
+    // Questions sur les risques avec choix multiples
+    if (currentPrompt.input.toLowerCase().includes("risques sst majeurs")) {
+      return (
+        <Select value={responses[currentPrompt.id] || ""} onValueChange={handleResponse}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez le niveau de risque" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="risques_physiques">Risques physiques (chutes, coupures)</SelectItem>
+            <SelectItem value="risques_chimiques">Risques chimiques</SelectItem>
+            <SelectItem value="risques_ergonomiques">Risques ergonomiques</SelectItem>
+            <SelectItem value="risques_psychosociaux">Risques psychosociaux</SelectItem>
+            <SelectItem value="risques_biologiques">Risques biologiques</SelectItem>
+            <SelectItem value="autres">Autres risques</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    }
+    
+    // Questions sur la cartographie des risques et documentation
+    if (currentPrompt.input.toLowerCase().includes("cartographie") ||
+        currentPrompt.input.toLowerCase().includes("documentez")) {
+      return (
+        <Select value={responses[currentPrompt.id] || ""} onValueChange={handleResponse}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez une option" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="oui_complet">Oui, entièrement</SelectItem>
+            <SelectItem value="oui_partiel">Oui, partiellement</SelectItem>
+            <SelectItem value="en_cours">En cours de réalisation</SelectItem>
+            <SelectItem value="non">Non</SelectItem>
+          </SelectContent>
+        </Select>
+      );
+    }
+    
+    // Par défaut, champ texte
+    return (
+      <Input
+        value={responses[currentPrompt.id] || ""}
+        onChange={(e) => handleResponse(e.target.value)}
+        placeholder="Votre réponse..."
+        className="w-full"
+      />
+    );
   };
 
   const generateReport = () => {
