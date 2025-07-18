@@ -61,6 +61,25 @@ export const DetailedDiagnostic = ({ selectedSector, onBack }: DetailedDiagnosti
     }
   };
 
+  const isResponseValid = () => {
+    if (!currentPrompt) return false;
+    
+    const response = responses[currentPrompt.id];
+    
+    switch (currentPrompt.expected_response) {
+      case "text":
+        return typeof response === "string" && response.trim().length > 0;
+      case "boolean":
+        return typeof response === "boolean";
+      case "date":
+        return typeof response === "string" && response.length > 0;
+      case "multi_choice":
+        return typeof response === "string" && response.length > 0;
+      default:
+        return response !== undefined && response !== null && response !== "";
+    }
+  };
+
   const renderResponseInput = () => {
     if (!currentPrompt) return null;
 
@@ -227,7 +246,7 @@ export const DetailedDiagnostic = ({ selectedSector, onBack }: DetailedDiagnosti
             
             <Button 
               onClick={nextStep}
-              disabled={!responses[currentPrompt.id]}
+              disabled={!isResponseValid()}
               className="gap-2"
             >
               Suivant
