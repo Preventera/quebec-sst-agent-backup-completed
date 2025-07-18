@@ -73,7 +73,7 @@ const Diagnostic = () => {
   };
 
   const startDetailedDiagnostic = (sector?: string) => {
-    setSelectedSector(sector || "");
+    setSelectedSector(sector === "tous" ? "" : sector || "");
     setCurrentStep('detailed');
   };
 
@@ -272,7 +272,7 @@ const Diagnostic = () => {
                         <SelectValue placeholder="Tous secteurs" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Tous secteurs</SelectItem>
+                        <SelectItem value="tous">Tous secteurs</SelectItem>
                         <SelectItem value="Manufacturier">Manufacturier</SelectItem>
                         <SelectItem value="Construction">Construction</SelectItem>
                         <SelectItem value="Services professionnels">Services professionnels</SelectItem>
