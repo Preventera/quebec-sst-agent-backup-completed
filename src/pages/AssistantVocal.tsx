@@ -268,20 +268,25 @@ const AssistantVocal = () => {
               {/* Contrôles vocaux */}
               <div className="p-6">
                 <div className="flex items-center justify-center gap-4">
-                  <Button
-                    size="lg"
-                    onClick={isListening ? handleStopListening : handleStartListening}
-                    disabled={isProcessing || isSpeaking}
-                    className={`h-16 w-16 rounded-full ${
-                      isListening ? 'bg-red-500 hover:bg-red-600' : ''
-                    }`}
-                  >
-                    {isListening ? (
+                  {isListening ? (
+                    <Button
+                      size="lg"
+                      onClick={handleStopListening}
+                      disabled={isProcessing || isSpeaking}
+                      className="h-16 w-16 rounded-full bg-red-500 hover:bg-red-600 text-white animate-pulse"
+                    >
                       <MicOff className="h-8 w-8" />
-                    ) : (
+                    </Button>
+                  ) : (
+                    <Button
+                      size="lg"
+                      onClick={handleStartListening}
+                      disabled={isProcessing || isSpeaking}
+                      className="h-16 w-16 rounded-full"
+                    >
                       <Mic className="h-8 w-8" />
-                    )}
-                  </Button>
+                    </Button>
+                  )}
                   
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm">
