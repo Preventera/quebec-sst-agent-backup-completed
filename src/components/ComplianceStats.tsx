@@ -2,8 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, AlertTriangle, XCircle, Clock, TrendingUp, TrendingDown } from "lucide-react";
 import { HelpTooltip } from "./LegalTooltip";
+import { useNavigate } from "react-router-dom";
 
 const ComplianceStats = () => {
+  const navigate = useNavigate();
+
   const stats = [
     {
       title: "Conformité générale",
@@ -12,7 +15,8 @@ const ComplianceStats = () => {
       status: "warning",
       description: "Évaluation globale LMRSST",
       helpText: "Score basé sur l'analyse de vos obligations légales selon les articles 51, 90, 101 de la LMRSST",
-      statusIcon: AlertTriangle
+      statusIcon: AlertTriangle,
+      detailRoute: "general"
     },
     {
       title: "Obligations respectées",
@@ -21,7 +25,8 @@ const ComplianceStats = () => {
       status: "success",
       description: "Articles conformes",
       helpText: "Nombre d'obligations réglementaires actuellement en conformité avec la LMRSST",
-      statusIcon: CheckCircle
+      statusIcon: CheckCircle,
+      detailRoute: "obligations"
     },
     {
       title: "Actions critiques",
@@ -30,7 +35,8 @@ const ComplianceStats = () => {
       status: "destructive",
       description: "Nécessitent action immédiate",
       helpText: "Actions prioritaires pour maintenir la conformité réglementaire et éviter les sanctions",
-      statusIcon: XCircle
+      statusIcon: XCircle,
+      detailRoute: "critical"
     },
     {
       title: "Échéances à venir",
@@ -39,7 +45,8 @@ const ComplianceStats = () => {
       status: "warning",
       description: "Dans les 30 prochains jours",
       helpText: "Dates limites pour les formations, rapports et mises à jour réglementaires obligatoires",
-      statusIcon: AlertTriangle
+      statusIcon: AlertTriangle,
+      detailRoute: "deadlines"
     }
   ];
 
@@ -64,7 +71,11 @@ const ComplianceStats = () => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       {stats.map((stat, index) => (
-        <Card key={index} className="hover:shadow-md transition-all duration-200 hover:scale-[1.02]">
+        <Card 
+          key={index} 
+          className="hover:shadow-md transition-all duration-200 hover:scale-[1.02] cursor-pointer"
+          onClick={() => navigate(`/compliance-details/${stat.detailRoute}`)}
+        >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <HelpTooltip content={stat.helpText} title={stat.title}>
               <CardTitle className="text-sm font-medium text-foreground">

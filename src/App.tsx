@@ -15,6 +15,7 @@ import PromptManagement from "./pages/PromptManagement";
 import Diagnostic from "./pages/Diagnostic";
 import DocumentGeneration from "./pages/DocumentGeneration";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
+import ComplianceDetails from "./pages/ComplianceDetails";
 import AgentDemo from "./components/AgentDemo";
 import VoiceWidget from "./components/VoiceWidget";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/diagnostic" element={<Diagnostic />} />
                 <Route path="/documents" element={<DocumentGeneration />} />
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
+                <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
                 <Route path="/demo" element={<AgentDemo />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
