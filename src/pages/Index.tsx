@@ -183,13 +183,26 @@ const Index = () => {
         </Tabs>
 
         {/* Footer Info */}
-        <div className="text-center pt-6 md:pt-8 border-t mt-8">
-          <p className="text-sm text-muted-foreground">
-            AgenticSST Québec™ - Solution d'accompagnement intelligente pour la conformité LMRSST
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            Développé avec l'architecture multi-agents pour les employeurs québécois
-          </p>
+        <div className="text-center pt-6 md:pt-8 border-t mt-8 space-y-4">
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              AgenticSST Québec™ - Solution d'accompagnement intelligente pour la conformité LMRSST
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Développé avec l'architecture multi-agents pour les employeurs québécois
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
+            <Button asChild variant="outline" size="sm">
+              <a href="/presentation-script">
+                📄 Script de présentation complet
+              </a>
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              • Fonctionnalités • Agents • Cas d'usage • Bénéfices •
+            </span>
+          </div>
         </div>
       </main>
     </div>

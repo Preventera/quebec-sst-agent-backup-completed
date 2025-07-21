@@ -18,6 +18,7 @@ import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
 import ComplianceDetails from "./pages/ComplianceDetails";
 import AgentDemo from "./components/AgentDemo";
 import VoiceWidget from "./components/VoiceWidget";
+import PresentationScript from "./pages/PresentationScript";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
                 <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
                 <Route path="/demo" element={<AgentDemo />} />
+                <Route path="/presentation-script" element={<PresentationScript />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
