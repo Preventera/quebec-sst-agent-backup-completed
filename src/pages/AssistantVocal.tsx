@@ -267,25 +267,35 @@ const AssistantVocal = () => {
 
               {/* Contrôles vocaux */}
               <div className="p-6">
-                <div className="flex items-center justify-center gap-4">
+                <div className="flex flex-col items-center justify-center gap-4">
                   {isListening ? (
-                    <Button
-                      size="lg"
-                      onClick={handleStopListening}
-                      disabled={isProcessing || isSpeaking}
-                      className="h-16 w-16 rounded-full bg-red-500 hover:bg-red-600 text-white animate-pulse"
-                    >
-                      <MicOff className="h-8 w-8" />
-                    </Button>
+                    <div className="flex flex-col items-center gap-2">
+                      <Button
+                        size="lg"
+                        onClick={handleStopListening}
+                        disabled={isProcessing || isSpeaking}
+                        className="h-20 w-20 rounded-full bg-red-500 hover:bg-red-600 text-white animate-pulse border-4 border-red-300"
+                      >
+                        <MicOff className="h-10 w-10" />
+                      </Button>
+                      <p className="text-sm font-semibold text-red-600 animate-pulse">
+                        CLIQUEZ POUR ARRÊTER
+                      </p>
+                    </div>
                   ) : (
-                    <Button
-                      size="lg"
-                      onClick={handleStartListening}
-                      disabled={isProcessing || isSpeaking}
-                      className="h-16 w-16 rounded-full"
-                    >
-                      <Mic className="h-8 w-8" />
-                    </Button>
+                    <div className="flex flex-col items-center gap-2">
+                      <Button
+                        size="lg"
+                        onClick={handleStartListening}
+                        disabled={isProcessing || isSpeaking}
+                        className="h-20 w-20 rounded-full bg-primary hover:bg-primary/90"
+                      >
+                        <Mic className="h-10 w-10" />
+                      </Button>
+                      <p className="text-sm text-muted-foreground">
+                        Cliquez pour commencer
+                      </p>
+                    </div>
                   )}
                   
                   <div className="flex items-center gap-2">
