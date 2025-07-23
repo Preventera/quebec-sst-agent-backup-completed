@@ -19,6 +19,7 @@ import ComplianceDetails from "./pages/ComplianceDetails";
 import AgentDemo from "./components/AgentDemo";
 import VoiceWidget from "./components/VoiceWidget";
 import PresentationScript from "./pages/PresentationScript";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -46,6 +47,7 @@ const App = () => (
                 <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
                 <Route path="/demo" element={<AgentDemo />} />
                 <Route path="/presentation-script" element={<PresentationScript />} />
+                <Route path="/faq" element={<FAQ />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
