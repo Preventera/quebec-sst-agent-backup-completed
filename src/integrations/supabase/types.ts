@@ -112,6 +112,136 @@ export type Database = {
           },
         ]
       }
+      sst_content_changes: {
+        Row: {
+          change_type: string
+          content_id: string
+          detected_at: string
+          id: string
+          new_content: string | null
+          notified: boolean
+          previous_content: string | null
+          summary: string | null
+        }
+        Insert: {
+          change_type: string
+          content_id: string
+          detected_at?: string
+          id?: string
+          new_content?: string | null
+          notified?: boolean
+          previous_content?: string | null
+          summary?: string | null
+        }
+        Update: {
+          change_type?: string
+          content_id?: string
+          detected_at?: string
+          id?: string
+          new_content?: string | null
+          notified?: boolean
+          previous_content?: string | null
+          summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_content_changes_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "sst_crawled_content"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_crawled_content: {
+        Row: {
+          article_number: string | null
+          content: string
+          content_hash: string
+          crawled_at: string
+          created_at: string
+          id: string
+          last_updated_at: string
+          section: string | null
+          source_id: string
+          tags: string[] | null
+          title: string
+          url: string
+        }
+        Insert: {
+          article_number?: string | null
+          content: string
+          content_hash: string
+          crawled_at?: string
+          created_at?: string
+          id?: string
+          last_updated_at?: string
+          section?: string | null
+          source_id: string
+          tags?: string[] | null
+          title: string
+          url: string
+        }
+        Update: {
+          article_number?: string | null
+          content?: string
+          content_hash?: string
+          crawled_at?: string
+          created_at?: string
+          id?: string
+          last_updated_at?: string
+          section?: string | null
+          source_id?: string
+          tags?: string[] | null
+          title?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sst_crawled_content_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sst_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sst_sources: {
+        Row: {
+          crawl_frequency: number
+          created_at: string
+          id: string
+          is_active: boolean
+          last_crawled_at: string | null
+          name: string
+          source_type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          crawl_frequency?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_crawled_at?: string | null
+          name: string
+          source_type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          crawl_frequency?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          last_crawled_at?: string | null
+          name?: string
+          source_type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

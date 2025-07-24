@@ -1,4 +1,4 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
@@ -95,6 +95,12 @@ const Header = () => {
                 Prompts
               </Button>
             </Link>
+            <Link to="/crawling-dashboard">
+              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
+                <Globe className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
+                Crawling
+              </Button>
+            </Link>
             <Link to="/faq">
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
                 <HelpCircle className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
@@ -164,6 +170,12 @@ const Header = () => {
                 <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                   <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
                   Prompts
+                </Button>
+              </Link>
+              <Link to="/crawling-dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
+                  <Globe className="h-4 w-4 mr-2" aria-hidden="true" />
+                  Crawling
                 </Button>
               </Link>
               <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)}>

@@ -20,6 +20,7 @@ import AgentDemo from "./components/AgentDemo";
 import VoiceWidget from "./components/VoiceWidget";
 import PresentationScript from "./pages/PresentationScript";
 import FAQ from "./pages/FAQ";
+import CrawlingDashboard from "./pages/CrawlingDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -48,6 +49,7 @@ const App = () => (
                 <Route path="/demo" element={<AgentDemo />} />
                 <Route path="/presentation-script" element={<PresentationScript />} />
                 <Route path="/faq" element={<FAQ />} />
+                <Route path="/crawling-dashboard" element={<CrawlingDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
