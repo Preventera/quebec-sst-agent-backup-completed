@@ -14,9 +14,9 @@ export const useConversationLogger = () => {
 
   const logConversation = useCallback(async (data: ConversationData) => {
     try {
-      // Pour l'instant, utiliser un user_id fictif
-      // Dans un vrai système, cela viendrait de l'authentification
-      const userId = crypto.randomUUID();
+      // Get current user or generate a proper UUID for anonymous users
+      const { data: { user } } = await supabase.auth.getUser();
+      const userId = user?.id || crypto.randomUUID();
 
       const { error } = await supabase
         .from("conversation_logs")

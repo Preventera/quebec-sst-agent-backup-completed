@@ -21,6 +21,7 @@ import VoiceWidget from "./components/VoiceWidget";
 import PresentationScript from "./pages/PresentationScript";
 import FAQ from "./pages/FAQ";
 import CrawlingDashboard from "./pages/CrawlingDashboard";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/presentation-script" element={<PresentationScript />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/crawling-dashboard" element={<CrawlingDashboard />} />
+                <Route path="/auth" element={<Auth />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

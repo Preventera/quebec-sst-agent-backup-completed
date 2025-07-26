@@ -18,9 +18,12 @@ export const useActionLogger = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Generate a proper UUID for anonymous users instead of using string "anonymous"
+      const anonymousId = crypto.randomUUID();
+      
       const logEntry = {
         ...actionLog,
-        user_id: user?.id || 'anonymous',
+        user_id: user?.id || anonymousId,
         timestamp: new Date().toISOString(),
       };
 

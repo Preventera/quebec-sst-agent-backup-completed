@@ -186,11 +186,19 @@ const SSTKnowledgeBase = () => {
     return Math.min(score, 100);
   };
 
-  const highlightText = (text: string, query: string): string => {
+  const highlightText = (text: string, query: string) => {
     if (!query.trim()) return text;
     
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<mark class="bg-primary/20 text-primary font-medium">$1</mark>');
+    // Safe text highlighting using React components instead of dangerouslySetInnerHTML
+    const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+    
+    return parts.map((part, index) => 
+      part.toLowerCase() === query.toLowerCase() ? (
+        <mark key={index} className="bg-primary/20 text-primary font-medium">
+          {part}
+        </mark>
+      ) : part
+    );
   };
 
   const handleSourceToggle = (source: string) => {
@@ -403,24 +411,16 @@ const SSTKnowledgeBase = () => {
                       </div>
                       
                       <h3 className="text-lg font-semibold mb-2">
-                        <span 
-                          dangerouslySetInnerHTML={{ 
-                            __html: highlightText(result.title, searchQuery) 
-                          }} 
-                        />
+                        {highlightText(result.title, searchQuery)}
                       </h3>
                       
                       <div className="text-muted-foreground mb-4">
-                        <span 
-                          dangerouslySetInnerHTML={{ 
-                            __html: highlightText(
-                              result.content.length > 300 
-                                ? result.content.substring(0, 300) + "..." 
-                                : result.content, 
-                              searchQuery
-                            ) 
-                          }} 
-                        />
+                        {highlightText(
+                          result.content.length > 300 
+                            ? result.content.substring(0, 300) + "..." 
+                            : result.content, 
+                          searchQuery
+                        )}
                       </div>
                       
                       {result.keywords && result.keywords.length > 0 && (

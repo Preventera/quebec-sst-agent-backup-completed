@@ -1,10 +1,12 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, signOut, isAuthenticated } = useAuth();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -37,6 +39,32 @@ const Header = () => {
           
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2 lg:gap-3">
+            {/* Auth Section */}
+            <div className="flex items-center gap-2 border-l border-primary-glow/20 pl-3 ml-3">
+              {isAuthenticated ? (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-primary-foreground/80">
+                    {user?.email}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={signOut}
+                    className="text-primary-foreground hover:bg-primary-glow text-xs"
+                  >
+                    <LogOut className="h-3 w-3 mr-1" />
+                    Déconnexion
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs">
+                    <User className="h-3 w-3 mr-1" />
+                    Connexion
+                  </Button>
+                </Link>
+              )}
+            </div>
             <Link to="/">
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
                 Accueil
@@ -184,6 +212,32 @@ const Header = () => {
                   FAQ
                 </Button>
               </Link>
+              
+              {/* Auth Section Mobile */}
+              <div className="col-span-2 border-t border-primary-glow/20 pt-2 mt-2">
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    <div className="text-xs text-primary-foreground/80 px-3">
+                      Connecté: {user?.email}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      onClick={signOut}
+                      className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Déconnexion
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
+                      <User className="h-4 w-4 mr-2" />
+                      Connexion
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           </nav>
         )}
