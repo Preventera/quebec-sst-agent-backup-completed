@@ -14,13 +14,13 @@ const Header = () => {
 
   return (
     <header className="bg-primary text-primary-foreground shadow-lg">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 md:gap-3">
+          <Link to="/" className="flex items-center gap-2 md:gap-3 flex-shrink-0">
             <Shield className="h-6 w-6 md:h-8 md:w-8" aria-hidden="true" />
             <div>
-              <h1 className="text-lg md:text-xl font-bold">AgenticSST Québec™</h1>
-              <p className="text-xs md:text-sm opacity-90 hidden sm:block">Conformité LMRSST intelligente</p>
+              <h1 className="text-base md:text-xl font-bold">AgenticSST Québec™</h1>
+              <p className="text-xs opacity-90 hidden lg:block">Conformité LMRSST intelligente</p>
             </div>
           </Link>
           
@@ -28,7 +28,7 @@ const Header = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="md:hidden text-primary-foreground hover:bg-primary-glow"
+            className="md:hidden text-primary-foreground hover:bg-primary-glow flex-shrink-0"
             onClick={toggleMobileMenu}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-navigation"
@@ -38,103 +38,105 @@ const Header = () => {
           </Button>
           
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2 lg:gap-3">
-            {/* Auth Section */}
-            <div className="flex items-center gap-2 border-l border-primary-glow/20 pl-3 ml-3">
-              {isAuthenticated ? (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-primary-foreground/80">
-                    {user?.email}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={signOut}
-                    className="text-primary-foreground hover:bg-primary-glow text-xs"
-                  >
-                    <LogOut className="h-3 w-3 mr-1" />
-                    Déconnexion
-                  </Button>
-                </div>
-              ) : (
-                <Link to="/auth">
-                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs">
-                    <User className="h-3 w-3 mr-1" />
-                    Connexion
-                  </Button>
-                </Link>
-              )}
+          <nav className="hidden md:flex items-center gap-1 overflow-x-auto flex-shrink min-w-0">
+            <div className="flex items-center gap-1 min-w-max">
+              <Link to="/">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  Accueil
+                </Button>
+              </Link>
+              <Link to="/assistant-vocal">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <Mic className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Assistant
+                </Button>
+              </Link>
+              <Link to="/diagnostic">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <Brain className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Diagnostic
+                </Button>
+              </Link>
+              <Link to="/documents">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <FileText className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Documents
+                </Button>
+              </Link>
+              <Link to="/sst-knowledge">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <BookOpen className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Base SST
+                </Button>
+              </Link>
+              <Link to="/tests">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  Tests
+                </Button>
+              </Link>
+              <Link to="/learning">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Dashboard
+                </Button>
+              </Link>
+              <Link to="/logs">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <MessageSquare className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Logs
+                </Button>
+              </Link>
+              <Link to="/annotation">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <CheckCircle className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Annotation
+                </Button>
+              </Link>
+              <Link to="/prompts">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <Settings className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Prompts
+                </Button>
+              </Link>
+              <Link to="/crawling-dashboard">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <Globe className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Crawling
+                </Button>
+              </Link>
+              <Link to="/faq">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <HelpCircle className="h-3 w-3 mr-1" aria-hidden="true" />
+                  FAQ
+                </Button>
+              </Link>
+              
+              {/* Auth Section */}
+              <div className="flex items-center gap-1 border-l border-primary-glow/20 pl-2 ml-2">
+                {isAuthenticated ? (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs text-primary-foreground/80 max-w-24 truncate">
+                      {user?.email}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={signOut}
+                      className="text-primary-foreground hover:bg-primary-glow text-xs px-2"
+                    >
+                      <LogOut className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Link to="/auth">
+                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                      <User className="h-3 w-3 mr-1" />
+                      Connexion
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
-            <Link to="/">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                Accueil
-              </Button>
-            </Link>
-            <Link to="/assistant-vocal">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <Mic className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Assistant Vocal
-              </Button>
-            </Link>
-            <Link to="/diagnostic">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <Brain className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Diagnostic
-              </Button>
-            </Link>
-            <Link to="/documents">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <FileText className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Documents
-              </Button>
-            </Link>
-            <Link to="/sst-knowledge">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <BookOpen className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Base SST
-              </Button>
-            </Link>
-            <Link to="/tests">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                Tests & Démo
-              </Button>
-            </Link>
-            <Link to="/learning">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Dashboard
-              </Button>
-            </Link>
-            <Link to="/logs">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <MessageSquare className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Logs
-              </Button>
-            </Link>
-            <Link to="/annotation">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <CheckCircle className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Annotation
-              </Button>
-            </Link>
-            <Link to="/prompts">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <Settings className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Prompts
-              </Button>
-            </Link>
-            <Link to="/crawling-dashboard">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <Globe className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                Crawling
-              </Button>
-            </Link>
-            <Link to="/faq">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs lg:text-sm">
-                <HelpCircle className="h-3 w-3 lg:h-4 lg:w-4 mr-1 lg:mr-2" aria-hidden="true" />
-                FAQ
-              </Button>
-            </Link>
           </nav>
         </div>
         
