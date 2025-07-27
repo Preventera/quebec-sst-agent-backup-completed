@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle } from "lucide-react";
+import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
+import orchestrationPrompts from "@/data/orchestrationPrompts.json";
 
 interface AgentFeedback {
   agent_name: string;
@@ -36,6 +38,19 @@ interface AgentPrompt {
   performance_score: number;
 }
 
+interface OrchestrationPrompt {
+  id: number;
+  title: string;
+  description: string;
+  agents: string[];
+  article_lmrsst: string;
+  category: string;
+  priority: string;
+  scope: string;
+  orchestration_prompt: string;
+  expected_deliverables: string[];
+}
+
 const PromptManagement = () => {
   const { toast } = useToast();
   const [selectedAgent, setSelectedAgent] = useState("Hugo");
@@ -44,6 +59,9 @@ const PromptManagement = () => {
   const [currentPrompt, setCurrentPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedPriority, setSelectedPriority] = useState("all");
 
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
 
@@ -209,6 +227,20 @@ Cite toujours les articles exacts et reste factuel.`
     });
   };
 
+  // Filtrage des prompts d'orchestration
+  const filteredOrchestrationPrompts = orchestrationPrompts.filter((prompt: OrchestrationPrompt) => {
+    const matchesSearch = prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         prompt.agents.some(agent => agent.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory;
+    const matchesPriority = selectedPriority === "all" || prompt.priority === selectedPriority;
+    
+    return matchesSearch && matchesCategory && matchesPriority;
+  });
+
+  const categories = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.category))];
+  const priorities = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.priority))];
+
   const currentAgentPrompt = agentPrompts[selectedAgent];
 
   return (
@@ -219,185 +251,318 @@ Cite toujours les articles exacts et reste factuel.`
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <FileText className="h-8 w-8 text-primary" />
-              Gestion des Prompts d'Agents
+              <Settings className="h-8 w-8 text-primary" />
+              Gestion des Prompts d'Orchestration
             </h1>
             <p className="text-muted-foreground mt-2">
-              Amélioration continue des prompts basée sur les feedbacks utilisateur
+              Prompts d'agents individuels et orchestration intelligente LMRSST
             </p>
           </div>
         </div>
 
-        {/* Sélection d'agent */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Bot className="h-5 w-5 text-primary" />
-                <span className="font-medium">Agent sélectionné :</span>
-              </div>
-              <Select value={selectedAgent} onValueChange={setSelectedAgent}>
-                <SelectTrigger className="w-48">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {agents.map((agent) => (
-                    <SelectItem key={agent} value={agent}>{agent}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => fetchAgentFeedback(selectedAgent)}
-                disabled={loading}
-              >
-                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                Actualiser
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Navigation par onglets */}
+        <Tabs defaultValue="orchestration" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
+            <TabsTrigger value="orchestration" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Orchestration LMRSST
+            </TabsTrigger>
+            <TabsTrigger value="agents" className="flex items-center gap-2">
+              <Bot className="h-4 w-4" />
+              Prompts Agents
+            </TabsTrigger>
+          </TabsList>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Performance actuelle */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Performance Actuelle
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {agentFeedback ? (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Précision</span>
-                      <span className="font-medium">{agentFeedback.accuracy_percentage}%</span>
-                    </div>
-                    <Progress value={agentFeedback.accuracy_percentage} />
+          {/* Onglet Orchestration LMRSST */}
+          <TabsContent value="orchestration" className="space-y-6">
+            {/* Filtres de recherche */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Rechercher un prompt..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
                   </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div className="bg-muted/30 p-3 rounded">
-                      <div className="font-medium text-lg">{agentFeedback.total_conversations}</div>
-                      <div className="text-muted-foreground">Conversations</div>
-                    </div>
-                    <div className="bg-muted/30 p-3 rounded">
-                      <div className="font-medium text-lg">{agentFeedback.total_annotations}</div>
-                      <div className="text-muted-foreground">Annotations</div>
-                    </div>
-                  </div>
-
-                  {agentFeedback.improvement_suggestions.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-medium text-sm">Suggestions d'amélioration :</h4>
-                      {agentFeedback.improvement_suggestions.map((suggestion, index) => (
-                        <div key={index} className="flex items-start gap-2 text-xs">
-                          <AlertTriangle className="h-3 w-3 text-orange-500 mt-0.5 flex-shrink-0" />
-                          <span>{suggestion}</span>
-                        </div>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Catégorie" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes catégories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedPriority} onValueChange={setSelectedPriority}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Priorité" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes priorités</SelectItem>
+                      {priorities.map((priority) => (
+                        <SelectItem key={priority} value={priority}>
+                          {priority === "critical" ? "Critique" : 
+                           priority === "high" ? "Élevée" : 
+                           priority === "medium" ? "Moyenne" : "Faible"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="text-sm text-muted-foreground flex items-center">
+                    {filteredOrchestrationPrompts.length} prompt{filteredOrchestrationPrompts.length > 1 ? 's' : ''} trouvé{filteredOrchestrationPrompts.length > 1 ? 's' : ''}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Grille des prompts d'orchestration */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredOrchestrationPrompts.map((prompt: OrchestrationPrompt) => (
+                <Card key={prompt.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-2">
+                        <CardTitle className="text-lg">{prompt.title}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={
+                            prompt.priority === "critical" ? "destructive" :
+                            prompt.priority === "high" ? "default" :
+                            prompt.priority === "medium" ? "secondary" : "outline"
+                          }>
+                            {prompt.priority === "critical" ? "Critique" : 
+                             prompt.priority === "high" ? "Élevée" : 
+                             prompt.priority === "medium" ? "Moyenne" : "Faible"}
+                          </Badge>
+                          <Badge variant="outline">{prompt.category}</Badge>
+                        </div>
+                      </div>
+                      <Zap className="h-5 w-5 text-primary flex-shrink-0" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground">{prompt.description}</p>
+                    
+                    <div className="space-y-2">
+                      <div className="text-sm">
+                        <strong>Agents impliqués:</strong>
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {prompt.agents.map((agent, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              {agent}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <strong>Article LMRSST:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs">{prompt.article_lmrsst}</code>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <strong>Livrables attendus:</strong>
+                        <ul className="list-disc list-inside mt-1 text-xs text-muted-foreground">
+                          {prompt.expected_deliverables.map((deliverable, index) => (
+                            <li key={index}>{deliverable}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-muted/30 p-3 rounded text-xs font-mono">
+                      {prompt.orchestration_prompt}
+                    </div>
+                    
+                    <Button className="w-full" size="sm">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Exécuter l'orchestration
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Onglet Prompts Agents */}
+          <TabsContent value="agents" className="space-y-6">
+
+            {/* Sélection d'agent */}
+            <Card className="mb-6">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5 text-primary" />
+                    <span className="font-medium">Agent sélectionné :</span>
+                  </div>
+                  <Select value={selectedAgent} onValueChange={setSelectedAgent}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {agents.map((agent) => (
+                        <SelectItem key={agent} value={agent}>{agent}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => fetchAgentFeedback(selectedAgent)}
+                    disabled={loading}
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                    Actualiser
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Performance actuelle */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Performance Actuelle
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {agentFeedback ? (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Précision</span>
+                          <span className="font-medium">{agentFeedback.accuracy_percentage}%</span>
+                        </div>
+                        <Progress value={agentFeedback.accuracy_percentage} />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="bg-muted/30 p-3 rounded">
+                          <div className="font-medium text-lg">{agentFeedback.total_conversations}</div>
+                          <div className="text-muted-foreground">Conversations</div>
+                        </div>
+                        <div className="bg-muted/30 p-3 rounded">
+                          <div className="font-medium text-lg">{agentFeedback.total_annotations}</div>
+                          <div className="text-muted-foreground">Annotations</div>
+                        </div>
+                      </div>
+
+                      {agentFeedback.improvement_suggestions.length > 0 && (
+                        <div className="space-y-2">
+                          <h4 className="font-medium text-sm">Suggestions d'amélioration :</h4>
+                          {agentFeedback.improvement_suggestions.map((suggestion, index) => (
+                            <div key={index} className="flex items-start gap-2 text-xs">
+                              <AlertTriangle className="h-3 w-3 text-orange-500 mt-0.5 flex-shrink-0" />
+                              <span>{suggestion}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
+                      <p className="text-sm text-muted-foreground">Chargement des métriques...</p>
                     </div>
                   )}
-                </>
-              ) : (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto mb-2"></div>
-                  <p className="text-sm text-muted-foreground">Chargement des métriques...</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Feedback récent */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" />
-                Feedback Récent
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {agentFeedback?.recent_feedback.map((feedback, index) => (
-                  <div key={index} className="border rounded p-3 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant={feedback.is_compliant ? "default" : "destructive"}>
-                        {feedback.is_compliant ? "Conforme" : "Non conforme"}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      <strong>Question :</strong> {feedback.user_message.substring(0, 100)}...
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      <strong>Réponse :</strong> {feedback.agent_response.substring(0, 100)}...
-                    </p>
-                    {feedback.annotation_notes && (
-                      <p className="text-xs bg-muted/30 p-2 rounded">
-                        <strong>Notes :</strong> {feedback.annotation_notes}
+              {/* Feedback récent */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5" />
+                    Feedback Récent
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {agentFeedback?.recent_feedback.map((feedback, index) => (
+                      <div key={index} className="border rounded p-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={feedback.is_compliant ? "default" : "destructive"}>
+                            {feedback.is_compliant ? "Conforme" : "Non conforme"}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          <strong>Question :</strong> {feedback.user_message.substring(0, 100)}...
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          <strong>Réponse :</strong> {feedback.agent_response.substring(0, 100)}...
+                        </p>
+                        {feedback.annotation_notes && (
+                          <p className="text-xs bg-muted/30 p-2 rounded">
+                            <strong>Notes :</strong> {feedback.annotation_notes}
+                          </p>
+                        )}
+                      </div>
+                    )) || (
+                      <p className="text-sm text-muted-foreground text-center py-4">
+                        Aucun feedback récent disponible
                       </p>
                     )}
                   </div>
-                )) || (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    Aucun feedback récent disponible
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
 
-          {/* Édition du prompt */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
-                Prompt Actuel
-                {currentAgentPrompt && (
-                  <Badge variant="outline" className="ml-auto">
-                    v{currentAgentPrompt.version}
-                  </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                value={currentPrompt}
-                onChange={(e) => setCurrentPrompt(e.target.value)}
-                placeholder="Entrez le prompt de l'agent..."
-                rows={12}
-                className="resize-none font-mono text-sm"
-              />
-              
-              <div className="flex gap-2">
-                <Button onClick={savePrompt} disabled={saving} className="flex-1">
-                  {saving ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  ) : (
-                    <Save className="h-4 w-4 mr-2" />
+              {/* Édition du prompt */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Prompt Actuel
+                    {currentAgentPrompt && (
+                      <Badge variant="outline" className="ml-auto">
+                        v{currentAgentPrompt.version}
+                      </Badge>
+                    )}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    value={currentPrompt}
+                    onChange={(e) => setCurrentPrompt(e.target.value)}
+                    placeholder="Entrez le prompt de l'agent..."
+                    rows={12}
+                    className="resize-none font-mono text-sm"
+                  />
+                  
+                  <div className="flex gap-2">
+                    <Button onClick={savePrompt} disabled={saving} className="flex-1">
+                      {saving ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      ) : (
+                        <Save className="h-4 w-4 mr-2" />
+                      )}
+                      Sauvegarder
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={generateImprovedPrompt}
+                      disabled={!agentFeedback || agentFeedback.improvement_suggestions.length === 0}
+                    >
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Améliorer
+                    </Button>
+                  </div>
+                  
+                  {currentAgentPrompt && (
+                    <p className="text-xs text-muted-foreground">
+                      Dernière mise à jour : {format(new Date(currentAgentPrompt.last_updated), "dd MMM yyyy, HH:mm", { locale: fr })}
+                    </p>
                   )}
-                  Sauvegarder
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={generateImprovedPrompt}
-                  disabled={!agentFeedback || agentFeedback.improvement_suggestions.length === 0}
-                >
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  Améliorer
-                </Button>
-              </div>
-              
-              {currentAgentPrompt && (
-                <p className="text-xs text-muted-foreground">
-                  Dernière mise à jour : {format(new Date(currentAgentPrompt.last_updated), "dd MMM yyyy, HH:mm", { locale: fr })}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

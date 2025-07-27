@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "title": "Comité SST pour entreprises +20 travailleurs",
+    "description": "Orchestrer DocuGen, Hugo et CoSS pour démontrer la mise en place du comité SST exigé par la LMRSST dans une entreprise de plus de 20 travailleurs.",
+    "agents": ["DocuGen", "Hugo", "CoSS"],
+    "article_lmrsst": "Art. 90",
+    "category": "Comité SST",
+    "priority": "high",
+    "scope": "entreprise_20_plus",
+    "orchestration_prompt": "Orchestrer DocuGen, Hugo et CoSS pour démontrer la mise en place du comité SST exigé par la LMRSST dans une entreprise de plus de 20 travailleurs.",
+    "expected_deliverables": ["Documentation comité SST", "Plan de mise en place", "Validation conformité"]
+  },
+  {
+    "id": 2,
+    "title": "Calendrier prévention article 101",
+    "description": "Utiliser LexiNorm et Prioris pour générer un calendrier annuel des activités de prévention conforme à l'article 101 LMRSST.",
+    "agents": ["LexiNorm", "Prioris"],
+    "article_lmrsst": "Art. 101",
+    "category": "Programme prévention",
+    "priority": "high",
+    "scope": "annuel",
+    "orchestration_prompt": "Utiliser LexiNorm et Prioris pour générer un calendrier annuel des activités de prévention conforme à l'article 101 LMRSST.",
+    "expected_deliverables": ["Calendrier annuel", "Activités priorisées", "Référentiel légal"]
+  },
+  {
+    "id": 3,
+    "title": "Programme prévention à jour",
+    "description": "Orchestrer DiagSST, ALSS et DocuGen pour produire et diffuser un programme de prévention à jour exigé par la LMRSST.",
+    "agents": ["DiagSST", "ALSS", "DocuGen"],
+    "article_lmrsst": "Art. 101",
+    "category": "Programme prévention",
+    "priority": "critical",
+    "scope": "entreprise",
+    "orchestration_prompt": "Orchestrer DiagSST, ALSS et DocuGen pour produire et diffuser un programme de prévention à jour exigé par la LMRSST.",
+    "expected_deliverables": ["Programme prévention", "Plan diffusion", "Documentation diagnostic"]
+  },
+  {
+    "id": 4,
+    "title": "Évaluation participation travailleurs",
+    "description": "Générer un rapport d'évaluation des mécanismes de participation des travailleurs, avec CoSS, Hugo et DocuGen.",
+    "agents": ["CoSS", "Hugo", "DocuGen"],
+    "article_lmrsst": "Art. 88-91",
+    "category": "Participation travailleurs",
+    "priority": "medium",
+    "scope": "evaluation",
+    "orchestration_prompt": "Générer un rapport d'évaluation des mécanismes de participation des travailleurs, avec CoSS, Hugo et DocuGen.",
+    "expected_deliverables": ["Rapport évaluation", "Mécanismes identifiés", "Recommandations amélioration"]
+  },
+  {
+    "id": 5,
+    "title": "Conformité équipements protection",
+    "description": "Déclencher l'orchestration d'une analyse de conformité LMRSST des équipements de protection, via DiagSST et LexiNorm.",
+    "agents": ["DiagSST", "LexiNorm"],
+    "article_lmrsst": "Réglementation EPI",
+    "category": "Équipements protection",
+    "priority": "high",
+    "scope": "equipements",
+    "orchestration_prompt": "Déclencher l'orchestration d'une analyse de conformité LMRSST des équipements de protection, via DiagSST et LexiNorm.",
+    "expected_deliverables": ["Analyse conformité", "Références légales", "Plan correction"]
+  },
+  {
+    "id": 6,
+    "title": "Priorisation multi-établissements",
+    "description": "Prioriser les obligations LMRSST d'une entreprise multi-établissements avec Prioris, Hugo et DocuGen.",
+    "agents": ["Prioris", "Hugo", "DocuGen"],
+    "article_lmrsst": "Art. 88-102",
+    "category": "Multi-établissements",
+    "priority": "high",
+    "scope": "multi_sites",
+    "orchestration_prompt": "Prioriser les obligations LMRSST d'une entreprise multi-établissements avec Prioris, Hugo et DocuGen.",
+    "expected_deliverables": ["Matrice priorisation", "Plan déploiement", "Documentation par site"]
+  },
+  {
+    "id": 7,
+    "title": "Identification postes à risques",
+    "description": "Automatiser l'identification des postes à risques nécessitant des mesures spécifiques LMRSST avec Sentinelle et DiagSST.",
+    "agents": ["Sentinelle", "DiagSST"],
+    "article_lmrsst": "Art. 101",
+    "category": "Postes à risques",
+    "priority": "critical",
+    "scope": "postes_travail",
+    "orchestration_prompt": "Automatiser l'identification des postes à risques nécessitant des mesures spécifiques LMRSST avec Sentinelle et DiagSST.",
+    "expected_deliverables": ["Cartographie risques", "Mesures spécifiques", "Plan surveillance"]
+  },
+  {
+    "id": 8,
+    "title": "Documentation réunions comité SST",
+    "description": "Documenter les réunions du comité SST avec DocuGen, validées par CoSS, et archivées dans Hugo.",
+    "agents": ["DocuGen", "CoSS", "Hugo"],
+    "article_lmrsst": "Art. 90",
+    "category": "Comité SST",
+    "priority": "medium",
+    "scope": "documentation",
+    "orchestration_prompt": "Documenter les réunions du comité SST avec DocuGen, validées par CoSS, et archivées dans Hugo.",
+    "expected_deliverables": ["Procès-verbaux", "Validation conformité", "Archivage sécurisé"]
+  },
+  {
+    "id": 9,
+    "title": "Mise à jour politiques internes",
+    "description": "Générer automatiquement la liste des politiques internes devant être modifiées suite à l'entrée en vigueur de la LMRSST, avec LexiNorm et DocuGen.",
+    "agents": ["LexiNorm", "DocuGen"],
+    "article_lmrsst": "Ensemble LMRSST",
+    "category": "Politiques internes",
+    "priority": "high",
+    "scope": "politiques",
+    "orchestration_prompt": "Générer automatiquement la liste des politiques internes devant être modifiées suite à l'entrée en vigueur de la LMRSST, avec LexiNorm et DocuGen.",
+    "expected_deliverables": ["Inventaire politiques", "Modifications requises", "Gabarits mis à jour"]
+  },
+  {
+    "id": 10,
+    "title": "Audit interne conformité",
+    "description": "Déployer une orchestration d'audit interne LMRSST avec Hugo, DiagSST et Prioris pour identifier les lacunes.",
+    "agents": ["Hugo", "DiagSST", "Prioris"],
+    "article_lmrsst": "Art. 88-102",
+    "category": "Audit interne",
+    "priority": "critical",
+    "scope": "audit_complet",
+    "orchestration_prompt": "Déployer une orchestration d'audit interne LMRSST avec Hugo, DiagSST et Prioris pour identifier les lacunes.",
+    "expected_deliverables": ["Rapport audit", "Lacunes identifiées", "Plan action priorisé"]
+  }
+]
