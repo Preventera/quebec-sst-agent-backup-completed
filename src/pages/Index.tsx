@@ -11,7 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { LegalTooltip, HelpTooltip } from "@/components/LegalTooltip";
 import { useEffect, useState } from "react";
-import { BarChart3, Users, AlertCircle, Zap, Menu, X } from "lucide-react";
+import { BarChart3, Users, AlertCircle, Zap, Menu, X, Brain, Mic } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   const { announce } = useAccessibilityContext();
@@ -63,7 +64,7 @@ const Index = () => {
       
       <main className="container mx-auto px-4 py-6 md:py-8" role="main">
         {/* Hero Section */}
-        <div className="text-center space-y-4 mb-6 md:mb-8">
+        <div className="text-center space-y-6 mb-6 md:mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-foreground">
             <LegalTooltip 
               article="Art. 101 LMRSST"
@@ -77,6 +78,31 @@ const Index = () => {
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Suivez votre conformité en temps réel avec l'intelligence artificielle multi-agents
           </p>
+          
+          {/* Primary CTA */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
+            <Button 
+              asChild 
+              size="lg" 
+              className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg transition-all duration-300 px-8 py-3"
+            >
+              <Link to="/diagnostic">
+                <Brain className="h-5 w-5 mr-2" />
+                Tester le diagnostic
+              </Link>
+            </Button>
+            <Button 
+              asChild 
+              variant="outline" 
+              size="lg"
+              className="border-primary/20 hover:border-primary/40"
+            >
+              <Link to="/assistant-vocal">
+                <Mic className="h-5 w-5 mr-2" />
+                Assistant vocal
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Compliance Statistics - Always visible */}
