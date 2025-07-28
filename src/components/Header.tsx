@@ -1,5 +1,6 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,7 +14,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-primary text-primary-foreground shadow-lg">
+    <header className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-lg">
       <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 md:gap-3 flex-shrink-0">
@@ -38,8 +39,8 @@ const Header = () => {
           </Button>
           
           {/* Desktop Navigation - Responsive breakpoint at 640px */}
-          <nav className="hidden sm:flex items-center gap-2 overflow-x-auto flex-shrink min-w-0">
-            <div className="flex items-center gap-2 min-w-max">
+          <nav className="hidden sm:flex items-center gap-2 flex-shrink min-w-0">
+            <div className="flex items-center gap-2">
               <Link to="/">
                 <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
                   Accueil
@@ -84,25 +85,41 @@ const Header = () => {
                 </Link>
               </div>
               
+              {/* QA & Analytics Group - Dropdown */}
+              <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                      <BarChart3 className="h-3 w-3 mr-1" aria-hidden="true" />
+                      QA & Analytics
+                      <ChevronDown className="h-3 w-3 ml-1" aria-hidden="true" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem asChild>
+                      <Link to="/tests" className="w-full">
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Tests & Démo
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/logs" className="w-full">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Logs
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/annotation" className="w-full">
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Annotation
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              
               {/* Admin Group */}
               <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
-                <Link to="/tests">
-                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                    Tests
-                  </Button>
-                </Link>
-                <Link to="/logs">
-                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                    <MessageSquare className="h-3 w-3 mr-1" aria-hidden="true" />
-                    Logs
-                  </Button>
-                </Link>
-                <Link to="/annotation">
-                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                    <CheckCircle className="h-3 w-3 mr-1" aria-hidden="true" />
-                    Annotation
-                  </Button>
-                </Link>
                 <Link to="/prompts">
                   <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
                     <Settings className="h-3 w-3 mr-1" aria-hidden="true" />
