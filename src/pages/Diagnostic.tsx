@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, CheckCircle, AlertTriangle, FileText, Download, Zap, Brain } from "lucide-react";
+import { ArrowLeft, CheckCircle, AlertTriangle, FileText, Download, Zap, Brain, HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { diagnosticLMRSST, DiagnosticParams, DiagnosticResult } from "@/lib/diagnosticLMRSST";
 import { DetailedDiagnostic } from "@/components/DetailedDiagnostic";
 
@@ -216,7 +217,7 @@ const Diagnostic = () => {
             </Card>
 
             <div className="grid md:grid-cols-2 gap-6">
-              <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <Card className="cursor-pointer hover:shadow-md transition-shadow group">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Zap className="h-6 w-6 text-primary" />
@@ -225,19 +226,34 @@ const Diagnostic = () => {
                   <p className="text-muted-foreground">
                     Évaluation express en 5 questions essentielles
                   </p>
+                  <div className="text-sm text-primary font-medium">
+                    Idéal pour un bilan express
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <Badge variant="secondary">5 minutes</Badge>
                     <Badge variant="outline">Questions essentielles</Badge>
                   </div>
-                  <ul className="text-sm space-y-1 text-muted-foreground">
-                    <li>• Secteur d'activité</li>
-                    <li>• Nombre d'employés</li>
-                    <li>• Formation SST</li>
-                    <li>• Registre incidents</li>
-                    <li>• Programme prévention</li>
-                  </ul>
+                  <div className="relative">
+                    <ul className="text-sm space-y-1 text-muted-foreground">
+                      <li>• Secteur d'activité</li>
+                      <li>• Nombre d'employés</li>
+                      <li>• Formation SST</li>
+                      <li>• Registre incidents</li>
+                      <li>• Programme prévention</li>
+                    </ul>
+                    <div className="absolute inset-0 bg-popover/95 border rounded-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 backdrop-blur-sm">
+                      <div className="text-xs font-medium mb-2">Aperçu des questions clefs :</div>
+                      <ul className="text-xs space-y-1 text-muted-foreground">
+                        <li>1. Dans quel secteur votre entreprise opère-t-elle ?</li>
+                        <li>2. Combien d'employés travaillent dans votre organisation ?</li>
+                        <li>3. Quand a eu lieu votre dernière formation SST ?</li>
+                        <li>4. Tenez-vous un registre des incidents à jour ?</li>
+                        <li>5. Avez-vous un programme de prévention en place ?</li>
+                      </ul>
+                    </div>
+                  </div>
                   <Button onClick={startQuickDiagnostic} className="w-full">
                     Commencer le diagnostic rapide
                   </Button>
@@ -253,6 +269,9 @@ const Diagnostic = () => {
                   <p className="text-muted-foreground">
                     Évaluation complète par secteur avec 72 questions spécialisées
                   </p>
+                  <div className="text-sm text-primary font-medium">
+                    Idéal pour un audit complet
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -266,7 +285,23 @@ const Diagnostic = () => {
                     <li>• Formations</li>
                   </ul>
                   <div className="space-y-2">
-                    <Label>Secteur (optionnel)</Label>
+                    <div className="flex items-center gap-2">
+                      <Label>Secteur (optionnel)</Label>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <HelpCircle className="h-4 w-4 text-muted-foreground" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="max-w-xs">
+                              Le secteur permet de personnaliser les questions selon votre domaine d'activité.
+                              Par exemple, le secteur "Construction" inclura des questions sur les équipements de protection individuelle,
+                              tandis que "Services" se concentrera sur les risques ergonomiques.
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <Select value={selectedSector} onValueChange={setSelectedSector}>
                       <SelectTrigger>
                         <SelectValue placeholder="Tous secteurs" />
