@@ -74,6 +74,57 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          company_name: string | null
+          company_size: string | null
+          created_at: string
+          data_processing_consent: boolean
+          first_name: string | null
+          id: string
+          job_title: string | null
+          last_name: string | null
+          marketing_consent: boolean
+          phone: string | null
+          rgpd_consent_date: string | null
+          rgpd_consent_given: boolean
+          sector: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string
+          data_processing_consent?: boolean
+          first_name?: string | null
+          id: string
+          job_title?: string | null
+          last_name?: string | null
+          marketing_consent?: boolean
+          phone?: string | null
+          rgpd_consent_date?: string | null
+          rgpd_consent_given?: boolean
+          sector?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string | null
+          company_size?: string | null
+          created_at?: string
+          data_processing_consent?: boolean
+          first_name?: string | null
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          marketing_consent?: boolean
+          phone?: string | null
+          rgpd_consent_date?: string | null
+          rgpd_consent_given?: boolean
+          sector?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       response_annotations: {
         Row: {
           annotated_by: string
