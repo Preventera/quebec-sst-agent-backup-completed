@@ -91,7 +91,7 @@ const Header = () => {
               </div>
               
               {/* QA & Analytics Group - Dropdown */}
-              {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base')) && (
+              {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling')) && (
                 <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -107,6 +107,14 @@ const Header = () => {
                           <Link to="/sst-knowledge" className="w-full">
                             <BookOpen className="h-4 w-4 mr-2" />
                             Base SST
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasAccess('crawling') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/crawling-dashboard" className="w-full">
+                            <Globe className="h-4 w-4 mr-2" />
+                            Crawling SST
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -146,14 +154,6 @@ const Header = () => {
                     <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
                       <Settings className="h-3 w-3 mr-1" aria-hidden="true" />
                       Prompts
-                    </Button>
-                  </Link>
-                )}
-                {hasAccess('crawling') && (
-                  <Link to="/crawling-dashboard">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <Globe className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Crawling
                     </Button>
                   </Link>
                 )}
@@ -298,7 +298,7 @@ const Header = () => {
                 <Link to="/crawling-dashboard" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                     <Globe className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Crawling
+                    Crawling SST
                   </Button>
                 </Link>
               )}
