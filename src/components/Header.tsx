@@ -80,14 +80,6 @@ const Header = () => {
                     </Button>
                   </Link>
                 )}
-                {hasAccess('knowledge-base') && (
-                  <Link to="/sst-knowledge">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <BookOpen className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Base SST
-                    </Button>
-                  </Link>
-                )}
                 {(hasAccess('compliance-dashboard') || hasAccess('learning-dashboard')) && (
                   <Link to="/learning">
                     <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
@@ -99,7 +91,7 @@ const Header = () => {
               </div>
               
               {/* QA & Analytics Group - Dropdown */}
-              {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation')) && (
+              {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base')) && (
                 <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -110,6 +102,14 @@ const Header = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48">
+                      {hasAccess('knowledge-base') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/sst-knowledge" className="w-full">
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Base SST
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {hasAccess('tests') && (
                         <DropdownMenuItem asChild>
                           <Link to="/tests" className="w-full">
