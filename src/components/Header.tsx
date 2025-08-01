@@ -1,4 +1,4 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3 } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { ProfileSelector } from "@/components/ProfileSelector";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,7 +42,7 @@ const Header = () => {
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
           
-          {/* Desktop Navigation - Responsive breakpoint at 640px */}
+          {/* Desktop Navigation - Simplified */}
           <nav className="hidden sm:flex items-center gap-2 flex-shrink min-w-0">
             <div className="flex items-center gap-2">
               <Link to="/">
@@ -50,63 +51,83 @@ const Header = () => {
                 </Button>
               </Link>
               
-              {/* Assistant Group */}
-              <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
-                {hasAccess('assistant') && (
-                  <Link to="/assistant-vocal">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <Mic className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Assistant
-                    </Button>
-                  </Link>
-                )}
-                {(hasAccess('diagnostic-quick') || hasAccess('diagnostic-detailed')) && (
-                  <Link to="/diagnostic">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <Brain className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Diagnostic
-                    </Button>
-                  </Link>
-                )}
-              </div>
+              {/* Core Features - Always visible */}
+              {hasAccess('assistant') && (
+                <Link to="/assistant-vocal">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                    <Mic className="h-3 w-3 mr-1" aria-hidden="true" />
+                    Assistant
+                  </Button>
+                </Link>
+              )}
               
-              {/* Data Group */}
-              <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
-                {hasAccess('documents') && (
-                  <Link to="/documents">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <FileText className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Documents
-                    </Button>
-                  </Link>
-                )}
-                {(hasAccess('compliance-dashboard') || hasAccess('learning-dashboard')) && (
-                  <Link to="/learning">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <TrendingUp className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Dashboard
-                    </Button>
-                  </Link>
-                )}
-              </div>
+              {(hasAccess('diagnostic-quick') || hasAccess('diagnostic-detailed')) && (
+                <Link to="/diagnostic">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                    <Brain className="h-3 w-3 mr-1" aria-hidden="true" />
+                    Diagnostic
+                  </Button>
+                </Link>
+              )}
               
-              {/* QA & Analytics Group - Dropdown */}
-              {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling')) && (
+              {hasAccess('documents') && (
+                <Link to="/documents">
+                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                    <FileText className="h-3 w-3 mr-1" aria-hidden="true" />
+                    Documents
+                  </Button>
+                </Link>
+              )}
+              
+              {/* Analytics & Tools - Grouped */}
+              {(hasAccess('learning-dashboard') || hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling') || hasAccess('prompt-agents') || hasAccess('faq')) && (
                 <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                        <BarChart3 className="h-3 w-3 mr-1" aria-hidden="true" />
-                        QA & Analytics
+                        <MoreHorizontal className="h-3 w-3 mr-1" aria-hidden="true" />
+                        Plus
                         <ChevronDown className="h-3 w-3 ml-1" aria-hidden="true" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-56 z-50 bg-background border shadow-md">
+                      {(hasAccess('compliance-dashboard') || hasAccess('learning-dashboard')) && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/learning" className="w-full">
+                            <TrendingUp className="h-4 w-4 mr-2" />
+                            Dashboard Analytics
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {hasAccess('knowledge-base') && (
                         <DropdownMenuItem asChild>
                           <Link to="/sst-knowledge" className="w-full">
                             <BookOpen className="h-4 w-4 mr-2" />
-                            Base SST
+                            Base de connaissances SST
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasAccess('tests') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/tests" className="w-full">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Tests & Démonstrations
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasAccess('conversation-logs') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/logs" className="w-full">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Logs des conversations
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasAccess('annotation') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/annotation" className="w-full">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Interface d'annotation
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -118,27 +139,19 @@ const Header = () => {
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {hasAccess('tests') && (
+                      {(hasAccess('prompt-agents') || hasAccess('prompt-orchestration')) && (
                         <DropdownMenuItem asChild>
-                          <Link to="/tests" className="w-full">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Tests & Démo
+                          <Link to="/prompts" className="w-full">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Gestion des prompts
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {hasAccess('conversation-logs') && (
+                      {hasAccess('faq') && (
                         <DropdownMenuItem asChild>
-                          <Link to="/logs" className="w-full">
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Logs
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {hasAccess('annotation') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/annotation" className="w-full">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Annotation
+                          <Link to="/faq" className="w-full">
+                            <HelpCircle className="h-4 w-4 mr-2" />
+                            FAQ
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -146,26 +159,6 @@ const Header = () => {
                   </DropdownMenu>
                 </div>
               )}
-              
-              {/* Admin Group */}
-              <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
-                {(hasAccess('prompt-agents') || hasAccess('prompt-orchestration')) && (
-                  <Link to="/prompts">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <Settings className="h-3 w-3 mr-1" aria-hidden="true" />
-                      Prompts
-                    </Button>
-                  </Link>
-                )}
-                {hasAccess('faq') && (
-                  <Link to="/faq">
-                    <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                      <HelpCircle className="h-3 w-3 mr-1" aria-hidden="true" />
-                      FAQ
-                    </Button>
-                  </Link>
-                )}
-              </div>
               
               {/* Profile Selector */}
               <div className="flex items-center gap-2 border-l border-primary-glow/20 pl-2 ml-2">
@@ -340,6 +333,13 @@ const Header = () => {
             </div>
           </nav>
         )}
+      </div>
+      
+      {/* Breadcrumb - Only show on non-homepage */}
+      <div className="border-t border-primary-glow/20">
+        <div className="container mx-auto px-2 sm:px-4 py-2">
+          <Breadcrumb />
+        </div>
       </div>
     </header>
   );

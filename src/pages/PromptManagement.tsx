@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
+import Pagination from "@/components/Pagination";
 import orchestrationPrompts from "@/data/orchestrationPrompts.json";
 
 interface AgentFeedback {
@@ -62,6 +63,8 @@ const PromptManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPriority, setSelectedPriority] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
 
@@ -238,6 +241,17 @@ Cite toujours les articles exacts et reste factuel.`
     return matchesSearch && matchesCategory && matchesPriority;
   });
 
+  // Pagination pour les prompts d'orchestration
+  const totalItems = filteredOrchestrationPrompts.length;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedPrompts = filteredOrchestrationPrompts.slice(startIndex, endIndex);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory, selectedPriority]);
+
   const categories = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.category))];
   const priorities = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.priority))];
 
@@ -323,7 +337,7 @@ Cite toujours les articles exacts et reste factuel.`
 
             {/* Grille des prompts d'orchestration */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {filteredOrchestrationPrompts.map((prompt: OrchestrationPrompt) => (
+              {paginatedPrompts.map((prompt: OrchestrationPrompt) => (
                 <Card key={prompt.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-start justify-between">
@@ -386,6 +400,20 @@ Cite toujours les articles exacts et reste factuel.`
                 </Card>
               ))}
             </div>
+
+            {/* Pagination */}
+            {filteredOrchestrationPrompts.length > 0 && (
+              <div className="mt-6">
+                <Pagination
+                  currentPage={currentPage}
+                  totalItems={totalItems}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={setCurrentPage}
+                  onItemsPerPageChange={setItemsPerPage}
+                  className="justify-center"
+                />
+              </div>
+            )}
           </TabsContent>
 
           {/* Onglet Prompts Agents */}

@@ -222,12 +222,21 @@ const AssistantVocal = () => {
               </div>
               
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={handleClearHistory}>
-                  <Trash2 className="h-4 w-4 mr-2" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleClearHistory}
+                  aria-label="Effacer l'historique des conversations"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" aria-hidden="true" />
                   Effacer
                 </Button>
-                <Button variant="outline" size="sm">
-                  <Settings className="h-4 w-4 mr-2" />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  aria-label="Ouvrir les paramètres de l'assistant vocal"
+                >
+                  <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
                   Paramètres
                 </Button>
               </div>
@@ -275,8 +284,10 @@ const AssistantVocal = () => {
                         onClick={handleStopListening}
                         disabled={isProcessing || isSpeaking}
                         className="h-20 w-20 rounded-full bg-red-500 hover:bg-red-600 text-white animate-pulse border-4 border-red-300"
+                        aria-label="Arrêter l'enregistrement vocal"
+                        aria-pressed="true"
                       >
-                        <MicOff className="h-10 w-10" />
+                        <MicOff className="h-10 w-10" aria-hidden="true" />
                       </Button>
                       <p className="text-sm font-semibold text-red-600 animate-pulse">
                         CLIQUEZ POUR ARRÊTER
@@ -289,8 +300,10 @@ const AssistantVocal = () => {
                         onClick={handleStartListening}
                         disabled={isProcessing || isSpeaking}
                         className="h-20 w-20 rounded-full bg-primary hover:bg-primary/90"
+                        aria-label="Commencer l'enregistrement vocal"
+                        aria-pressed="false"
                       >
-                        <Mic className="h-10 w-10" />
+                        <Mic className="h-10 w-10" aria-hidden="true" />
                       </Button>
                       <p className="text-sm text-muted-foreground">
                         Cliquez pour commencer
@@ -299,7 +312,11 @@ const AssistantVocal = () => {
                   )}
                   
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      aria-label={volume > 0 ? `Volume à ${Math.round(volume * 100)}%` : "Audio coupé"}
+                    >
                       {volume > 0 ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
                     </Button>
                     <input
@@ -309,8 +326,26 @@ const AssistantVocal = () => {
                       step="0.1"
                       value={volume}
                       onChange={(e) => setVolume(parseFloat(e.target.value))}
-                      className="w-20"
+                      onKeyDown={(e) => {
+                        if (e.key === 'ArrowLeft') {
+                          setVolume(Math.max(0, volume - 0.1));
+                        } else if (e.key === 'ArrowRight') {
+                          setVolume(Math.min(1, volume + 0.1));
+                        }
+                      }}
+                      className="w-20 h-2 bg-muted rounded-lg appearance-none cursor-pointer 
+                                [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 
+                                [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary 
+                                [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-md
+                                [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full 
+                                [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none"
+                      aria-label="Réglage du volume"
+                      aria-valuemin={0}
+                      aria-valuemax={1}
+                      aria-valuenow={volume}
+                      aria-valuetext={`Volume à ${Math.round(volume * 100)}%`}
                     />
+                    <span className="text-xs text-muted-foreground w-8">{Math.round(volume * 100)}%</span>
                   </div>
                 </div>
                 

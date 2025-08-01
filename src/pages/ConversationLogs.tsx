@@ -9,6 +9,7 @@ import { MessageSquare, Bot, Calendar, Search, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
+import Pagination from "@/components/Pagination";
 
 interface ConversationLog {
   id: string;
@@ -22,9 +23,12 @@ interface ConversationLog {
 
 const ConversationLogs = () => {
   const [logs, setLogs] = useState<ConversationLog[]>([]);
+  const [allLogs, setAllLogs] = useState<ConversationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [agentFilter, setAgentFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(25);
 
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
 
@@ -45,7 +49,7 @@ const ConversationLogs = () => {
 
       const { data, error } = await query;
       if (error) throw error;
-      setLogs(data || []);
+      setAllLogs(data || []);
     } catch (error) {
       console.error("Erreur lors du chargement des logs:", error);
     } finally {
@@ -53,10 +57,22 @@ const ConversationLogs = () => {
     }
   };
 
-  const filteredLogs = logs.filter(log =>
+  // Filtrage et pagination
+  const filteredLogs = allLogs.filter(log =>
     log.user_message.toLowerCase().includes(searchTerm.toLowerCase()) ||
     log.agent_response.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const totalItems = filteredLogs.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, agentFilter]);
 
   useEffect(() => {
     fetchLogs();
@@ -116,14 +132,14 @@ const ConversationLogs = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card>
             <CardContent className="pt-6">
-              <div className="text-2xl font-bold">{logs.length}</div>
+              <div className="text-2xl font-bold">{allLogs.length}</div>
               <p className="text-xs text-muted-foreground">Total conversations</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="pt-6">
               <div className="text-2xl font-bold">
-                {new Set(logs.map(log => log.agent_name)).size}
+                {new Set(allLogs.map(log => log.agent_name)).size}
               </div>
               <p className="text-xs text-muted-foreground">Agents actifs</p>
             </CardContent>
@@ -131,7 +147,7 @@ const ConversationLogs = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="text-2xl font-bold">
-                {logs.filter(log => log.created_at >= new Date(Date.now() - 24*60*60*1000).toISOString()).length}
+                {allLogs.filter(log => log.created_at >= new Date(Date.now() - 24*60*60*1000).toISOString()).length}
               </div>
               <p className="text-xs text-muted-foreground">Dernières 24h</p>
             </CardContent>
@@ -139,7 +155,7 @@ const ConversationLogs = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="text-2xl font-bold">
-                {logs.length > 0 ? Math.round(logs.reduce((acc, log) => acc + log.agent_response.length, 0) / logs.length) : 0}
+                {allLogs.length > 0 ? Math.round(allLogs.reduce((acc, log) => acc + log.agent_response.length, 0) / allLogs.length) : 0}
               </div>
               <p className="text-xs text-muted-foreground">Moy. caractères/réponse</p>
             </CardContent>
@@ -161,7 +177,8 @@ const ConversationLogs = () => {
               </CardContent>
             </Card>
           ) : (
-            filteredLogs.map((log) => (
+            <>
+              {paginatedLogs.map((log) => (
               <Card key={log.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
@@ -207,7 +224,20 @@ const ConversationLogs = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))
+            ))}
+            
+            {/* Pagination */}
+            <div className="mt-6">
+              <Pagination
+                currentPage={currentPage}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+                className="justify-center"
+              />
+            </div>
+          </>
           )}
         </div>
       </div>
