@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap } from "lucide-react";
+import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap, MoreVertical, Edit, Copy, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -337,12 +337,23 @@ Cite toujours les articles exacts et reste factuel.`
 
             {/* Grille des prompts d'orchestration */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {paginatedPrompts.map((prompt: OrchestrationPrompt) => (
-                <Card key={prompt.id} className="hover:shadow-lg transition-shadow">
+              {paginatedPrompts.map((prompt: OrchestrationPrompt) => {
+                const isOrchestrator = prompt.agents.length > 1;
+                const randomStatus = ['draft', 'test', 'production'][Math.floor(Math.random() * 3)];
+                
+                return (
+                <Card key={prompt.id} className="group hover:shadow-lg transition-all duration-200 relative">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="space-y-2">
-                        <CardTitle className="text-lg">{prompt.title}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-lg">{prompt.title}</CardTitle>
+                          {isOrchestrator && (
+                            <Badge variant="default" className="bg-primary/10 text-primary">
+                              Orchestrateur
+                            </Badge>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={
                             prompt.priority === "critical" ? "destructive" :
@@ -354,9 +365,28 @@ Cite toujours les articles exacts et reste factuel.`
                              prompt.priority === "medium" ? "Moyenne" : "Faible"}
                           </Badge>
                           <Badge variant="outline">{prompt.category}</Badge>
+                          <Badge variant={
+                            randomStatus === 'production' ? 'default' :
+                            randomStatus === 'test' ? 'secondary' : 'outline'
+                          } className={
+                            randomStatus === 'production' ? 'bg-green-500/10 text-green-700 border-green-200' :
+                            randomStatus === 'test' ? 'bg-orange-500/10 text-orange-700 border-orange-200' :
+                            'bg-gray-500/10 text-gray-700 border-gray-200'
+                          }>
+                            {randomStatus === 'production' ? 'Production' :
+                             randomStatus === 'test' ? 'Test' : 'Brouillon'}
+                          </Badge>
                         </div>
                       </div>
-                      <Zap className="h-5 w-5 text-primary flex-shrink-0" />
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-primary flex-shrink-0" />
+                        {/* Menu contextuel au survol */}
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                            <Settings className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -392,13 +422,21 @@ Cite toujours les articles exacts et reste factuel.`
                       {prompt.orchestration_prompt}
                     </div>
                     
-                    <Button className="w-full" size="sm">
-                      <Zap className="h-4 w-4 mr-2" />
-                      Exécuter l'orchestration
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button className="flex-1" size="sm">
+                        <Zap className="h-4 w-4 mr-2" />
+                        Exécuter
+                      </Button>
+                      {randomStatus !== 'production' && (
+                        <Button variant="outline" size="sm">
+                          Publier
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination */}
