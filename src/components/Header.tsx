@@ -139,11 +139,19 @@ const Header = () => {
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {(hasAccess('prompt-agents') || hasAccess('prompt-orchestration')) && (
+                      {hasAccess('prompt-orchestration') && (
                         <DropdownMenuItem asChild>
-                          <Link to="/prompts" className="w-full">
+                          <Link to="/prompts/catalog" className="w-full">
+                            <BookOpen className="h-4 w-4 mr-2" />
+                            Catalogue des workflows
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {hasAccess('prompt-agents') && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/prompts/admin" className="w-full">
                             <Settings className="h-4 w-4 mr-2" />
-                            Gestion des prompts
+                            Administration prompts
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -278,11 +286,20 @@ const Header = () => {
                 </Link>
               )}
               
-              {(hasAccess('prompt-agents') || hasAccess('prompt-orchestration')) && (
-                <Link to="/prompts" onClick={() => setIsMobileMenuOpen(false)}>
+              {hasAccess('prompt-orchestration') && (
+                <Link to="/prompts/catalog" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
+                    <BookOpen className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Catalogue
+                  </Button>
+                </Link>
+              )}
+              
+              {hasAccess('prompt-agents') && (
+                <Link to="/prompts/admin" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                     <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
-                    Prompts
+                    Admin Prompts
                   </Button>
                 </Link>
               )}

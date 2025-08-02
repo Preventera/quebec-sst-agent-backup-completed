@@ -12,6 +12,8 @@ import ConversationLogs from "./pages/ConversationLogs";
 import AnnotationInterface from "./pages/AnnotationInterface";
 import LearningDashboard from "./pages/LearningDashboard";
 import PromptManagement from "./pages/PromptManagement";
+import PromptCatalog from "./pages/PromptCatalog";
+import PromptAdmin from "./pages/PromptAdmin";
 import Diagnostic from "./pages/Diagnostic";
 import DocumentGeneration from "./pages/DocumentGeneration";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
@@ -43,6 +45,8 @@ const App = () => (
                 <Route path="/annotation" element={<AnnotationInterface />} />
                 <Route path="/learning" element={<LearningDashboard />} />
                 <Route path="/prompts" element={<PromptManagement />} />
+                <Route path="/prompts/catalog" element={<PromptCatalog />} />
+                <Route path="/prompts/admin" element={<PromptAdmin />} />
                 <Route path="/diagnostic" element={<Diagnostic />} />
                 <Route path="/documents" element={<DocumentGeneration />} />
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
