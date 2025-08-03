@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, MessageSquare, Settings, Download } from "lucide-react";
+import { FileText, MessageSquare, Settings, Download, Info, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const QuickActions = () => {
   const navigate = useNavigate();
@@ -54,9 +55,24 @@ const QuickActions = () => {
   ];
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20">
       <CardHeader>
-        <CardTitle>Actions rapides</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <ArrowRight className="h-5 w-5 text-accent" />
+            Actions prioritaires
+          </CardTitle>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Actions recommandées pour maintenir et améliorer votre conformité LMRSST</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -64,14 +80,17 @@ const QuickActions = () => {
             <Button
               key={index}
               variant="outline"
-              className="h-auto p-4 flex items-start gap-3 justify-start"
+              className="h-auto p-4 flex items-center gap-3 justify-between hover:bg-accent/10 hover:border-accent/30 transition-all duration-200 group"
               onClick={() => handleAction(index)}
             >
-              <action.icon className="h-5 w-5 text-primary mt-0.5" />
-              <div className="text-left">
-                <div className="font-medium">{action.title}</div>
-                <div className="text-sm text-muted-foreground">{action.description}</div>
+              <div className="flex items-center gap-3">
+                <action.icon className="h-5 w-5 text-primary group-hover:text-accent transition-colors" />
+                <div className="text-left">
+                  <div className="font-medium">{action.title}</div>
+                  <div className="text-sm text-muted-foreground">{action.description}</div>
+                </div>
               </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
             </Button>
           ))}
         </div>

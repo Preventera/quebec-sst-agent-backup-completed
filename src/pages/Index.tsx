@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { LegalTooltip, HelpTooltip } from "@/components/LegalTooltip";
 import { useEffect, useState } from "react";
-import { BarChart3, Users, AlertCircle, Zap, Menu, X, Brain, Mic } from "lucide-react";
+import { BarChart3, Users, AlertCircle, Zap, Menu, X, Brain, Mic, Info, TrendingUp, Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -79,26 +79,26 @@ const Index = () => {
             Suivez votre conformité en temps réel avec l'intelligence artificielle multi-agents
           </p>
           
-          {/* Primary CTA */}
-          <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-6">
+          {/* Primary CTA - Enhanced */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
             <Button 
               asChild 
               size="lg" 
-              className="bg-gradient-to-r from-primary to-accent text-primary-foreground hover:shadow-lg transition-all duration-300 px-8 py-3"
+              className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground hover:shadow-xl hover:scale-105 transition-all duration-300 px-10 py-4 text-lg font-semibold"
             >
               <Link to="/diagnostic">
-                <Brain className="h-5 w-5 mr-2" />
+                <Brain className="h-6 w-6 mr-3" />
                 Tester le diagnostic
               </Link>
             </Button>
             <Button 
               asChild 
-              variant="outline" 
+              variant="secondary" 
               size="lg"
-              className="border-primary/20 hover:border-primary/40"
+              className="bg-accent/10 border-2 border-accent/30 hover:border-accent/50 hover:bg-accent/20 transition-all duration-300 px-8 py-4 text-lg"
             >
               <Link to="/assistant-vocal">
-                <Mic className="h-5 w-5 mr-2" />
+                <Mic className="h-6 w-6 mr-3" />
                 Assistant vocal
               </Link>
             </Button>
@@ -134,21 +134,21 @@ const Index = () => {
         {/* Main Content - Tabbed Layout */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className={`${isMobileMenuOpen ? 'grid' : 'hidden md:grid'} w-full grid-cols-2 md:grid-cols-4 mb-6`} id="mobile-tab-menu">
-            <TabsTrigger value="overview" className="text-xs md:text-sm">
-              <BarChart3 className="h-4 w-4 mr-1 md:mr-2" />
+            <TabsTrigger value="overview" className="text-xs md:text-sm flex items-center gap-1">
+              <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Vue</span> Globale
             </TabsTrigger>
-            <TabsTrigger value="agents" className="text-xs md:text-sm">
-              <Users className="h-4 w-4 mr-1 md:mr-2" />
-              Agents
+            <TabsTrigger value="agents" className="text-xs md:text-sm flex items-center gap-1">
+              <Activity className="h-4 w-4" />
+              <span className="hidden sm:inline">Perf.</span> Agents
             </TabsTrigger>
-            <TabsTrigger value="details" className="text-xs md:text-sm">
-              <AlertCircle className="h-4 w-4 mr-1 md:mr-2" />
-              Détails
+            <TabsTrigger value="details" className="text-xs md:text-sm flex items-center gap-1">
+              <AlertCircle className="h-4 w-4" />
+              <span className="hidden sm:inline">Non-</span>Conformités
             </TabsTrigger>
-            <TabsTrigger value="actions" className="text-xs md:text-sm">
-              <Zap className="h-4 w-4 mr-1 md:mr-2" />
-              Actions
+            <TabsTrigger value="actions" className="text-xs md:text-sm flex items-center gap-1">
+              <Zap className="h-4 w-4" />
+              <span className="hidden sm:inline">Actions</span> Prioritaires
             </TabsTrigger>
           </TabsList>
 
