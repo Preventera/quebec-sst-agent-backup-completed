@@ -16,6 +16,7 @@ import PromptCatalog from "./pages/PromptCatalog";
 import PromptAdmin from "./pages/PromptAdmin";
 import Diagnostic from "./pages/Diagnostic";
 import DocuGen from "./pages/DocuGen";
+import AgileFunctionsHub from "./components/agile/AgileFunctionsHub";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
 import ComplianceDetails from "./pages/ComplianceDetails";
 import AgentDemo from "./components/AgentDemo";
@@ -50,6 +51,7 @@ const App = () => (
                 <Route path="/diagnostic" element={<Diagnostic />} />
                 <Route path="/documents" element={<Navigate to="/docugen" replace />} />
                 <Route path="/docugen" element={<DocuGen />} />
+                <Route path="/agile-functions" element={<AgileFunctionsHub />} />
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
                 <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
                 <Route path="/demo" element={<AgentDemo />} />

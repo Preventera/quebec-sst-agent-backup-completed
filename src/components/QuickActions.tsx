@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, MessageSquare, Settings, Download, Info, ArrowRight } from "lucide-react";
+import { FileText, Zap, Settings, Download, Info, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -11,10 +11,10 @@ const QuickActions = () => {
   const handleAction = (index: number) => {
     switch (index) {
       case 0: // Générer rapport
-        navigate('/document-generation');
+        navigate('/docugen');
         break;
-      case 1: // Consulter Conversa
-        toast.info("Fonctionnalité Conversa en cours de développement");
+      case 1: // Fonctions Agiles SST
+        navigate('/agile-functions');
         break;
       case 2: // Configuration
         toast.info("Page de configuration en cours de développement");
@@ -35,10 +35,10 @@ const QuickActions = () => {
       action: "Générer"
     },
     {
-      icon: MessageSquare,
-      title: "Consulter Conversa",
-      description: "Assistant IA conversationnel",
-      action: "Ouvrir"
+      icon: Zap,
+      title: "Fonctions Agiles SST",
+      description: "200+ actions de conformité",
+      action: "Explorer"
     },
     {
       icon: Settings,
