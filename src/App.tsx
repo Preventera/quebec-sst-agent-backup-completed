@@ -16,6 +16,7 @@ import PromptCatalog from "./pages/PromptCatalog";
 import PromptAdmin from "./pages/PromptAdmin";
 import Diagnostic from "./pages/Diagnostic";
 import DocumentGeneration from "./pages/DocumentGeneration";
+import DocuGen from "./pages/DocuGen";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
 import ComplianceDetails from "./pages/ComplianceDetails";
 import AgentDemo from "./components/AgentDemo";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/prompts/admin" element={<PromptAdmin />} />
                 <Route path="/diagnostic" element={<Diagnostic />} />
                 <Route path="/documents" element={<DocumentGeneration />} />
+                <Route path="/docugen" element={<DocuGen />} />
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
                 <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
                 <Route path="/demo" element={<AgentDemo />} />

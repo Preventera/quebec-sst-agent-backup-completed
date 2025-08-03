@@ -44,11 +44,11 @@ export const useUserProfile = () => {
     const permissions: Record<UserRole, string[]> = {
       'Employeur': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
-        'documents', 'knowledge-base', 'compliance-dashboard'
+        'documents', 'docugen', 'knowledge-base', 'compliance-dashboard'
       ],
       'RSS': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
-        'documents', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
+        'documents', 'docugen', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
         'conversation-logs', 'annotation', 'prompt-agents', 'prompt-admin'
       ],
       'CoSS': [
@@ -57,11 +57,11 @@ export const useUserProfile = () => {
       ],
       'ALSS': [
         'home', 'assistant', 'faq', 'diagnostic-quick',
-        'documents', 'knowledge-base', 'compliance-dashboard', 'prompt-agents'
+        'documents', 'docugen', 'knowledge-base', 'compliance-dashboard', 'prompt-agents'
       ],
       'Admin': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
-        'documents', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
+        'documents', 'docugen', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
         'tests', 'demo', 'conversation-logs', 'annotation', 'prompt-agents',
         'prompt-admin', 'crawling'
       ]

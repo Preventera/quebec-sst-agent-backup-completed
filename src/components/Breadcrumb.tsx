@@ -28,6 +28,7 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className }) => {
       'assistant-vocal': 'Assistant Vocal SST',
       'diagnostic': 'Diagnostic Intelligent',
       'documents': 'Génération Documents',
+      'docugen': 'DocuGen 2.0',
       'learning': 'Dashboard Analytics',
       'tests': 'Tests & Démonstrations',
       'logs': 'Logs Conversations',

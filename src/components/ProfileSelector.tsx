@@ -18,7 +18,7 @@ export const ProfileSelector: React.FC = () => {
   
   // Count accessible modules for current role
   const accessibleModules = [
-    'assistant', 'diagnostic-quick', 'diagnostic-detailed', 'documents',
+    'assistant', 'diagnostic-quick', 'diagnostic-detailed', 'documents', 'docugen',
     'knowledge-base', 'compliance-dashboard', 'learning-dashboard', 'tests',
     'conversation-logs', 'annotation', 'prompt-agents', 'prompt-admin', 'crawling'
   ].filter(module => hasAccess(module)).length;
