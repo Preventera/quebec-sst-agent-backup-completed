@@ -554,3 +554,36 @@ export function findRelatedArticles(subjectId: string): LegalArticle[] {
   
   return related;
 }
+
+// Classe de gestion de l'ontologie légale
+export class LegalOntologyManager {
+  getFrameworks(): LegalFramework[] {
+    return LEGAL_FRAMEWORKS;
+  }
+  
+  getSubjects(): SSTSubject[] {
+    return SST_SUBJECTS;
+  }
+  
+  getSectors(): SectorDefinition[] {
+    return SECTOR_DEFINITIONS;
+  }
+  
+  getApplicableLaws(companySize: number, sector: string, date?: Date): LegalArticle[] {
+    return getApplicableLaws(companySize, sector, date);
+  }
+  
+  getRequiredSubjects(
+    companySize: number, 
+    sector: string, 
+    riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'medium'
+  ): SSTSubject[] {
+    return getRequiredSubjects(companySize, sector, riskLevel);
+  }
+}
+
+// Export de la classe pour les tests
+export { LegalOntologyManager as LegalOntology };
+
+// Instance singleton pour utilisation globale
+export const legalOntology = new LegalOntologyManager();

@@ -1,0 +1,1 @@
+Please add the ANTHROPIC_API_KEY secret to enable Claude 4 Sonnet for DocuGen AI generation.

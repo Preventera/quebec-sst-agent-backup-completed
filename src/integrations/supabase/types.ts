@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      compliance_history: {
+        Row: {
+          company_id: string
+          corrective_actions: string[] | null
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          status: string
+          type: string
+        }
+        Insert: {
+          company_id: string
+          corrective_actions?: string[] | null
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          status: string
+          type?: string
+        }
+        Update: {
+          company_id?: string
+          corrective_actions?: string[] | null
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          status?: string
+          type?: string
+        }
+        Relationships: []
+      }
       conversation_logs: {
         Row: {
           agent_name: string
@@ -47,6 +80,45 @@ export type Database = {
         }
         Relationships: []
       }
+      diagnostic_results: {
+        Row: {
+          category: string
+          company_id: string
+          created_at: string
+          date_assessed: string
+          description: string
+          id: string
+          priority: number | null
+          recommendations: string[] | null
+          risk_level: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          company_id: string
+          created_at?: string
+          date_assessed?: string
+          description: string
+          id?: string
+          priority?: number | null
+          recommendations?: string[] | null
+          risk_level: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          created_at?: string
+          date_assessed?: string
+          description?: string
+          id?: string
+          priority?: number | null
+          recommendations?: string[] | null
+          risk_level?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       learning_metrics: {
         Row: {
           accuracy_percentage: number
@@ -71,6 +143,51 @@ export type Database = {
           id?: string
           last_updated?: string
           total_annotations?: number
+        }
+        Relationships: []
+      }
+      preventive_measures: {
+        Row: {
+          company_id: string
+          cost: number | null
+          created_at: string
+          description: string
+          effectiveness: number | null
+          id: string
+          implementation: string
+          priority: number | null
+          responsible: string | null
+          status: string
+          target_risk: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          cost?: number | null
+          created_at?: string
+          description: string
+          effectiveness?: number | null
+          id?: string
+          implementation?: string
+          priority?: number | null
+          responsible?: string | null
+          status?: string
+          target_risk?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          cost?: number | null
+          created_at?: string
+          description?: string
+          effectiveness?: number | null
+          id?: string
+          implementation?: string
+          priority?: number | null
+          responsible?: string | null
+          status?: string
+          target_risk?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -162,6 +279,87 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      risk_inventory: {
+        Row: {
+          company_id: string
+          control_measures: string[] | null
+          created_at: string
+          hazard_type: string
+          id: string
+          location: string
+          probability: number | null
+          risk_score: number | null
+          severity: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          control_measures?: string[] | null
+          created_at?: string
+          hazard_type: string
+          id?: string
+          location: string
+          probability?: number | null
+          risk_score?: number | null
+          severity?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          control_measures?: string[] | null
+          created_at?: string
+          hazard_type?: string
+          id?: string
+          location?: string
+          probability?: number | null
+          risk_score?: number | null
+          severity?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scian_actions: {
+        Row: {
+          company_id: string
+          created_at: string
+          deadline: string | null
+          description: string
+          evidence: string[] | null
+          id: string
+          implemented: boolean | null
+          mandatory: boolean | null
+          scian_code: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          deadline?: string | null
+          description: string
+          evidence?: string[] | null
+          id?: string
+          implemented?: boolean | null
+          mandatory?: boolean | null
+          scian_code: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          deadline?: string | null
+          description?: string
+          evidence?: string[] | null
+          id?: string
+          implemented?: boolean | null
+          mandatory?: boolean | null
+          scian_code?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       sst_content_changes: {
         Row: {

@@ -4,7 +4,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DocumentTemplate, DocumentGenerationRequest, GeneratedDocument } from '@/types/docugen';
 import { DocuGenEngine } from '@/lib/docugen/templateEngine';
-import { LegalOntology } from '@/lib/docugen/legalOntology';
+import { LegalOntologyManager } from '@/lib/docugen/legalOntology';
 import { SafetyGraphIntegrator } from '@/lib/safetyGraphIntegration';
 
 // Mock des dépendances
@@ -24,12 +24,12 @@ vi.mock('@/integrations/supabase/client', () => ({
 
 describe('DocuGen 2.0 Pipeline Tests', () => {
   let docuGenEngine: DocuGenEngine;
-  let legalOntology: LegalOntology;
+  let legalOntology: LegalOntologyManager;
   let safetyIntegrator: SafetyGraphIntegrator;
 
   beforeEach(() => {
     docuGenEngine = new DocuGenEngine();
-    legalOntology = new LegalOntology();
+    legalOntology = new LegalOntologyManager();
     safetyIntegrator = new SafetyGraphIntegrator();
   });
 

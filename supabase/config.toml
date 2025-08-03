@@ -60,6 +60,9 @@ verify_jwt = false
 [functions.get-agent-feedback]
 verify_jwt = false
 
+[functions.docugen-ai]
+verify_jwt = false
+
 [edge-runtime]
 enabled = true
 port = 54330
