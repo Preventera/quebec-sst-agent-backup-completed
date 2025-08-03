@@ -49,21 +49,21 @@ export const useUserProfile = () => {
       'RSS': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
         'documents', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
-        'conversation-logs', 'annotation', 'prompt-agents', 'prompt-orchestration'
+        'conversation-logs', 'annotation', 'prompt-agents', 'prompt-admin'
       ],
       'CoSS': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
-        'knowledge-base', 'compliance-dashboard'
+        'knowledge-base', 'compliance-dashboard', 'prompt-agents'
       ],
       'ALSS': [
         'home', 'assistant', 'faq', 'diagnostic-quick',
-        'documents', 'knowledge-base', 'compliance-dashboard'
+        'documents', 'knowledge-base', 'compliance-dashboard', 'prompt-agents'
       ],
       'Admin': [
         'home', 'assistant', 'faq', 'diagnostic-quick', 'diagnostic-detailed',
         'documents', 'knowledge-base', 'compliance-dashboard', 'learning-dashboard',
         'tests', 'demo', 'conversation-logs', 'annotation', 'prompt-agents',
-        'prompt-orchestration', 'crawling'
+        'prompt-admin', 'crawling'
       ]
     };
 

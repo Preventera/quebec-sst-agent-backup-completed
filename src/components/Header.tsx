@@ -139,15 +139,15 @@ const Header = () => {
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {hasAccess('prompt-orchestration') && (
+                      {hasAccess('prompt-agents') && (
                         <DropdownMenuItem asChild>
                           <Link to="/prompts/catalog" className="w-full">
                             <BookOpen className="h-4 w-4 mr-2" />
-                            Catalogue des workflows
+                            Catalogue Prompts
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {hasAccess('prompt-agents') && (
+                      {hasAccess('prompt-admin') && (
                         <DropdownMenuItem asChild>
                           <Link to="/prompts/admin" className="w-full">
                             <Settings className="h-4 w-4 mr-2" />
@@ -286,7 +286,7 @@ const Header = () => {
                 </Link>
               )}
               
-              {hasAccess('prompt-orchestration') && (
+              {hasAccess('prompt-agents') && (
                 <Link to="/prompts/catalog" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                     <BookOpen className="h-4 w-4 mr-2" aria-hidden="true" />
@@ -295,7 +295,7 @@ const Header = () => {
                 </Link>
               )}
               
-              {hasAccess('prompt-agents') && (
+              {hasAccess('prompt-admin') && (
                 <Link to="/prompts/admin" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                     <Settings className="h-4 w-4 mr-2" aria-hidden="true" />

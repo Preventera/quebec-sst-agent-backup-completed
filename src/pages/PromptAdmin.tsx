@@ -8,12 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap, MoreVertical, Edit, Copy, Play, Upload, Lock } from "lucide-react";
+import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap, MoreVertical, Edit, Copy, Play, Upload, Lock, ShieldAlert } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
+import { useUserProfile } from "@/hooks/useUserProfile";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import orchestrationPrompts from "@/data/orchestrationPrompts.json";
 
 interface AgentFeedback {
