@@ -25,19 +25,21 @@ const Breadcrumb: React.FC<BreadcrumbProps> = ({ items, className }) => {
     ];
 
     const routeLabels: Record<string, string> = {
-      'assistant-vocal': 'Assistant Vocal',
-      'diagnostic': 'Diagnostic',
-      'documents': 'Documents',
-      'learning': 'Dashboard',
-      'tests': 'Tests & Démo',
+      'assistant-vocal': 'Assistant Vocal SST',
+      'diagnostic': 'Diagnostic Intelligent',
+      'documents': 'Génération Documents',
+      'learning': 'Dashboard Analytics',
+      'tests': 'Tests & Démonstrations',
       'logs': 'Logs Conversations',
-      'annotation': 'Annotation',
-      'prompts': 'Gestion Prompts',
-      'sst-knowledge': 'Base SST',
+      'annotation': 'Interface Annotation',
+      'prompts': 'Workflows',
+      'catalog': 'Catalogue Workflows',
+      'admin': 'Administration Workflows',
+      'sst-knowledge': 'Base de Connaissances SST',
       'crawling-dashboard': 'Crawling SST',
-      'faq': 'FAQ',
+      'faq': 'Aide & Support',
       'compliance-details': 'Détails Conformité',
-      'auth': 'Connexion'
+      'auth': 'Authentification'
     };
 
     pathSegments.forEach((segment, index) => {

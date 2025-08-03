@@ -9,12 +9,19 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, User, Users, Shield, UserCheck, Settings } from 'lucide-react';
+import { ChevronDown, User, Users, Shield, UserCheck, Settings, Info } from 'lucide-react';
 import { useUserProfile, UserRole } from '@/hooks/useUserProfile';
 
 export const ProfileSelector: React.FC = () => {
-  const { profile, updateRole, getRoleInfo } = useUserProfile();
+  const { profile, updateRole, getRoleInfo, hasAccess } = useUserProfile();
   const roleInfo = getRoleInfo();
+  
+  // Count accessible modules for current role
+  const accessibleModules = [
+    'assistant', 'diagnostic-quick', 'diagnostic-detailed', 'documents',
+    'knowledge-base', 'compliance-dashboard', 'learning-dashboard', 'tests',
+    'conversation-logs', 'annotation', 'prompt-agents', 'prompt-admin', 'crawling'
+  ].filter(module => hasAccess(module)).length;
 
   const roles: Array<{
     value: UserRole;
@@ -68,10 +75,14 @@ export const ProfileSelector: React.FC = () => {
           <div className={`w-3 h-3 rounded-full ${roleInfo.color}`} />
           Profil actuel : {roleInfo.label}
         </DropdownMenuLabel>
-        <div className="px-2 pb-2">
+        <div className="px-2 pb-2 space-y-1">
           <Badge variant="secondary" className="text-xs">
             {roleInfo.description}
           </Badge>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Info className="h-3 w-3" />
+            Accès à {accessibleModules} modules
+          </div>
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-xs text-muted-foreground">

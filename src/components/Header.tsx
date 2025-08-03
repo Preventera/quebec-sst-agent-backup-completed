@@ -1,6 +1,6 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3, MoreHorizontal } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3, MoreHorizontal, Database, Search, TestTube, Activity, Workflow, Lock, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -90,78 +90,127 @@ const Header = () => {
                         <ChevronDown className="h-3 w-3 ml-1" aria-hidden="true" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 z-50 bg-background border shadow-md">
+                    <DropdownMenuContent align="end" className="w-64 z-50 bg-background border shadow-md">
+                      {/* Analytics Section */}
                       {(hasAccess('compliance-dashboard') || hasAccess('learning-dashboard')) && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/learning" className="w-full">
-                            <TrendingUp className="h-4 w-4 mr-2" />
-                            Dashboard Analytics
-                          </Link>
-                        </DropdownMenuItem>
+                        <>
+                          <DropdownMenuLabel className="flex items-center gap-2">
+                            <Activity className="h-4 w-4" />
+                            Analytics
+                          </DropdownMenuLabel>
+                          <DropdownMenuItem asChild>
+                            <Link to="/learning" className="w-full">
+                              <TrendingUp className="h-4 w-4 mr-2" />
+                              Dashboard Conformité
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
                       )}
-                      {hasAccess('knowledge-base') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/sst-knowledge" className="w-full">
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            Base de connaissances SST
-                          </Link>
-                        </DropdownMenuItem>
+                      
+                      {/* Knowledge & Resources Section */}
+                      {(hasAccess('knowledge-base') || hasAccess('faq')) && (
+                        <>
+                          <DropdownMenuLabel className="flex items-center gap-2">
+                            <Search className="h-4 w-4" />
+                            Ressources
+                          </DropdownMenuLabel>
+                          {hasAccess('knowledge-base') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/sst-knowledge" className="w-full">
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                Base de connaissances SST
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          {hasAccess('faq') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/faq" className="w-full">
+                                <HelpCircle className="h-4 w-4 mr-2" />
+                                FAQ
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                        </>
                       )}
-                      {hasAccess('tests') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/tests" className="w-full">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Tests & Démonstrations
-                          </Link>
-                        </DropdownMenuItem>
+                      
+                      {/* Testing & Quality Section */}
+                      {(hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation')) && (
+                        <>
+                          <DropdownMenuLabel className="flex items-center gap-2">
+                            <TestTube className="h-4 w-4" />
+                            Tests & Qualité
+                          </DropdownMenuLabel>
+                          {hasAccess('tests') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/tests" className="w-full">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Tests & Démonstrations
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          {hasAccess('conversation-logs') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/logs" className="w-full">
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                                Logs conversations
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          {hasAccess('annotation') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/annotation" className="w-full">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Interface annotation
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuSeparator />
+                        </>
                       )}
-                      {hasAccess('conversation-logs') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/logs" className="w-full">
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Logs des conversations
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {hasAccess('annotation') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/annotation" className="w-full">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Interface d'annotation
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
+                      
+                      {/* Data Management Section */}
                       {hasAccess('crawling') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/crawling-dashboard" className="w-full">
-                            <Globe className="h-4 w-4 mr-2" />
-                            Crawling SST
-                          </Link>
-                        </DropdownMenuItem>
+                        <>
+                          <DropdownMenuLabel className="flex items-center gap-2">
+                            <Database className="h-4 w-4" />
+                            Données
+                          </DropdownMenuLabel>
+                          <DropdownMenuItem asChild>
+                            <Link to="/crawling-dashboard" className="w-full">
+                              <Globe className="h-4 w-4 mr-2" />
+                              Crawling SST
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
                       )}
-                      {hasAccess('prompt-agents') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/prompts/catalog" className="w-full">
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            Catalogue Prompts
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {hasAccess('prompt-admin') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/prompts/admin" className="w-full">
-                            <Settings className="h-4 w-4 mr-2" />
-                            Administration prompts
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {hasAccess('faq') && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/faq" className="w-full">
-                            <HelpCircle className="h-4 w-4 mr-2" />
-                            FAQ
-                          </Link>
-                        </DropdownMenuItem>
+                      
+                      {/* Workflow Management Section */}
+                      {(hasAccess('prompt-agents') || hasAccess('prompt-admin')) && (
+                        <>
+                          <DropdownMenuLabel className="flex items-center gap-2">
+                            <Workflow className="h-4 w-4" />
+                            Workflows
+                          </DropdownMenuLabel>
+                          {hasAccess('prompt-agents') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/prompts/catalog" className="w-full">
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                Catalogue Workflows
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                          {hasAccess('prompt-admin') && (
+                            <DropdownMenuItem asChild>
+                              <Link to="/prompts/admin" className="w-full">
+                                <Lock className="h-4 w-4 mr-2" />
+                                Administration
+                              </Link>
+                            </DropdownMenuItem>
+                          )}
+                        </>
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
