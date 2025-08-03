@@ -125,10 +125,18 @@ export default function DocuGen() {
     : [];
 
   const handleGenerateDocument = async () => {
-    if (!selectedTemplate || !companyProfile.name || companyProfile.size === 0) {
+    // Validation des champs obligatoires
+    const missingFields = [];
+    if (!companyProfile.name) missingFields.push("Nom de l'entreprise");
+    if (!companyProfile.address) missingFields.push("Adresse de l'établissement");
+    if (companyProfile.size === 0) missingFields.push("Taille de l'entreprise");
+    if (!companyProfile.sector) missingFields.push("Secteur d'activité");
+    if (!selectedTemplate) missingFields.push("Template sélectionné");
+
+    if (missingFields.length > 0) {
       toast({
         title: "Données manquantes",
-        description: "Veuillez remplir tous les champs obligatoires",
+        description: `Champs requis: ${missingFields.join(', ')}`,
         variant: "destructive"
       });
       return;
