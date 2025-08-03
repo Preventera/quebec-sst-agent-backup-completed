@@ -483,7 +483,7 @@ export class DocuGenEngine {
     const profile = request.companyProfile;
     
     // Get applicable laws and articles
-    const applicableLaws = getApplicableLaws(profile.size, profile.sector);
+    const applicableLaws = getApplicableLaws(profile.size, profile.sector, profile.scianCode);
     const requiredSubjects = getRequiredSubjects(profile.size, profile.sector, profile.riskLevel);
     const relatedArticles = findRelatedArticles(template.subject);
 

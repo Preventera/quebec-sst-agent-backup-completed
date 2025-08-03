@@ -117,7 +117,7 @@ export default function DocuGen() {
 
   // Get legal context
   const applicableLaws = companyProfile.size > 0 && companyProfile.sector 
-    ? getApplicableLaws(companyProfile.size, companyProfile.sector)
+    ? getApplicableLaws(companyProfile.size, companyProfile.sector, companyProfile.scianCode)
     : [];
 
   const requiredSubjects = companyProfile.size > 0 && companyProfile.sector

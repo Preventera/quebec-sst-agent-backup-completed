@@ -439,13 +439,14 @@ export const ONTOLOGY_RELATIONSHIPS: OntologyRelationship[] = [
 export function getApplicableLaws(
   companySize: number, 
   sector: string, 
+  scianCode?: string,
   date: Date = new Date()
 ): LegalArticle[] {
   const applicable: LegalArticle[] = [];
   
   for (const framework of LEGAL_FRAMEWORKS) {
     for (const article of framework.articles) {
-      if (isArticleApplicable(article, companySize, sector, date)) {
+      if (isArticleApplicable(article, companySize, sector, scianCode, date)) {
         applicable.push(article);
       }
     }
@@ -458,10 +459,11 @@ export function isArticleApplicable(
   article: LegalArticle,
   companySize: number,
   sector: string,
-  date: Date
+  scianCode?: string,
+  date: Date = new Date()
 ): boolean {
   for (const condition of article.applicabilityConditions) {
-    if (!evaluateCondition(condition, companySize, sector, date)) {
+    if (!evaluateCondition(condition, companySize, sector, scianCode, date)) {
       return false;
     }
   }
@@ -472,7 +474,8 @@ function evaluateCondition(
   condition: ApplicabilityCondition,
   companySize: number,
   sector: string,
-  date: Date
+  scianCode?: string,
+  date: Date = new Date()
 ): boolean {
   switch (condition.type) {
     case 'company_size':
@@ -569,8 +572,8 @@ export class LegalOntologyManager {
     return SECTOR_DEFINITIONS;
   }
   
-  getApplicableLaws(companySize: number, sector: string, date?: Date): LegalArticle[] {
-    return getApplicableLaws(companySize, sector, date);
+  getApplicableLaws(companySize: number, sector: string, scianCode?: string, date?: Date): LegalArticle[] {
+    return getApplicableLaws(companySize, sector, scianCode, date);
   }
   
   getRequiredSubjects(
