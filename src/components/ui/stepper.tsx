@@ -32,7 +32,7 @@ export const Stepper: React.FC<StepperProps> = ({
           const isClickable = index <= Math.max(currentStep, Math.max(...completedSteps, -1) + 1);
           
           return (
-            <React.Fragment key={step.id}>
+            <div key={step.id} className="flex items-center">
               <div
                 className={cn(
                   "flex flex-col items-center cursor-pointer transition-all duration-200",
@@ -88,7 +88,7 @@ export const Stepper: React.FC<StepperProps> = ({
                   )}
                 />
               )}
-            </React.Fragment>
+            </div>
           );
         })}
       </div>
