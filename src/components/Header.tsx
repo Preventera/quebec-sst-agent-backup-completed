@@ -75,7 +75,7 @@ const Header = () => {
               )}
               
               {hasAccess('documents') && (
-                <Link to="/documents">
+                <Link to="/docugen">
                   <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
                     <FileText className="h-3 w-3 mr-1" aria-hidden="true" />
                     Documents
@@ -296,7 +296,7 @@ const Header = () => {
               )}
               
               {hasAccess('documents') && (
-                <Link to="/documents" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link to="/docugen" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
                     <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
                     Documents

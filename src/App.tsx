@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AccessibilityProvider } from "@/components/AccessibilityProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
@@ -15,7 +15,6 @@ import PromptManagement from "./pages/PromptManagement";
 import PromptCatalog from "./pages/PromptCatalog";
 import PromptAdmin from "./pages/PromptAdmin";
 import Diagnostic from "./pages/Diagnostic";
-import DocumentGeneration from "./pages/DocumentGeneration";
 import DocuGen from "./pages/DocuGen";
 import SSTKnowledgeBase from "./pages/SSTKnowledgeBase";
 import ComplianceDetails from "./pages/ComplianceDetails";
@@ -49,7 +48,7 @@ const App = () => (
                 <Route path="/prompts/catalog" element={<PromptCatalog />} />
                 <Route path="/prompts/admin" element={<PromptAdmin />} />
                 <Route path="/diagnostic" element={<Diagnostic />} />
-                <Route path="/documents" element={<DocumentGeneration />} />
+                <Route path="/documents" element={<Navigate to="/docugen" replace />} />
                 <Route path="/docugen" element={<DocuGen />} />
                 <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
                 <Route path="/compliance-details/:metricType" element={<ComplianceDetails />} />
