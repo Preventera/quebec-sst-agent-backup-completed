@@ -71,3 +71,5 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+Notebook LLM: https://notebooklm.google.com/notebook/01fd5b40-12c5-4ee1-87d7-535663a7d8b4
