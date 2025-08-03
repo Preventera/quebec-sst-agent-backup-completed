@@ -1,14 +1,15 @@
 // Carte de profil d'entreprise améliorée
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Building2, Users, MapPin, HelpCircle, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Building2, Users, MapPin, HelpCircle, CheckCircle, AlertTriangle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CompanyProfile } from '@/types/docugen';
+import { getSuggestedScianCodes } from '@/data/scianMapping';
 
 interface CompanyProfileCardProps {
   profile: CompanyProfile;
@@ -102,6 +103,25 @@ export const CompanyProfileCard: React.FC<CompanyProfileCardProps> = ({
   onProfileChange,
   errors = {}
 }) => {
+  const [suggestedScianCodes, setSuggestedScianCodes] = useState<Array<{code: string, label: string}>>([]);
+  const [showScianSuggestion, setShowScianSuggestion] = useState(false);
+
+  // Auto-suggestion des codes SCIAN selon le secteur
+  useEffect(() => {
+    if (profile.sector) {
+      const suggestions = getSuggestedScianCodes(profile.sector);
+      setSuggestedScianCodes(suggestions);
+      setShowScianSuggestion(suggestions.length > 0 && !profile.scianCode);
+    } else {
+      setSuggestedScianCodes([]);
+      setShowScianSuggestion(false);
+    }
+  }, [profile.sector, profile.scianCode]);
+
+  const handleScianSuggestion = (scianCode: string) => {
+    onProfileChange('scianCode', scianCode);
+    setShowScianSuggestion(false);
+  };
   const sectors = [
     { value: 'construction', label: 'Construction' },
     { value: 'manufacturier', label: 'Manufacturier' },
@@ -248,17 +268,51 @@ export const CompanyProfileCard: React.FC<CompanyProfileCardProps> = ({
         className="bg-muted/30"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FieldWithValidation
-            label="Code SCIAN"
-            tooltip="Code SCIAN spécifique (optionnel)"
-            value={profile.scianCode}
-          >
-            <Input
-              placeholder="Ex: 236220"
-              value={profile.scianCode || ''}
-              onChange={(e) => onProfileChange('scianCode', e.target.value)}
-            />
-          </FieldWithValidation>
+          <div className="space-y-3">
+            <FieldWithValidation
+              label="Code SCIAN"
+              tooltip="Code SCIAN spécifique (optionnel)"
+              value={profile.scianCode}
+            >
+              <Input
+                placeholder="Ex: 236220"
+                value={profile.scianCode || ''}
+                onChange={(e) => onProfileChange('scianCode', e.target.value)}
+              />
+            </FieldWithValidation>
+
+            {/* Suggestions SCIAN automatiques */}
+            {showScianSuggestion && suggestedScianCodes.length > 0 && (
+              <Card className="border-primary/20 bg-primary/5">
+                <CardContent className="p-3">
+                  <div className="flex items-start gap-2 mb-2">
+                    <Lightbulb className="h-4 w-4 text-primary mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium text-primary">Codes SCIAN suggérés pour {profile.sector}</p>
+                      <p className="text-xs text-muted-foreground">Cliquez pour appliquer automatiquement</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    {suggestedScianCodes.slice(0, 3).map((suggestion) => (
+                      <button
+                        key={suggestion.code}
+                        onClick={() => handleScianSuggestion(suggestion.code)}
+                        className="w-full text-left p-2 rounded-md hover:bg-primary/10 transition-colors border border-transparent hover:border-primary/20"
+                      >
+                        <span className="font-mono text-sm font-medium text-primary">{suggestion.code}</span>
+                        <span className="text-xs text-muted-foreground ml-2">{suggestion.label}</span>
+                      </button>
+                    ))}
+                    {suggestedScianCodes.length > 3 && (
+                      <p className="text-xs text-muted-foreground text-center pt-1">
+                        +{suggestedScianCodes.length - 3} autres codes disponibles
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
 
           <FieldWithValidation
             label="Activités spécifiques"
