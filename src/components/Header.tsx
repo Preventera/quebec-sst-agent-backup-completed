@@ -83,14 +83,6 @@ const Header = () => {
                 </Link>
               )}
               
-              {hasAccess('docugen') && (
-                <Link to="/docugen">
-                  <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
-                    <FileText className="h-3 w-3 mr-1" aria-hidden="true" />
-                    DocuGen 2.0
-                  </Button>
-                </Link>
-              )}
               
               {/* Analytics & Tools - Grouped */}
               {(hasAccess('learning-dashboard') || hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling') || hasAccess('prompt-agents') || hasAccess('prompt-admin') || hasAccess('faq')) && (
@@ -304,14 +296,6 @@ const Header = () => {
                 </Link>
               )}
               
-              {hasAccess('docugen') && (
-                <Link to="/docugen" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
-                    <FileText className="h-4 w-4 mr-2" aria-hidden="true" />
-                    DocuGen 2.0
-                  </Button>
-                </Link>
-              )}
               
               {hasAccess('knowledge-base') && (
                 <Link to="/sst-knowledge" onClick={() => setIsMobileMenuOpen(false)}>
