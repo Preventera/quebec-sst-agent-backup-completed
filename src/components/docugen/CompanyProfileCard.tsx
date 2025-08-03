@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Building2, Users, MapPin, HelpCircle, CheckCircle, AlertTriangle, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -339,6 +340,52 @@ export const CompanyProfileCard: React.FC<CompanyProfileCardProps> = ({
               onChange={(e) => onProfileChange('responsible_person', e.target.value)}
             />
           </FieldWithValidation>
+
+          {/* Membres du comité SST - pour entreprises de 20+ employés */}
+          {profile.size >= 20 && (
+            <FieldWithValidation
+              label="Membres du comité SST"
+              tooltip="Membres du comité paritaire de santé et sécurité (requis pour les entreprises de 20 employés et plus)"
+              value={profile.committee_members?.join(', ')}
+            >
+              <div className="space-y-2">
+                {(profile.committee_members || []).map((member, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      value={member}
+                      onChange={(e) => {
+                        const newMembers = [...(profile.committee_members || [])];
+                        newMembers[index] = e.target.value;
+                        onProfileChange('committee_members', newMembers);
+                      }}
+                      placeholder="Ex: Marie Tremblay - Représentante employée"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newMembers = (profile.committee_members || []).filter((_, i) => i !== index);
+                        onProfileChange('committee_members', newMembers);
+                      }}
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    onProfileChange('committee_members', [...(profile.committee_members || []), '']);
+                  }}
+                >
+                  + Ajouter un membre
+                </Button>
+              </div>
+            </FieldWithValidation>
+          )}
         </div>
       </ProfileCard>
     </div>

@@ -604,7 +604,8 @@ export class DocuGenEngine {
       'company_address': 'address',
       'alss_name': 'alss_name',
       'alss_position': 'alss_position',
-      'responsible_person': 'responsible_person'
+      'responsible_person': 'responsible_person',
+      'committee_members': 'committee_members'
     };
 
     const profileKey = mapping[placeholderId];

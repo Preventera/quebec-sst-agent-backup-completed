@@ -123,6 +123,7 @@ export interface CompanyProfile {
   specificActivities?: string[];
   existingMeasures?: string[];
   responsible_person?: string;
+  committee_members?: string[];
   complianceHistory?: ComplianceRecord[];
 }
 

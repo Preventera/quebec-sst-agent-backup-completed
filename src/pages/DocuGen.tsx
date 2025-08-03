@@ -138,6 +138,14 @@ export default function DocuGen() {
       missingFields.push("Responsable du registre");
     }
 
+    // Validation des membres du comité pour entreprises de 20+ employés avec programme de prévention
+    if (selectedTemplate?.id === 'prog_prev_LMRSST_v2' && companyProfile.size >= 20) {
+      if (!companyProfile.committee_members || companyProfile.committee_members.length === 0 || 
+          companyProfile.committee_members.some(member => !member.trim())) {
+        missingFields.push("Membres du comité SST");
+      }
+    }
+
     if (missingFields.length > 0) {
       toast({
         title: "Données manquantes",
