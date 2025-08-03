@@ -80,7 +80,7 @@ const Header = () => {
               )}
               
               {/* Analytics & Tools - Grouped */}
-              {(hasAccess('learning-dashboard') || hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling') || hasAccess('prompt-agents') || hasAccess('faq')) && (
+              {(hasAccess('learning-dashboard') || hasAccess('tests') || hasAccess('conversation-logs') || hasAccess('annotation') || hasAccess('knowledge-base') || hasAccess('crawling') || hasAccess('prompt-agents') || hasAccess('prompt-admin') || hasAccess('faq')) && (
                 <div className="flex items-center gap-1 px-1 border-l border-primary-glow/20">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
