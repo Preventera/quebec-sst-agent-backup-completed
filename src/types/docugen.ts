@@ -122,6 +122,7 @@ export interface CompanyProfile {
   riskLevel?: 'low' | 'medium' | 'high' | 'critical';
   specificActivities?: string[];
   existingMeasures?: string[];
+  responsible_person?: string;
   complianceHistory?: ComplianceRecord[];
 }
 

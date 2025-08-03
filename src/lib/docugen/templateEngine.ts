@@ -603,7 +603,8 @@ export class DocuGenEngine {
       'company_size': 'size',
       'company_address': 'address',
       'alss_name': 'alss_name',
-      'alss_position': 'alss_position'
+      'alss_position': 'alss_position',
+      'responsible_person': 'responsible_person'
     };
 
     const profileKey = mapping[placeholderId];

@@ -125,13 +125,18 @@ export default function DocuGen() {
     : [];
 
   const handleGenerateDocument = async () => {
-    // Validation des champs obligatoires
+    // Validation des champs obligatoires de base
     const missingFields = [];
     if (!companyProfile.name) missingFields.push("Nom de l'entreprise");
     if (!companyProfile.address) missingFields.push("Adresse de l'établissement");
     if (companyProfile.size === 0) missingFields.push("Taille de l'entreprise");
     if (!companyProfile.sector) missingFields.push("Secteur d'activité");
     if (!selectedTemplate) missingFields.push("Template sélectionné");
+
+    // Validation conditionnelle selon le template
+    if (selectedTemplate?.id === 'registre_incidents_v1' && !companyProfile.responsible_person) {
+      missingFields.push("Responsable du registre");
+    }
 
     if (missingFields.length > 0) {
       toast({

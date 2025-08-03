@@ -8,19 +8,11 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Building2, Users, MapPin, HelpCircle, CheckCircle, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CompanyProfile } from '@/types/docugen';
 
 interface CompanyProfileCardProps {
-  profile: {
-    name: string;
-    size: number;
-    sector: string;
-    scianCode?: string;
-    address?: string;
-    riskLevel?: 'low' | 'medium' | 'high' | 'critical';
-    specificActivities?: string[];
-    existingMeasures?: string[];
-  };
-  onProfileChange: (field: string, value: any) => void;
+  profile: CompanyProfile;
+  onProfileChange: (field: keyof CompanyProfile, value: any) => void;
   errors?: Record<string, string>;
 }
 
@@ -279,6 +271,18 @@ export const CompanyProfileCard: React.FC<CompanyProfileCardProps> = ({
               onChange={(e) => 
                 onProfileChange('specificActivities', e.target.value.split(',').map(s => s.trim()).filter(Boolean))
               }
+            />
+          </FieldWithValidation>
+
+          <FieldWithValidation
+            label="Responsable du registre"
+            tooltip="Personne chargée de la tenue du registre (requis pour certains documents)"
+            value={profile.responsible_person}
+          >
+            <Input
+              placeholder="Ex: Jean Dupont, Superviseur SST"
+              value={profile.responsible_person || ''}
+              onChange={(e) => onProfileChange('responsible_person', e.target.value)}
             />
           </FieldWithValidation>
         </div>
