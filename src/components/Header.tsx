@@ -22,7 +22,11 @@ const Header = () => {
       <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 md:gap-3 flex-shrink-0">
-            <Shield className="h-6 w-6 md:h-8 md:w-8" aria-hidden="true" />
+            <img 
+              src="/lovable-uploads/f6462ab4-bd80-41f9-856d-f07694dc073f.png" 
+              alt="Agentic SST Québec" 
+              className="h-6 w-6 md:h-8 md:w-8 object-contain"
+            />
             <div>
               <h1 className="text-base md:text-xl font-bold">AgenticSST Québec™</h1>
               <p className="text-xs opacity-90 hidden lg:block">Conformité LMRSST intelligente</p>
