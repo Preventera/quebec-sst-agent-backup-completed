@@ -7,17 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3 } from 'lucide-react';
+import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 
 interface SSTKnowledge {
   id: string;
   title: string;
   content: string;
-  keywords: string[];
-  source: string;
-  category: string;
+  tags: string[] | null;
+  source_name: string;
+  url: string;
+  section: string | null;
+  article_number: string | null;
   created_at: string;
   relevance_score?: number;
 }
@@ -25,103 +28,87 @@ interface SSTKnowledge {
 interface SearchStats {
   totalDocuments: number;
   totalSources: number;
-  totalCategories: number;
   searchResults: number;
 }
-
-// Données de démonstration temporaires (en attendant la synchronisation des types Supabase)
-const demoSources = ['CNESST', 'IRSST', 'ASP Construction', 'ASP Secteur Minier'];
-const demoCategories = ['Sécurité générale', 'Construction', 'Santé au travail', 'Recherche'];
-
-const demoKnowledge: SSTKnowledge[] = [
-  {
-    id: '1',
-    title: 'Guide de prévention des chutes de hauteur',
-    content: 'Les chutes de hauteur constituent l\'une des principales causes d\'accidents du travail dans le secteur de la construction. Ce guide présente les meilleures pratiques pour prévenir ces accidents, incluant l\'utilisation d\'équipements de protection individuelle, la mise en place de garde-corps et la formation des travailleurs.',
-    keywords: ['chutes', 'hauteur', 'prévention', 'EPI', 'construction'],
-    source: 'CNESST',
-    category: 'Construction',
-    created_at: '2024-01-15'
-  },
-  {
-    id: '2',
-    title: 'Exposition aux poussières de silice cristalline',
-    content: 'La silice cristalline alvéolaire est un agent cancérigène reconnu. Cette recherche de l\'IRSST examine les méthodes de mesure de l\'exposition et propose des stratégies de contrôle pour protéger les travailleurs dans diverses industries.',
-    keywords: ['silice', 'poussières', 'cancérigène', 'exposition', 'mesure'],
-    source: 'IRSST',
-    category: 'Recherche',
-    created_at: '2024-02-01'
-  },
-  {
-    id: '3',
-    title: 'Formation en manutention sécuritaire',
-    content: 'Les troubles musculo-squelettiques représentent une part importante des lésions professionnelles. Cette formation couvre les techniques de levage sécuritaire, l\'organisation du travail et l\'aménagement des postes pour réduire les risques.',
-    keywords: ['manutention', 'TMS', 'ergonomie', 'formation', 'prévention'],
-    source: 'ASP Construction',
-    category: 'Sécurité générale',
-    created_at: '2024-01-20'
-  },
-  {
-    id: '4',
-    title: 'Protocole de cadenassage et consignation',
-    content: 'Le cadenassage est essentiel pour prévenir les accidents lors de la maintenance d\'équipements. Ce protocole détaille les étapes à suivre pour isoler les sources d\'énergie et sécuriser les interventions.',
-    keywords: ['cadenassage', 'consignation', 'maintenance', 'énergie', 'sécurité'],
-    source: 'CNESST',
-    category: 'Sécurité générale',
-    created_at: '2024-01-10'
-  },
-  {
-    id: '5',
-    title: 'Risques psychosociaux au travail',
-    content: 'Les facteurs psychosociaux peuvent avoir des impacts significatifs sur la santé mentale et physique des travailleurs. Cette étude examine les sources de stress au travail et propose des interventions préventives.',
-    keywords: ['psychosociaux', 'stress', 'santé mentale', 'prévention', 'organisation'],
-    source: 'IRSST',
-    category: 'Santé au travail',
-    created_at: '2024-02-05'
-  },
-  {
-    id: '6',
-    title: 'Sécurité des espaces confinés',
-    content: 'Le travail en espaces confinés présente de nombreux risques : atmosphère toxique, manque d\'oxygène, risques d\'englouti ssement. Ce guide détaille les procédures d\'entrée sécuritaire et les équipements de surveillance requis.',
-    keywords: ['espaces confinés', 'atmosphère', 'surveillance', 'procédures', 'risques'],
-    source: 'CNESST',
-    category: 'Sécurité générale',
-    created_at: '2024-01-25'
-  },
-  {
-    id: '7',
-    title: 'Ergonomie des postes de travail informatiques',
-    content: 'L\'ergonomie des postes informatiques est cruciale pour prévenir les troubles musculo-squelettiques. Cette recherche propose des recommandations pour l\'aménagement des postes et l\'organisation du travail.',
-    keywords: ['ergonomie', 'informatique', 'postes de travail', 'TMS', 'aménagement'],
-    source: 'IRSST',
-    category: 'Santé au travail',
-    created_at: '2024-02-10'
-  },
-  {
-    id: '8',
-    title: 'Formation à l\'utilisation des échafaudages',
-    content: 'Les échafaudages sont essentiels en construction mais présentent des risques importants. Cette formation couvre l\'inspection, le montage, l\'utilisation sécuritaire et le démontage des échafaudages.',
-    keywords: ['échafaudages', 'montage', 'inspection', 'formation', 'construction'],
-    source: 'ASP Construction',
-    category: 'Construction',
-    created_at: '2024-01-30'
-  }
-];
 
 const SSTKnowledgeBase = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SSTKnowledge[]>([]);
-  const [selectedSources, setSelectedSources] = useState<string[]>(demoSources);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(demoCategories);
+  const [selectedSources, setSelectedSources] = useState<string[]>([]);
   const [maxResults, setMaxResults] = useState([10]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const [availableSources, setAvailableSources] = useState<string[]>([]);
+  const [allContent, setAllContent] = useState<SSTKnowledge[]>([]);
   const [stats, setStats] = useState<SearchStats>({
-    totalDocuments: demoKnowledge.length,
-    totalSources: demoSources.length,
-    totalCategories: demoCategories.length,
+    totalDocuments: 0,
+    totalSources: 0,
     searchResults: 0
   });
+
+  // Charger les données depuis Supabase
+  const loadSSTData = async () => {
+    try {
+      setIsLoadingData(true);
+      
+      // Récupérer le contenu avec les sources
+      const { data: contentData, error: contentError } = await supabase
+        .from('sst_crawled_content')
+        .select(`
+          id,
+          title,
+          content,
+          tags,
+          url,
+          section,
+          article_number,
+          created_at,
+          sst_sources!inner(name)
+        `)
+        .order('created_at', { ascending: false });
+
+      if (contentError) {
+        throw contentError;
+      }
+
+      // Transformer les données pour l'interface
+      const transformedContent: SSTKnowledge[] = (contentData || []).map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content,
+        tags: item.tags,
+        source_name: (item.sst_sources as any)?.name || 'Source inconnue',
+        url: item.url,
+        section: item.section,
+        article_number: item.article_number,
+        created_at: item.created_at
+      }));
+
+      // Extraire les sources uniques
+      const sources = [...new Set(transformedContent.map(item => item.source_name))];
+      
+      setAllContent(transformedContent);
+      setAvailableSources(sources);
+      setSelectedSources(sources); // Sélectionner toutes les sources par défaut
+      
+      setStats({
+        totalDocuments: transformedContent.length,
+        totalSources: sources.length,
+        searchResults: 0
+      });
+
+    } catch (error) {
+      console.error('Erreur lors du chargement des données SST:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données de la base de connaissances",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   const performSearch = () => {
     if (!searchQuery.trim()) {
@@ -132,25 +119,26 @@ const SSTKnowledgeBase = () => {
 
     setIsLoading(true);
     
-    // Simulation d'une recherche avec délai
+    // Simulation d'un délai pour l'expérience utilisateur
     setTimeout(() => {
       const query = searchQuery.toLowerCase();
       
       // Filtrer les résultats
-      const filteredResults = demoKnowledge
+      const filteredResults = allContent
         .filter(item => {
-          // Filtres par source et catégorie
-          const sourceMatch = selectedSources.includes(item.source);
-          const categoryMatch = selectedCategories.includes(item.category);
+          // Filtre par source
+          const sourceMatch = selectedSources.includes(item.source_name);
           
           // Recherche textuelle
           const titleMatch = item.title.toLowerCase().includes(query);
           const contentMatch = item.content.toLowerCase().includes(query);
-          const keywordMatch = item.keywords.some(keyword => 
-            keyword.toLowerCase().includes(query)
-          );
+          const tagsMatch = item.tags ? item.tags.some(tag => 
+            tag.toLowerCase().includes(query)
+          ) : false;
+          const sectionMatch = item.section ? item.section.toLowerCase().includes(query) : false;
+          const articleMatch = item.article_number ? item.article_number.toLowerCase().includes(query) : false;
           
-          return sourceMatch && categoryMatch && (titleMatch || contentMatch || keywordMatch);
+          return sourceMatch && (titleMatch || contentMatch || tagsMatch || sectionMatch || articleMatch);
         })
         .map(item => ({
           ...item,
@@ -162,7 +150,7 @@ const SSTKnowledgeBase = () => {
       setResults(filteredResults);
       setStats(prev => ({ ...prev, searchResults: filteredResults.length }));
       setIsLoading(false);
-    }, 800);
+    }, 300);
   };
 
   const calculateRelevanceScore = (item: SSTKnowledge, query: string): number => {
@@ -176,11 +164,21 @@ const SSTKnowledgeBase = () => {
 
     // Score basé sur la correspondance dans le contenu
     const contentMatches = (item.content.toLowerCase().match(new RegExp(queryLower, 'g')) || []).length;
-    score += contentMatches * 10;
+    score += contentMatches * 5;
 
-    // Score basé sur les mots-clés
-    if (item.keywords.some(keyword => keyword.toLowerCase().includes(queryLower))) {
+    // Score basé sur les tags
+    if (item.tags && item.tags.some(tag => tag.toLowerCase().includes(queryLower))) {
       score += 30;
+    }
+
+    // Score basé sur la section
+    if (item.section && item.section.toLowerCase().includes(queryLower)) {
+      score += 20;
+    }
+
+    // Score basé sur le numéro d'article
+    if (item.article_number && item.article_number.toLowerCase().includes(queryLower)) {
+      score += 40;
     }
 
     return Math.min(score, 100);
@@ -209,20 +207,18 @@ const SSTKnowledgeBase = () => {
     );
   };
 
-  const handleCategoryToggle = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
+
+  // Charger les données au montage du composant
+  useEffect(() => {
+    loadSSTData();
+  }, []);
 
   // Effectuer la recherche quand les filtres changent
   useEffect(() => {
     if (searchQuery) {
       performSearch();
     }
-  }, [selectedSources, selectedCategories, maxResults]);
+  }, [selectedSources, maxResults, allContent]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -238,34 +234,34 @@ const SSTKnowledgeBase = () => {
             </h1>
           </div>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Recherche sémantique dans les ressources de santé et sécurité au travail du Québec
+            Recherche dans les ressources de santé et sécurité au travail du Québec
           </p>
-          <div className="text-sm text-muted-foreground">
-            Version de démonstration - En attente de synchronisation avec la base de données
-          </div>
+          {isLoadingData && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Chargement de la base de connaissances...
+            </div>
+          )}
         </div>
 
         {/* Métriques */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <Card>
             <CardContent className="p-4 text-center">
               <FileText className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">{stats.totalDocuments}</div>
+              <div className="text-2xl font-bold text-primary">
+                {isLoadingData ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : stats.totalDocuments}
+              </div>
               <div className="text-sm text-muted-foreground">Documents</div>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <Database className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">{stats.totalSources}</div>
+              <div className="text-2xl font-bold text-primary">
+                {isLoadingData ? <Loader2 className="h-6 w-6 animate-spin mx-auto" /> : stats.totalSources}
+              </div>
               <div className="text-sm text-muted-foreground">Sources</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <BarChart3 className="h-6 w-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">{stats.totalCategories}</div>
-              <div className="text-sm text-muted-foreground">Catégories</div>
             </CardContent>
           </Card>
           <Card>
@@ -307,14 +303,15 @@ const SSTKnowledgeBase = () => {
                 {/* Filtres par source */}
                 <div className="space-y-3">
                   <h4 className="font-medium">Sources</h4>
-                  <ScrollArea className="h-32">
+                  <ScrollArea className="h-40">
                     <div className="space-y-2">
-                      {demoSources.map((source) => (
+                      {availableSources.map((source) => (
                         <div key={source} className="flex items-center space-x-2">
                           <Checkbox
                             id={`source-${source}`}
                             checked={selectedSources.includes(source)}
                             onCheckedChange={() => handleSourceToggle(source)}
+                            disabled={isLoadingData}
                           />
                           <label 
                             htmlFor={`source-${source}`}
@@ -324,32 +321,11 @@ const SSTKnowledgeBase = () => {
                           </label>
                         </div>
                       ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                <Separator />
-
-                {/* Filtres par catégorie */}
-                <div className="space-y-3">
-                  <h4 className="font-medium">Catégories</h4>
-                  <ScrollArea className="h-32">
-                    <div className="space-y-2">
-                      {demoCategories.map((category) => (
-                        <div key={category} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`category-${category}`}
-                            checked={selectedCategories.includes(category)}
-                            onCheckedChange={() => handleCategoryToggle(category)}
-                          />
-                          <label 
-                            htmlFor={`category-${category}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {category}
-                          </label>
+                      {isLoadingData && (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         </div>
-                      ))}
+                      )}
                     </div>
                   </ScrollArea>
                 </div>
@@ -374,7 +350,7 @@ const SSTKnowledgeBase = () => {
                   </div>
                   <Button 
                     onClick={performSearch}
-                    disabled={isLoading}
+                    disabled={isLoading || isLoadingData}
                     size="lg"
                   >
                     <Search className="h-5 w-5 mr-2" />
@@ -384,8 +360,20 @@ const SSTKnowledgeBase = () => {
               </CardContent>
             </Card>
 
+            {/* État de chargement */}
+            {isLoadingData && (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    Chargement de la base de connaissances SST...
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Résultats */}
-            {results.length > 0 && (
+            {!isLoadingData && results.length > 0 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">
                   Résultats de recherche ({results.length})
@@ -397,11 +385,18 @@ const SSTKnowledgeBase = () => {
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex gap-2 flex-wrap">
                           <Badge variant="secondary">
-                            {result.source}
+                            {result.source_name}
                           </Badge>
-                          <Badge variant="outline">
-                            {result.category}
-                          </Badge>
+                          {result.section && (
+                            <Badge variant="outline">
+                              {result.section}
+                            </Badge>
+                          )}
+                          {result.article_number && (
+                            <Badge variant="outline">
+                              Article {result.article_number}
+                            </Badge>
+                          )}
                           {result.relevance_score && (
                             <Badge variant="default">
                               Score: {result.relevance_score}%
@@ -416,25 +411,35 @@ const SSTKnowledgeBase = () => {
                       
                       <div className="text-muted-foreground mb-4">
                         {highlightText(
-                          result.content.length > 300 
-                            ? result.content.substring(0, 300) + "..." 
+                          result.content.length > 400 
+                            ? result.content.substring(0, 400) + "..." 
                             : result.content, 
                           searchQuery
                         )}
                       </div>
                       
-                      {result.keywords && result.keywords.length > 0 && (
+                      {result.tags && result.tags.length > 0 && (
                         <div className="flex gap-1 flex-wrap mb-4">
-                          {result.keywords.slice(0, 5).map((keyword, index) => (
+                          {result.tags.slice(0, 6).map((tag, index) => (
                             <Badge key={index} variant="outline" className="text-xs">
-                              {keyword}
+                              {tag}
                             </Badge>
                           ))}
                         </div>
                       )}
                       
-                      <div className="text-sm text-muted-foreground">
-                        Ajouté le {new Date(result.created_at).toLocaleDateString('fr-CA')}
+                      <div className="flex justify-between items-center text-sm text-muted-foreground">
+                        <span>
+                          Publié le {new Date(result.created_at).toLocaleDateString('fr-FR')}
+                        </span>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => window.open(result.url, '_blank')}
+                        >
+                          <ExternalLink className="h-4 w-4 mr-1" />
+                          Voir la source
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -442,62 +447,78 @@ const SSTKnowledgeBase = () => {
               </div>
             )}
 
-            {/* Message d'accueil ou aucun résultat */}
-            {!isLoading && results.length === 0 && searchQuery && (
+            {/* Message d'introduction si aucune recherche */}
+            {!isLoadingData && !searchQuery && allContent.length > 0 && (
               <Card>
                 <CardContent className="p-8 text-center">
-                  <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun résultat trouvé</h3>
+                  <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    Recherche dans la base de connaissances SST
+                  </h3>
+                  <p className="text-muted-foreground mb-6">
+                    Utilisez la barre de recherche ci-dessus pour explorer notre collection de ressources en santé et sécurité au travail. 
+                    Vous pouvez rechercher par mots-clés, sujets spécifiques, références réglementaires, ou numéros d'articles.
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Exemples de recherche :</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li>• "prévention des chutes"</li>
+                        <li>• "équipement de protection"</li>
+                        <li>• "exposition chimique"</li>
+                        <li>• "article 51"</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-medium">Sources disponibles :</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        {availableSources.slice(0, 4).map(source => (
+                          <li key={source}>• {source}</li>
+                        ))}
+                        {availableSources.length > 4 && (
+                          <li className="text-xs">... et {availableSources.length - 4} autres</li>
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Message si aucune donnée chargée */}
+            {!isLoadingData && allContent.length === 0 && (
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <Database className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    Base de connaissances vide
+                  </h3>
                   <p className="text-muted-foreground">
-                    Essayez de modifier vos termes de recherche ou vos filtres
+                    Aucun contenu SST n'a encore été crawlé. Utilisez le tableau de bord de crawling pour ajouter des sources.
                   </p>
                 </CardContent>
               </Card>
             )}
 
-            {!searchQuery && results.length === 0 && (
+            {/* Message si aucun résultat */}
+            {!isLoadingData && searchQuery && results.length === 0 && !isLoading && (
               <Card>
                 <CardContent className="p-8 text-center">
-                  <Database className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
-                    Bienvenue dans la base de connaissances SST
+                    Aucun résultat trouvé
                   </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Recherchez dans les ressources officielles de santé et sécurité au travail du Québec
+                  <p className="text-muted-foreground mb-4">
+                    Votre recherche "{searchQuery}" n'a donné aucun résultat.
                   </p>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSearchQuery("prévention des chutes")}
-                      className="h-auto p-4 text-left flex-col items-start"
-                    >
-                      <BookOpen className="h-5 w-5 mb-2" />
-                      Prévention des chutes
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSearchQuery("équipements protection")}
-                      className="h-auto p-4 text-left flex-col items-start"
-                    >
-                      <Users className="h-5 w-5 mb-2" />
-                      Équipements de protection
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSearchQuery("risques chimiques")}
-                      className="h-auto p-4 text-left flex-col items-start"
-                    >
-                      <ExternalLink className="h-5 w-5 mb-2" />
-                      Risques chimiques
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setSearchQuery("ergonomie")}
-                      className="h-auto p-4 text-left flex-col items-start"
-                    >
-                      <TrendingUp className="h-5 w-5 mb-2" />
-                      Ergonomie
-                    </Button>
+                  <div className="text-left max-w-md mx-auto">
+                    <h4 className="font-medium mb-2">Suggestions :</h4>
+                    <ul className="text-sm text-muted-foreground space-y-1">
+                      <li>• Vérifiez l'orthographe de vos mots-clés</li>
+                      <li>• Essayez des termes plus généraux</li>
+                      <li>• Modifiez les filtres de source</li>
+                      <li>• Utilisez des synonymes</li>
+                    </ul>
                   </div>
                 </CardContent>
               </Card>
