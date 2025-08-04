@@ -148,12 +148,12 @@ const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps)
 const AgileFunctionsHub = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [selectedPriority, setSelectedPriority] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPriority, setSelectedPriority] = useState('all');
 
   const categories = getAgileCategories();
   const priorities = getAgilePriorities();
-  const filteredFunctions = filterAgileFunctions(searchTerm, selectedCategory, selectedPriority);
+  const filteredFunctions = filterAgileFunctions(searchTerm, selectedCategory === 'all' ? '' : selectedCategory, selectedPriority === 'all' ? '' : selectedPriority);
 
   const handleExecuteFunction = (func: AgileFunction) => {
     if (func.template_id) {
@@ -169,8 +169,8 @@ const AgileFunctionsHub = () => {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedCategory('');
-    setSelectedPriority('');
+    setSelectedCategory('all');
+    setSelectedPriority('all');
   };
 
   const criticalFunctions = filteredFunctions.filter(f => f.priorite === 'Critique');
@@ -262,7 +262,7 @@ const AgileFunctionsHub = () => {
                 <SelectValue placeholder="Toutes les catégories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les catégories</SelectItem>
+                <SelectItem value="all">Toutes les catégories</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -276,7 +276,7 @@ const AgileFunctionsHub = () => {
                 <SelectValue placeholder="Toutes les priorités" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Toutes les priorités</SelectItem>
+                <SelectItem value="all">Toutes les priorités</SelectItem>
                 {priorities.map(priority => (
                   <SelectItem key={priority} value={priority}>
                     {priority}
