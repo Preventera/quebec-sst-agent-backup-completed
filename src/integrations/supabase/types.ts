@@ -410,8 +410,12 @@ export type Database = {
           crawled_at: string
           created_at: string
           id: string
+          importance: number | null
+          keywords: string[] | null
           last_updated_at: string
           section: string | null
+          sector: string | null
+          semantic_category: string | null
           source_id: string
           tags: string[] | null
           title: string
@@ -424,8 +428,12 @@ export type Database = {
           crawled_at?: string
           created_at?: string
           id?: string
+          importance?: number | null
+          keywords?: string[] | null
           last_updated_at?: string
           section?: string | null
+          sector?: string | null
+          semantic_category?: string | null
           source_id: string
           tags?: string[] | null
           title: string
@@ -438,8 +446,12 @@ export type Database = {
           crawled_at?: string
           created_at?: string
           id?: string
+          importance?: number | null
+          keywords?: string[] | null
           last_updated_at?: string
           section?: string | null
+          sector?: string | null
+          semantic_category?: string | null
           source_id?: string
           tags?: string[] | null
           title?: string
@@ -455,39 +467,90 @@ export type Database = {
           },
         ]
       }
+      sst_notifications: {
+        Row: {
+          affected_sectors: string[] | null
+          content: string
+          created_at: string
+          id: string
+          importance: number
+          is_read: boolean
+          title: string
+          type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          affected_sectors?: string[] | null
+          content: string
+          created_at?: string
+          id?: string
+          importance?: number
+          is_read?: boolean
+          title: string
+          type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          affected_sectors?: string[] | null
+          content?: string
+          created_at?: string
+          id?: string
+          importance?: number
+          is_read?: boolean
+          title?: string
+          type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       sst_sources: {
         Row: {
           crawl_frequency: number
+          crawling_depth: number | null
           created_at: string
           id: string
           is_active: boolean
           last_crawled_at: string | null
           name: string
           source_type: string
+          supports_pdf: boolean | null
+          total_content_crawled: number | null
           updated_at: string
           url: string
+          use_firecrawl: boolean | null
         }
         Insert: {
           crawl_frequency?: number
+          crawling_depth?: number | null
           created_at?: string
           id?: string
           is_active?: boolean
           last_crawled_at?: string | null
           name: string
           source_type: string
+          supports_pdf?: boolean | null
+          total_content_crawled?: number | null
           updated_at?: string
           url: string
+          use_firecrawl?: boolean | null
         }
         Update: {
           crawl_frequency?: number
+          crawling_depth?: number | null
           created_at?: string
           id?: string
           is_active?: boolean
           last_crawled_at?: string | null
           name?: string
           source_type?: string
+          supports_pdf?: boolean | null
+          total_content_crawled?: number | null
           updated_at?: string
           url?: string
+          use_firecrawl?: boolean | null
         }
         Relationships: []
       }
