@@ -156,59 +156,11 @@ const executeMonitoringDashboard = async (func: AgileFunction): Promise<Executio
 };
 
 const executeInspectionChecklist = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Génère une checklist d'inspection
-  const checklistData = {
-    title: func.fonction,
-    regulation: func.liens_reglementaires,
-    items: generateInspectionItems(func),
-    estimated_time: func.estimated_time || "10 min"
-  };
-
-  return {
-    success: true,
-    message: `Checklist ${func.fonction} générée`,
-    data: checklistData
-  };
-};
-
-const executeTrainingScheduler = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Planifie des formations
-  return {
-    success: true,
-    message: `Planification ${func.fonction} initialisée`,
-    data: {
-      training_type: func.focus,
-      regulation: func.liens_reglementaires,
-      estimated_duration: func.estimated_time
-    }
-  };
-};
-
-const executeAuditPlanner = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Planifie des audits
-  return {
-    success: true,
-    message: `Planification d'audit ${func.fonction} créée`,
-    data: {
-      audit_type: func.focus,
-      regulation: func.liens_reglementaires,
-      priority: func.priorite
-    }
-  };
-};
-
-const executeDocumentGenerator = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Génère des documents via DocuGen
-  const { data, error } = await supabase.functions.invoke('docugen-ai', {
+  // Appel à l'edge function pour générer la checklist
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
     body: {
-      template_type: 'agile_function',
-      function_data: {
-        id: func.id,
-        title: func.fonction,
-        regulation: func.liens_reglementaires,
-        focus: func.focus,
-        priority: func.priorite
-      }
+      agileFunction: func,
+      actionType: 'inspection_checklist'
     }
   });
 
@@ -219,59 +171,165 @@ const executeDocumentGenerator = async (func: AgileFunction): Promise<ExecutionR
     };
   }
 
+  if (data?.data?.file) {
+    // Créer un lien de téléchargement
+    const blob = new Blob([data.data.file.content], { type: data.data.file.type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = data.data.file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   return {
     success: true,
-    message: `Document ${func.fonction} généré avec succès`,
-    data: data,
-    redirectTo: '/docugen'
+    message: data?.message || `Checklist ${func.fonction} générée`,
+    data: data?.data
+  };
+};
+
+const executeTrainingScheduler = async (func: AgileFunction): Promise<ExecutionResult> => {
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
+    body: {
+      agileFunction: func,
+      actionType: 'training_scheduler'
+    }
+  });
+
+  if (error) {
+    return {
+      success: false,
+      message: `Erreur: ${error.message}`
+    };
+  }
+
+  if (data?.data?.file) {
+    downloadFile(data.data.file);
+  }
+
+  return {
+    success: true,
+    message: data?.message || `Plan de formation ${func.fonction} créé`,
+    data: data?.data
+  };
+};
+
+const executeAuditPlanner = async (func: AgileFunction): Promise<ExecutionResult> => {
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
+    body: {
+      agileFunction: func,
+      actionType: 'audit_planner'
+    }
+  });
+
+  if (error) {
+    return {
+      success: false,
+      message: `Erreur: ${error.message}`
+    };
+  }
+
+  if (data?.data?.file) {
+    downloadFile(data.data.file);
+  }
+
+  return {
+    success: true,
+    message: data?.message || `Plan d'audit ${func.fonction} généré`,
+    data: data?.data
+  };
+};
+
+const executeDocumentGenerator = async (func: AgileFunction): Promise<ExecutionResult> => {
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
+    body: {
+      agileFunction: func,
+      actionType: 'document_generator'
+    }
+  });
+
+  if (error) {
+    return {
+      success: false,
+      message: `Erreur lors de la génération: ${error.message}`
+    };
+  }
+
+  if (data?.data?.file) {
+    downloadFile(data.data.file);
+  }
+
+  return {
+    success: true,
+    message: data?.message || `Document ${func.fonction} généré`,
+    data: data?.data
   };
 };
 
 const executeAlertSystem = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Configure un système d'alerte
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
+    body: {
+      agileFunction: func,
+      actionType: 'alert_system'
+    }
+  });
+
+  if (error) {
+    return {
+      success: false,
+      message: `Erreur: ${error.message}`
+    };
+  }
+
+  if (data?.data?.file) {
+    downloadFile(data.data.file);
+  }
+
   return {
     success: true,
-    message: `Système d'alerte ${func.fonction} configuré`,
-    data: {
-      alert_type: func.focus,
-      regulation: func.liens_reglementaires,
-      priority: func.priorite
-    }
+    message: data?.message || `Système d'alerte ${func.fonction} configuré`,
+    data: data?.data
   };
 };
 
 const executeReportGenerator = async (func: AgileFunction): Promise<ExecutionResult> => {
-  // Génère un rapport
+  const { data, error } = await supabase.functions.invoke('agile-function-executor', {
+    body: {
+      agileFunction: func,
+      actionType: 'report_generator'
+    }
+  });
+
+  if (error) {
+    return {
+      success: false,
+      message: `Erreur: ${error.message}`
+    };
+  }
+
+  if (data?.data?.file) {
+    downloadFile(data.data.file);
+  }
+
   return {
     success: true,
-    message: `Génération de rapport ${func.fonction} en cours`,
-    data: {
-      report_type: func.focus,
-      regulation: func.liens_reglementaires,
-      kpi: func.kpi
-    }
+    message: data?.message || `Rapport ${func.fonction} généré`,
+    data: data?.data
   };
 };
 
-// Utilitaires
-const generateInspectionItems = (func: AgileFunction): string[] => {
-  const baseItems = [
-    `Vérifier la conformité selon ${func.liens_reglementaires}`,
-    `Contrôler les éléments liés à: ${func.focus}`,
-    `Documenter les non-conformités identifiées`,
-    `Mesurer le KPI: ${func.kpi || 'À définir'}`
-  ];
-
-  // Ajout d'éléments spécifiques selon la catégorie
-  if (func.categorie.includes('CSTC') || func.categorie.includes('RBQ')) {
-    baseItems.push('Vérifier la signalisation chantier');
-    baseItems.push('Contrôler les équipements de protection collective');
-  }
-
-  if (func.categorie.includes('LMRSST')) {
-    baseItems.push('Vérifier les registres obligatoires');
-    baseItems.push('Contrôler la formation des employés');
-  }
-
-  return baseItems;
+// Utilitaire pour télécharger les fichiers
+const downloadFile = (file: { name: string; content: string; type: string }) => {
+  const blob = new Blob([file.content], { type: file.type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 };
