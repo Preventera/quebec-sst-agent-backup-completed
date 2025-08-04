@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+
 import ComplianceStats from "@/components/ComplianceStats";
 import AlertPanel from "@/components/AlertPanel";
 import DiagnosticButton from "@/components/DiagnosticButton";
@@ -60,7 +60,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       
       <main className="container mx-auto px-4 py-6 md:py-8" role="main">
         {/* Hero Section */}
