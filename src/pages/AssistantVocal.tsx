@@ -147,52 +147,59 @@ const AssistantVocal = () => {
           reader.onloadend = async () => {
             const base64Audio = (reader.result as string).split(',')[1];
             
-            // Transcription avec voice-to-text
-            const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('voice-to-text', {
-              body: { audio: base64Audio }
-            });
-            
-            if (transcriptionError) throw transcriptionError;
-            
-            const confidence = transcriptionData.confidence || 0.85;
-            const userMessage: Message = {
-              id: Date.now().toString(),
-              type: 'user',
-              content: transcriptionData.text,
-              timestamp: new Date(),
-              confidence,
-              duration: recordingDuration
-            };
-            
-            setMessages(prev => [...prev, userMessage]);
-            
-            // Ajouter au contexte de conversation
-            conversationContext.current.push({
-              role: 'user',
-              content: transcriptionData.text
-            });
-            
-            // Log de l'interaction
-            await logAction({
-              action_type: 'voice_query_full',
-              component: 'AssistantVocal',
-              details: { 
-                query: transcriptionData.text, 
+            try {
+              // Transcription avec voice-to-text
+              const { data: transcriptionData, error: transcriptionError } = await supabase.functions.invoke('voice-to-text', {
+                body: { audio: base64Audio }
+              });
+              
+              if (transcriptionError) {
+                console.error('Transcription error:', transcriptionError);
+                throw new Error(`Erreur de transcription: ${transcriptionError.message || 'Quota OpenAI dépassé'}`);
+              }
+              
+              const confidence = transcriptionData.confidence || 0.85;
+              const userMessage: Message = {
+                id: Date.now().toString(),
+                type: 'user',
+                content: transcriptionData.text,
+                timestamp: new Date(),
                 confidence,
                 duration: recordingDuration
+              };
+              
+              setMessages(prev => [...prev, userMessage]);
+              
+              // Ajouter au contexte de conversation
+              conversationContext.current.push({
+                role: 'user',
+                content: transcriptionData.text
+              });
+              
+              // Log de l'interaction
+              await logAction({
+                action_type: 'voice_query_full',
+                component: 'AssistantVocal',
+                details: { 
+                  query: transcriptionData.text, 
+                  confidence,
+                  duration: recordingDuration
+                }
+              });
+              
+              // Obtenir la réponse de l'assistant SST
+              const assistantStartTime = Date.now();
+              const { data: assistantData, error: assistantError } = await supabase.functions.invoke('sst-assistant', {
+                body: { 
+                  message: transcriptionData.text, 
+                  context: conversationContext.current 
+                }
+              });
+              
+              if (assistantError) {
+                console.error('Assistant error:', assistantError);
+                throw new Error(`Erreur de l'assistant: ${assistantError.message || 'Service temporairement indisponible'}`);
               }
-            });
-            
-            // Obtenir la réponse de l'assistant SST
-            const assistantStartTime = Date.now();
-            const { data: assistantData, error: assistantError } = await supabase.functions.invoke('sst-assistant', {
-              body: { 
-                message: transcriptionData.text, 
-                context: conversationContext.current 
-              }
-            });
-            
-            if (assistantError) throw assistantError;
             
             const responseTime = Date.now() - assistantStartTime;
             const assistantMessage: Message = {
@@ -257,18 +264,55 @@ const AssistantVocal = () => {
               console.error('Erreur lecture audio:', voiceError);
               setIsSpeaking(false);
             }
+            
+            } catch (error: any) {
+              console.error('Erreur dans le traitement:', error);
+              setIsListening(false);
+              setIsProcessing(false);
+              setConnectionStatus('disconnected');
+              
+              // Message d'erreur dans la conversation
+              const errorMessage: Message = {
+                id: (Date.now() + 2).toString(),
+                type: 'assistant',
+                content: `❌ Erreur: ${error.message || 'Service temporairement indisponible. Veuillez réessayer ou vérifier votre quota OpenAI.'}`,
+                timestamp: new Date(),
+                confidence: 0
+              };
+              
+              setMessages(prev => [...prev, errorMessage]);
+              
+              toast({
+                title: "❌ Erreur de traitement",
+                description: error.message || "Erreur lors du traitement audio. Quota OpenAI peut être dépassé.",
+                variant: "destructive",
+              });
+            }
           };
           
           reader.readAsDataURL(audioBlob);
         } catch (error: any) {
           console.error('Erreur traitement audio:', error);
+          setIsListening(false);
+          setIsProcessing(false);
           setConnectionStatus('disconnected');
+          
+          // Message d'erreur dans la conversation
+          const errorMessage: Message = {
+            id: (Date.now() + 2).toString(),
+            type: 'assistant',
+            content: `❌ Erreur: ${error.message || 'Service temporairement indisponible. Veuillez réessayer ou vérifier votre quota OpenAI.'}`,
+            timestamp: new Date(),
+            confidence: 0
+          };
+          
+          setMessages(prev => [...prev, errorMessage]);
+          
           toast({
             title: "❌ Erreur de traitement",
-            description: error.message || "Erreur lors du traitement audio",
+            description: error.message || "Erreur lors du traitement audio. Quota OpenAI peut être dépassé.",
             variant: "destructive",
           });
-          setIsProcessing(false);
         }
         
         // Arrêter le flux audio
