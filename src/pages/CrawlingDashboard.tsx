@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Bot, Calendar, Database, Globe, Loader2, RefreshCw, TrendingUp } from 'lucide-react';
+import { AlertCircle, Bot, Calendar, Database, Download, Globe, Loader2, RefreshCw, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 
@@ -186,6 +186,46 @@ export default function CrawlingDashboard() {
     });
   };
 
+  const handleCnesstScraper = async () => {
+    setCrawling(true);
+    setCrawlProgress(0);
+
+    try {
+      toast({
+        title: "CNESST Scraper",
+        description: "Lancement du scraping CNESST...",
+      });
+
+      const { data, error } = await supabase.functions.invoke('cnesst-prevention-scraper');
+
+      if (error) throw error;
+      
+      setCrawlProgress(100);
+      
+      setTimeout(() => {
+        setCrawling(false);
+        setCrawlProgress(0);
+        loadData();
+        
+        toast({
+          title: "Scraping terminé",
+          description: `${data.totalLinks} liens trouvés, ${data.savedToDatabase} sauvegardés`,
+        });
+      }, 1000);
+
+    } catch (error) {
+      console.error('CNESST scraper error:', error);
+      setCrawling(false);
+      setCrawlProgress(0);
+      
+      toast({
+        title: "Erreur",
+        description: "Erreur lors du scraping CNESST",
+        variant: "destructive",
+      });
+    }
+  };
+
   const startCrawl = async (sourceId?: string, useEnhanced = false) => {
     setCrawling(true);
     setCrawlProgress(0);
@@ -336,6 +376,23 @@ export default function CrawlingDashboard() {
               <>
                 <Bot className="h-4 w-4 mr-2" />
                 Crawling Enhanced
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={handleCnesstScraper}
+            disabled={crawling}
+            variant="secondary"
+          >
+            {crawling ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                CNESST Scraper...
+              </>
+            ) : (
+              <>
+                <Download className="h-4 w-4 mr-2" />
+                CNESST Scraper
               </>
             )}
           </Button>
