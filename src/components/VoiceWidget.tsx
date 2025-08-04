@@ -71,10 +71,33 @@ const VoiceWidget = ({ className }: VoiceWidgetProps) => {
     }
 
     if (isListening) {
-      // Arrêter l'enregistrement
+      // Arrêter l'enregistrement immédiatement
+      setIsListening(false);
+      setIsProcessing(false);
+      setAudioLevel(0);
+      setConnectionStatus('connected');
+      
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
         mediaRecorderRef.current.stop();
       }
+      
+      // Nettoyer le contexte audio
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      
+      // Arrêter les pistes du flux audio
+      if (mediaRecorderRef.current?.stream) {
+        mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+      }
+      
+      toast({
+        title: "🛑 Enregistrement arrêté",
+        description: "L'écoute a été interrompue",
+        duration: 2000,
+      });
+      
       return;
     }
 
