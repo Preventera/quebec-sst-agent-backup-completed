@@ -26,6 +26,7 @@ import FAQ from "./pages/FAQ";
 import CrawlingDashboard from "./pages/CrawlingDashboard";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Header from "./components/Header";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <div id="main-content">
+              <Header />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/assistant-vocal" element={<AssistantVocal />} />
