@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Mic, MicOff, Volume2, VolumeX, Settings, History, Trash2, Zap, Brain, Copy, Download, Share2, Sparkles, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +45,17 @@ const AssistantVocal = () => {
     }
   ]);
   const [volume, setVolume] = useState(0.8);
+  const [ttsProvider, setTtsProvider] = useState<'openai' | 'elevenlabs'>('openai');
+  const [selectedVoice, setSelectedVoice] = useState('alloy');
+  
+  // Réinitialiser la voix quand on change de provider
+  useEffect(() => {
+    if (ttsProvider === 'openai') {
+      setSelectedVoice('alloy');
+    } else {
+      setSelectedVoice('Aria');
+    }
+  }, [ttsProvider]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
@@ -245,8 +258,11 @@ const AssistantVocal = () => {
             // Lecture audio automatique de la réponse
             try {
               setIsSpeaking(true);
-              const { data: voiceData, error: voiceError } = await supabase.functions.invoke('text-to-voice', {
-                body: { text: assistantData.response, voice: 'alloy' }
+              const voiceFunction = ttsProvider === 'elevenlabs' ? 'text-to-voice-elevenlabs' : 'text-to-voice';
+              const voiceParam = ttsProvider === 'elevenlabs' ? { text: assistantData.response, voice: selectedVoice } : { text: assistantData.response, voice: selectedVoice };
+              
+              const { data: voiceData, error: voiceError } = await supabase.functions.invoke(voiceFunction, {
+                body: voiceParam
               });
               
               if (!voiceError) {
@@ -728,6 +744,62 @@ const AssistantVocal = () => {
                       <Badge variant={connectionStatus === 'connected' ? 'default' : 'destructive'}>
                         {connectionStatus === 'connected' ? '🟢 Connecté' : '🔴 Déconnecté'}
                       </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Configuration TTS */}
+                <Card className="border-secondary/20">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Volume2 className="h-4 w-4 text-primary" />
+                      Audio & Voix
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="tts-provider" className="text-xs">Provider TTS</Label>
+                      <Select value={ttsProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setTtsProvider(value)}>
+                        <SelectTrigger className="h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="openai">OpenAI</SelectItem>
+                          <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="voice-select" className="text-xs">Voix</Label>
+                      <Select value={selectedVoice} onValueChange={setSelectedVoice}>
+                        <SelectTrigger className="h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ttsProvider === 'openai' ? (
+                            <>
+                              <SelectItem value="alloy">Alloy</SelectItem>
+                              <SelectItem value="echo">Echo</SelectItem>
+                              <SelectItem value="fable">Fable</SelectItem>
+                              <SelectItem value="onyx">Onyx</SelectItem>
+                              <SelectItem value="nova">Nova</SelectItem>
+                              <SelectItem value="shimmer">Shimmer</SelectItem>
+                            </>
+                          ) : (
+                            <>
+                              <SelectItem value="Aria">Aria</SelectItem>
+                              <SelectItem value="Sarah">Sarah</SelectItem>
+                              <SelectItem value="Laura">Laura</SelectItem>
+                              <SelectItem value="Charlotte">Charlotte</SelectItem>
+                              <SelectItem value="Alice">Alice</SelectItem>
+                              <SelectItem value="Matilda">Matilda</SelectItem>
+                              <SelectItem value="Jessica">Jessica</SelectItem>
+                              <SelectItem value="Lily">Lily</SelectItem>
+                            </>
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </CardContent>
                 </Card>
