@@ -254,7 +254,7 @@ const VoiceWidget = ({ className }: VoiceWidgetProps) => {
                 onClick={handleQuickVoice}
                 size="lg"
                 className={`h-16 w-16 rounded-full hover:scale-110 transition-all duration-300 border-2 border-white/20 ${getStatusColor()}`}
-                disabled={isProcessing}
+                disabled={false}
                 aria-label={isListening ? "Arrêter l'enregistrement" : "Commencer l'enregistrement vocal"}
               >
                 {isListening ? (

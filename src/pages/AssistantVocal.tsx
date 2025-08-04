@@ -570,8 +570,8 @@ const AssistantVocal = () => {
                             <Button
                               size="lg"
                               onClick={handleStopListening}
-                              disabled={isProcessing || isSpeaking}
-                              className="h-24 w-24 rounded-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse border-4 border-red-300 shadow-lg shadow-red-500/30"
+                              disabled={false}
+                              className="h-24 w-24 rounded-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse border-4 border-red-300 shadow-lg shadow-red-500/30 hover:scale-105 transition-all duration-300"
                               aria-label="Arrêter l'enregistrement vocal"
                               aria-pressed="true"
                             >
