@@ -28,12 +28,19 @@ interface CrawledContent {
   article_number: string | null;
   section: string | null;
   tags: string[];
+  keywords: string[] | null;
+  semantic_category: string | null;
+  importance: number | null;
+  sector: string | null;
   last_updated_at: string;
   crawled_at: string;
   source_id: string;
   sst_sources?: {
     name: string;
     source_type: string;
+    crawling_depth: number | null;
+    supports_pdf: boolean | null;
+    use_firecrawl: boolean | null;
   };
 }
 
@@ -117,7 +124,7 @@ export default function CrawlingDashboard() {
       .from('sst_crawled_content')
       .select(`
         *,
-        sst_sources!inner(name, source_type)
+        sst_sources!inner(name, source_type, crawling_depth, supports_pdf, use_firecrawl)
       `)
       .order('crawled_at', { ascending: false })
       .limit(50);
@@ -299,19 +306,36 @@ export default function CrawlingDashboard() {
             Actualiser
           </Button>
           <Button
-            onClick={() => startCrawl()}
+            onClick={() => startCrawl(undefined, false)}
+            disabled={crawling}
+            variant="outline"
+          >
+            {crawling ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Crawling Standard...
+              </>
+            ) : (
+              <>
+                <Bot className="h-4 w-4 mr-2" />
+                Crawling Standard
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={() => startCrawl(undefined, true)}
             disabled={crawling}
             className="bg-primary hover:bg-primary/90"
           >
             {crawling ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Crawling...
+                Crawling Enhanced...
               </>
             ) : (
               <>
                 <Bot className="h-4 w-4 mr-2" />
-                Lancer Crawling Global
+                Crawling Enhanced
               </>
             )}
           </Button>
@@ -500,24 +524,81 @@ export default function CrawlingDashboard() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm mb-3 line-clamp-3">
-                      {item.content.substring(0, 200)}...
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <div className="flex gap-4">
-                        <span>Crawlé: {formatTimeAgo(item.crawled_at)}</span>
-                        {item.section && <span>Section: {item.section}</span>}
-                      </div>
-                      <div className="flex gap-1">
-                        {item.tags.slice(0, 3).map(tag => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </CardContent>
+                   <CardContent>
+                     <p className="text-sm mb-3 line-clamp-3">
+                       {item.content.substring(0, 200)}...
+                     </p>
+                     
+                     {/* Affichage des nouvelles données sémantiques */}
+                     {(item.keywords || item.semantic_category || item.importance || item.sector) && (
+                       <div className="mb-3 p-3 bg-muted/50 rounded-md">
+                         <h4 className="text-xs font-semibold mb-2">Analyse Sémantique Enhanced</h4>
+                         <div className="space-y-1">
+                           {item.semantic_category && (
+                             <div className="flex items-center gap-2">
+                               <span className="text-xs text-muted-foreground">Catégorie:</span>
+                               <Badge variant="outline" className="text-xs">
+                                 {item.semantic_category}
+                               </Badge>
+                             </div>
+                           )}
+                           {item.importance && (
+                             <div className="flex items-center gap-2">
+                               <span className="text-xs text-muted-foreground">Importance:</span>
+                               <Badge 
+                                 variant={item.importance >= 4 ? 'destructive' : item.importance >= 3 ? 'default' : 'secondary'}
+                                 className="text-xs"
+                               >
+                                 {item.importance}/5
+                               </Badge>
+                             </div>
+                           )}
+                           {item.sector && (
+                             <div className="flex items-center gap-2">
+                               <span className="text-xs text-muted-foreground">Secteur:</span>
+                               <Badge variant="outline" className="text-xs">
+                                 {item.sector}
+                               </Badge>
+                             </div>
+                           )}
+                           {item.keywords && item.keywords.length > 0 && (
+                             <div className="flex items-start gap-2">
+                               <span className="text-xs text-muted-foreground">Mots-clés:</span>
+                               <div className="flex flex-wrap gap-1">
+                                 {item.keywords.slice(0, 5).map((keyword, idx) => (
+                                   <Badge key={idx} variant="secondary" className="text-xs">
+                                     {keyword}
+                                   </Badge>
+                                 ))}
+                                 {item.keywords.length > 5 && (
+                                   <Badge variant="outline" className="text-xs">
+                                     +{item.keywords.length - 5}
+                                   </Badge>
+                                 )}
+                               </div>
+                             </div>
+                           )}
+                         </div>
+                       </div>
+                     )}
+                     
+                     <div className="flex items-center justify-between text-xs text-muted-foreground">
+                       <div className="flex gap-4">
+                         <span>Crawlé: {formatTimeAgo(item.crawled_at)}</span>
+                         {item.section && <span>Section: {item.section}</span>}
+                         {item.sst_sources?.crawling_depth && (
+                           <span>Profondeur: {item.sst_sources.crawling_depth}</span>
+                         )}
+                       </div>
+                       <div className="flex gap-1">
+                         {item.tags.slice(0, 3).map(tag => (
+                           <Badge key={tag} variant="secondary" className="text-xs">
+                             {tag}
+                           </Badge>
+                         ))}
+                       </div>
+                     </div>
+                   </CardContent>
                 </Card>
               ))}
             </div>
