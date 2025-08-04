@@ -170,11 +170,26 @@ const AssistantVocal = () => {
                 console.error('Transcription error:', transcriptionError);
                 
                 let errorMessage = 'Erreur de transcription';
-                if (transcriptionError.message && transcriptionError.message.includes('quota')) {
-                  errorMessage = 'Quota OpenAI dépassé. Vérifiez votre compte OpenAI.';
+                if (transcriptionError.message && (transcriptionError.message.includes('quota') || transcriptionError.message.includes('insufficient_quota'))) {
+                  errorMessage = '❌ Quota OpenAI dépassé pour la transcription. Veuillez recharger votre compte OpenAI ou réessayer plus tard.';
                 } else if (transcriptionError.message && transcriptionError.message.includes('non-2xx')) {
-                  errorMessage = 'Service de transcription temporairement indisponible.';
+                  errorMessage = '❌ Service OpenAI temporairement indisponible. Le quota peut être dépassé.';
+                } else {
+                  errorMessage = `❌ Erreur de transcription: ${transcriptionError.message || 'Service temporairement indisponible'}`;
                 }
+                
+                // Ajouter un message d'erreur dans la conversation
+                const errorMsg: Message = {
+                  id: (Date.now() + 3).toString(),
+                  type: 'assistant',
+                  content: `${errorMessage}\n\n💡 **Solution:** Vérifiez votre quota OpenAI sur https://platform.openai.com/usage`,
+                  timestamp: new Date(),
+                  confidence: 0
+                };
+                
+                setMessages(prev => [...prev, errorMsg]);
+                setIsProcessing(false);
+                setConnectionStatus('disconnected');
                 
                 throw new Error(errorMessage);
               }
