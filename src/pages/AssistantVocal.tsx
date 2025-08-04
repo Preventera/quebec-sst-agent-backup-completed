@@ -168,7 +168,15 @@ const AssistantVocal = () => {
               
               if (transcriptionError) {
                 console.error('Transcription error:', transcriptionError);
-                throw new Error(`Erreur de transcription: ${transcriptionError.message || 'Quota OpenAI dépassé'}`);
+                
+                let errorMessage = 'Erreur de transcription';
+                if (transcriptionError.message && transcriptionError.message.includes('quota')) {
+                  errorMessage = 'Quota OpenAI dépassé. Vérifiez votre compte OpenAI.';
+                } else if (transcriptionError.message && transcriptionError.message.includes('non-2xx')) {
+                  errorMessage = 'Service de transcription temporairement indisponible.';
+                }
+                
+                throw new Error(errorMessage);
               }
               
               const confidence = transcriptionData.confidence || 0.85;
