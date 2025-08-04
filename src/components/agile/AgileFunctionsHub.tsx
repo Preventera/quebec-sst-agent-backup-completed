@@ -27,13 +27,18 @@ import {
   filterAgileFunctions,
   type AgileFunction 
 } from "@/data/agileFunctions";
+import { executeAgileFunction, getActionType } from "@/lib/agileExecutor";
 
 interface AgileFunctionCardProps {
   agileFunction: AgileFunction;
   onExecute: (func: AgileFunction) => void;
+  isExecuting?: boolean;
 }
 
-const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps) => {
+const AgileFunctionCard = ({ agileFunction, onExecute, isExecuting = false }: AgileFunctionCardProps) => {
+  const actionType = getActionType(agileFunction);
+  const isAvailable = actionType !== 'coming_soon';
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'Critique': return 'destructive';
@@ -45,6 +50,8 @@ const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps)
   };
 
   const getStatusIcon = (status?: string) => {
+    if (isExecuting) return <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />;
+    
     switch (status) {
       case 'completed': return <CheckCircle className="h-4 w-4 text-green-500" />;
       case 'generating': return <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />;
@@ -54,7 +61,7 @@ const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps)
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-all duration-200 border-accent/20 hover:border-accent/40">
+    <Card className={`group hover:shadow-lg transition-all duration-200 border-accent/20 hover:border-accent/40 ${!isAvailable ? 'opacity-60' : ''}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -77,12 +84,17 @@ const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps)
           <Badge variant="outline" className="text-xs">
             {agileFunction.categorie.split(' / ')[0]}
           </Badge>
+          {!isAvailable && (
+            <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800">
+              Bientôt
+            </Badge>
+          )}
         </div>
       </CardHeader>
 
       <CardContent className="pt-0">
         <div className="space-y-3">
-          {agileFunction.status === 'generating' && (
+          {(agileFunction.status === 'generating' || isExecuting) && (
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
                 <span>Génération en cours...</span>
@@ -123,10 +135,14 @@ const AgileFunctionCard = ({ agileFunction, onExecute }: AgileFunctionCardProps)
               size="sm"
               className="flex-1 h-8 text-xs"
               onClick={() => onExecute(agileFunction)}
-              disabled={agileFunction.status === 'generating'}
+              disabled={agileFunction.status === 'generating' || isExecuting || !isAvailable}
             >
               <Play className="h-3 w-3 mr-1" />
-              {agileFunction.status === 'generating' ? 'En cours...' : 'Exécuter'}
+              {isExecuting || agileFunction.status === 'generating'
+                ? 'En cours...' 
+                : !isAvailable 
+                  ? 'Bientôt disponible'
+                  : 'Exécuter'}
             </Button>
             
             {agileFunction.status === 'completed' && (
@@ -150,20 +166,39 @@ const AgileFunctionsHub = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
+  const [executingFunctions, setExecutingFunctions] = useState<Set<number>>(new Set());
 
   const categories = getAgileCategories();
   const priorities = getAgilePriorities();
   const filteredFunctions = filterAgileFunctions(searchTerm, selectedCategory === 'all' ? '' : selectedCategory, selectedPriority === 'all' ? '' : selectedPriority);
 
-  const handleExecuteFunction = (func: AgileFunction) => {
-    if (func.template_id) {
-      // Rediriger vers DocuGen avec le template spécifique
-      navigate(`/docugen?template=${func.template_id}`);
-      toast.success(`Lancement de ${func.fonction} via DocuGen 2.0`);
-    } else {
-      // Simulation d'exécution pour les fonctions sans template
-      toast.success(`Exécution de: ${func.fonction}`);
-      // Ici vous pourrez intégrer vos agents spécifiques
+  const handleExecuteFunction = async (func: AgileFunction) => {
+    // Marquer la fonction comme en cours d'exécution
+    setExecutingFunctions(prev => new Set([...prev, func.id]));
+    
+    try {
+      const result = await executeAgileFunction(func);
+      
+      if (result.success) {
+        toast.success(result.message);
+        
+        // Redirection si spécifiée
+        if (result.redirectTo) {
+          navigate(result.redirectTo);
+        }
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error('Erreur exécution fonction agile:', error);
+      toast.error(`Erreur lors de l'exécution de ${func.fonction}`);
+    } finally {
+      // Retirer la fonction de la liste d'exécution
+      setExecutingFunctions(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(func.id);
+        return newSet;
+      });
     }
   };
 
@@ -311,6 +346,7 @@ const AgileFunctionsHub = () => {
               key={func.id}
               agileFunction={func}
               onExecute={handleExecuteFunction}
+              isExecuting={executingFunctions.has(func.id)}
             />
           ))}
         </div>
