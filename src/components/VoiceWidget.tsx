@@ -339,30 +339,42 @@ const VoiceWidget = ({ className }: VoiceWidgetProps) => {
           <div className="space-y-6">
             {/* État actuel avec indicateurs avancés */}
             <div className="text-center p-6 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-lg border">
-              <div className={`w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center relative overflow-hidden ${getStatusColor()}`}>
-                {isListening ? (
-                  <MicOff className="h-12 w-12 text-white relative z-10" />
-                ) : (
-                  <Mic className="h-12 w-12 text-white relative z-10" />
-                )}
+              <div className="flex flex-col items-center gap-4">
+                {/* Bouton de démarrage */}
+                <Button
+                  size="lg"
+                  onClick={() => !isListening && handleQuickVoice()}
+                  disabled={isListening || isProcessing}
+                  className="h-20 w-20 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-3 border-green-300 shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                  aria-label="Démarrer l'enregistrement vocal"
+                >
+                  <Mic className="h-8 w-8" />
+                </Button>
                 
-                {/* Effet de pulsation audio */}
+                {/* Bouton d'arrêt - visible seulement pendant l'enregistrement */}
                 {isListening && (
-                  <div className="absolute inset-0 bg-white/20 animate-ping rounded-full" />
+                  <Button
+                    size="lg"
+                    onClick={handleQuickVoice}
+                    className="h-16 w-16 rounded-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse border-3 border-red-300 shadow-lg shadow-red-500/30 hover:scale-105 transition-all duration-300"
+                    aria-label="Arrêter l'enregistrement vocal"
+                  >
+                    <MicOff className="h-6 w-6" />
+                  </Button>
                 )}
               </div>
               
-              <div className="space-y-2">
-                <p className="text-xl font-semibold">
-                  {isListening && "🎤 Je vous écoute..."}
+              <div className="space-y-2 mt-4">
+                <p className="text-lg font-semibold">
+                  {isListening && "🎤 ENREGISTREMENT EN COURS"}
                   {isProcessing && "⚡ Analyse en cours..."}
                   {!isListening && !isProcessing && "✨ Prêt à vous aider"}
                 </p>
                 
                 <p className="text-sm text-muted-foreground">
-                  {isListening && "Parlez clairement et distinctement"}
+                  {isListening && "Cliquez sur STOP rouge pour finaliser"}
                   {isProcessing && "Traitement de votre demande SST"}
-                  {!isListening && !isProcessing && "Posez vos questions sur la sécurité au travail"}
+                  {!isListening && !isProcessing && "Cliquez sur le micro vert pour commencer"}
                 </p>
               </div>
               

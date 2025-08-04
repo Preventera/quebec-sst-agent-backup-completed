@@ -564,61 +564,56 @@ const AssistantVocal = () => {
                   {/* Contrôles vocaux améliorés */}
                   <div className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5">
                     <div className="flex flex-col items-center justify-center gap-6">
-                      {isListening ? (
-                        <div className="flex flex-col items-center gap-4">
-                          <div className="relative">
-                            <Button
-                              size="lg"
-                              onClick={handleStopListening}
-                              disabled={false}
-                              className="h-24 w-24 rounded-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse border-4 border-red-300 shadow-lg shadow-red-500/30 hover:scale-105 transition-all duration-300"
-                              aria-label="Arrêter l'enregistrement vocal"
-                              aria-pressed="true"
-                            >
-                              <MicOff className="h-12 w-12" aria-hidden="true" />
-                            </Button>
-                            {/* Effet de pulsation */}
-                            <div className="absolute inset-0 rounded-full bg-red-500/30 animate-ping" />
-                          </div>
-                          <div className="text-center">
-                            <p className="text-lg font-semibold text-red-600 animate-pulse">
-                              🎤 CLIQUEZ POUR ARRÊTER
-                            </p>
-                            {audioLevel > 0 && (
-                              <div className="mt-2 space-y-1">
-                                <p className="text-xs text-muted-foreground">Niveau audio</p>
-                                <Progress value={audioLevel} className="w-32 h-2" />
-                                <p className="text-xs font-mono">{Math.round(audioLevel)}%</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-4">
+                      <div className="flex flex-col items-center gap-4">
+                        {/* Bouton de démarrage - toujours visible */}
+                        <Button
+                          size="lg"
+                          onClick={handleStartListening}
+                          disabled={isListening || isProcessing || isSpeaking}
+                          className="h-24 w-24 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-4 border-green-300 shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Démarrer l'enregistrement vocal"
+                        >
+                          <Mic className="h-12 w-12" />
+                        </Button>
+                        
+                        {/* Bouton d'arrêt - visible seulement pendant l'enregistrement */}
+                        {isListening && (
                           <Button
                             size="lg"
-                            onClick={handleStartListening}
-                            disabled={isProcessing || isSpeaking}
-                            className="h-24 w-24 rounded-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary border-4 border-primary/20 shadow-lg shadow-primary/30 hover:scale-105 transition-all duration-300"
-                            aria-label="Commencer l'enregistrement vocal"
-                            aria-pressed="false"
+                            onClick={handleStopListening}
+                            className="h-20 w-20 rounded-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white animate-pulse border-4 border-red-300 shadow-lg shadow-red-500/30 hover:scale-105 transition-all duration-300"
+                            aria-label="Arrêter l'enregistrement vocal"
                           >
-                            <Mic className="h-12 w-12 text-white" aria-hidden="true" />
+                            <MicOff className="h-10 w-10" />
                           </Button>
-                          <div className="text-center">
-                            <p className="text-lg font-medium">
-                              {isProcessing ? "⚡ Traitement en cours..." : 
-                               isSpeaking ? "🔊 Assistant en train de parler..." : 
-                               "🎙️ Prêt à vous écouter"}
-                            </p>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {isProcessing ? "Analyse de votre question SST" : 
-                               isSpeaking ? "Réponse en cours de lecture" :
-                               "Cliquez sur le micro pour poser votre question"}
-                            </p>
-                          </div>
+                        )}
+                        
+                        <div className="text-center">
+                          <p className="text-lg font-medium">
+                            {isListening ? "🎤 ENREGISTREMENT EN COURS" : 
+                             isProcessing ? "⚡ Traitement en cours..." : 
+                             isSpeaking ? "🔊 Assistant en train de parler..." : 
+                             "🎙️ Prêt à vous écouter"}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {isListening ? "Cliquez sur STOP pour finaliser" : 
+                             isProcessing ? "Analyse de votre question SST" : 
+                             isSpeaking ? "Réponse en cours de lecture" :
+                             "Cliquez sur le micro vert pour commencer"}
+                          </p>
+                          
+                          {/* Indicateur de niveau audio */}
+                          {isListening && audioLevel > 0 && (
+                            <div className="mt-4 space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <span>Niveau audio</span>
+                                <span className="font-mono">{Math.round(audioLevel)}%</span>
+                              </div>
+                              <Progress value={audioLevel} className="w-48 h-3" />
+                            </div>
+                          )}
                         </div>
-                      )}
+                      </div>
                       
                       {/* Contrôles volume avec design amélioré */}
                       <div className="flex items-center gap-4 bg-background/80 rounded-lg p-3 border">
