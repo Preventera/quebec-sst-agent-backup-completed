@@ -263,17 +263,48 @@ const AssistantVocal = () => {
             setIsProcessing(false);
             setConnectionStatus('connected');
             
-            // Lecture audio automatique de la réponse
+            // Lecture audio automatique de la réponse avec fallback
             try {
               setIsSpeaking(true);
-              const voiceFunction = ttsProvider === 'elevenlabs' ? 'text-to-voice-elevenlabs' : 'text-to-voice';
-              const voiceParam = ttsProvider === 'elevenlabs' ? { text: assistantData.response, voice: selectedVoice } : { text: assistantData.response, voice: selectedVoice };
+              let voiceFunction = ttsProvider === 'elevenlabs' ? 'text-to-voice-elevenlabs' : 'text-to-voice';
+              let voiceParam = ttsProvider === 'elevenlabs' ? { text: assistantData.response, voice: selectedVoice } : { text: assistantData.response, voice: selectedVoice };
               
               const { data: voiceData, error: voiceError } = await supabase.functions.invoke(voiceFunction, {
                 body: voiceParam
               });
               
-              if (!voiceError) {
+              // Fallback automatique sur ElevenLabs si OpenAI échoue
+              if (voiceError && ttsProvider === 'openai') {
+                console.log('OpenAI TTS failed, switching to ElevenLabs fallback...');
+                
+                // Basculer automatiquement sur ElevenLabs
+                setTtsProvider('elevenlabs');
+                setSelectedVoice('Aria');
+                
+                toast({
+                  title: "🔄 Basculement automatique",
+                  description: "Passage à ElevenLabs pour la synthèse vocale",
+                  duration: 3000,
+                });
+                
+                // Réessayer avec ElevenLabs
+                const { data: fallbackVoiceData, error: fallbackError } = await supabase.functions.invoke('text-to-voice-elevenlabs', {
+                  body: { text: assistantData.response, voice: 'Aria' }
+                });
+                
+                if (!fallbackError) {
+                  const audio = new Audio(`data:audio/mp3;base64,${fallbackVoiceData.audioContent}`);
+                  audio.volume = volume;
+                  await audio.play();
+                  
+                  audio.onended = () => {
+                    setIsSpeaking(false);
+                  };
+                } else {
+                  setIsSpeaking(false);
+                  console.error('Fallback to ElevenLabs also failed:', fallbackError);
+                }
+              } else if (!voiceError) {
                 const audio = new Audio(`data:audio/mp3;base64,${voiceData.audioContent}`);
                 audio.volume = volume;
                 await audio.play();
@@ -283,6 +314,7 @@ const AssistantVocal = () => {
                 };
               } else {
                 setIsSpeaking(false);
+                console.error('Both TTS services failed');
               }
             } catch (voiceError) {
               console.error('Erreur lecture audio:', voiceError);
