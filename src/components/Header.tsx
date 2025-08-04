@@ -1,4 +1,4 @@
-import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3, MoreHorizontal, Database, Search, TestTube, Activity, Workflow, Lock, Users } from "lucide-react";
+import { Shield, MessageSquare, CheckCircle, TrendingUp, FileText, Mic, Menu, X, Brain, BookOpen, Settings, HelpCircle, Globe, User, LogOut, ChevronDown, BarChart3, MoreHorizontal, Database, Search, TestTube, Activity, Workflow, Lock, Users, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
@@ -82,6 +82,13 @@ const Header = () => {
                   </Button>
                 </Link>
               )}
+              
+              <Link to="/agile-functions">
+                <Button variant="ghost" className="text-primary-foreground hover:bg-primary-glow text-xs px-2">
+                  <Zap className="h-3 w-3 mr-1" aria-hidden="true" />
+                  Fonctions Agiles
+                </Button>
+              </Link>
               
               
               {/* Analytics & Tools - Grouped */}
@@ -295,6 +302,13 @@ const Header = () => {
                   </Button>
                 </Link>
               )}
+              
+              <Link to="/agile-functions" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full text-primary-foreground hover:bg-primary-glow text-sm justify-start">
+                  <Zap className="h-4 w-4 mr-2" aria-hidden="true" />
+                  Fonctions Agiles
+                </Button>
+              </Link>
               
               
               {hasAccess('knowledge-base') && (
