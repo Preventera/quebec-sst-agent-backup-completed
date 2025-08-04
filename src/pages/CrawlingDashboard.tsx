@@ -179,7 +179,7 @@ export default function CrawlingDashboard() {
     });
   };
 
-  const startCrawl = async (sourceId?: string) => {
+  const startCrawl = async (sourceId?: string, useEnhanced = false) => {
     setCrawling(true);
     setCrawlProgress(0);
 
@@ -187,7 +187,9 @@ export default function CrawlingDashboard() {
       const action = sourceId ? 'crawl_source' : 'crawl_all';
       const payload = sourceId ? { action, sourceId } : { action };
 
-      const { data, error } = await supabase.functions.invoke('sst-crawler', {
+      // Use enhanced crawler by default
+      const functionName = useEnhanced || !sourceId ? 'sst-crawler-enhanced' : 'sst-crawler';
+      const { data, error } = await supabase.functions.invoke(functionName, {
         body: payload
       });
 
