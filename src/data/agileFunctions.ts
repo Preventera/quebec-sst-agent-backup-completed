@@ -11,6 +11,8 @@ export interface AgileFunction {
   template_id?: string;
   estimated_time?: string;
   status?: 'available' | 'generating' | 'completed' | 'error';
+  description?: string;
+  criticite?: number;
 }
 
 export const agileFunctions: AgileFunction[] = [
@@ -136,6 +138,20 @@ export const agileFunctions: AgileFunction[] = [
     exemple_usage: "Workflow complet gestion accidents",
     agent_owner: "IncidentAgent",
     estimated_time: "15 min"
+  },
+  {
+    id: 201,
+    priorite: "High",
+    categorie: "Intelligence / Veille",
+    fonction: "Crawling intelligent SST avec traitement sémantique",
+    focus: "Surveillance automatisée des sources SST avec analyse sémantique et notifications intelligentes",
+    liens_reglementaires: "LMRSST art. 2.1, RSST mise à jour continue",
+    kpi: "Sources crawlées/jour, alertes critiques détectées",
+    description: "Système de crawling avancé qui surveille 18+ sources SST québécoises avec traitement sémantique, extraction PDF, et notifications automatiques pour les changements réglementaires critiques",
+    criticite: 4,
+    estimated_time: "2 min",
+    agent_owner: "AgentCrawlerSST",
+    template_id: "crawling_sst_enhanced"
   }
 ];
 

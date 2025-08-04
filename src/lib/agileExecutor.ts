@@ -19,9 +19,15 @@ export type AgileActionType =
   | 'document_generator'
   | 'alert_system'
   | 'report_generator'
+  | 'crawling_enhanced'
   | 'coming_soon';
 
 export const getActionType = (func: AgileFunction): AgileActionType => {
+  // Fonctions spécialisées avec template_id
+  if (func.template_id === 'crawling_sst_enhanced') {
+    return 'crawling_enhanced';
+  }
+  
   // Fonctions avec templates DocuGen
   if (func.template_id) {
     return 'docugen_template';
@@ -99,6 +105,9 @@ export const executeAgileFunction = async (func: AgileFunction): Promise<Executi
 
       case 'report_generator':
         return await executeReportGenerator(func);
+
+      case 'crawling_enhanced':
+        return await executeCrawlingEnhanced(func);
 
       case 'coming_soon':
       default:
@@ -333,3 +342,42 @@ const downloadFile = (file: { name: string; content: string; type: string }) => 
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 };
+
+async function executeCrawlingEnhanced(func: AgileFunction): Promise<ExecutionResult> {
+  try {
+    console.log('Lancement du crawling intelligent SST pour:', func.fonction);
+    
+    const { data, error } = await supabase.functions.invoke('sst-crawler-enhanced', {
+      body: {
+        action: 'crawl_all',
+        options: {
+          maxDepth: 3,
+          usePDFExtraction: true,
+          useFirecrawl: false,
+          semanticProcessing: true,
+          sectorClassification: true
+        }
+      }
+    });
+
+    if (error) throw error;
+
+    const totalExtracted = data?.totalExtracted || 0;
+    const totalNew = data?.totalNew || 0;
+    const totalUpdated = data?.totalUpdated || 0;
+
+    return {
+      success: true,
+      message: `Crawling intelligent terminé: ${totalExtracted} contenus analysés, ${totalNew} nouveaux, ${totalUpdated} mis à jour avec traitement sémantique`,
+      data: data,
+      redirectTo: '/crawling-dashboard'
+    };
+    
+  } catch (error) {
+    console.error('Erreur crawling enhanced:', error);
+    return {
+      success: false,
+      message: `Erreur lors du crawling intelligent: ${error instanceof Error ? error.message : 'Erreur inconnue'}`
+    };
+  }
+}
