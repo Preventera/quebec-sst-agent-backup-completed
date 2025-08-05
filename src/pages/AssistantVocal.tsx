@@ -46,6 +46,7 @@ const AssistantVocal = () => {
   ]);
   const [volume, setVolume] = useState(0.8);
   const [ttsProvider, setTtsProvider] = useState<'openai' | 'elevenlabs'>('openai');
+  const [assistantProvider, setAssistantProvider] = useState<'claude' | 'openai'>('claude');
   const [selectedVoice, setSelectedVoice] = useState('alloy');
   
   // Réinitialiser la voix quand on change de provider
@@ -223,25 +224,38 @@ const AssistantVocal = () => {
                 }
               });
               
-              // Obtenir la réponse de l'assistant SST - Essayer Claude d'abord, puis OpenAI
+              // Obtenir la réponse de l'assistant SST selon le provider choisi
               const assistantStartTime = Date.now();
               let assistantData, assistantError;
               
-              // Essayer Claude en premier
-              try {
-                const { data, error } = await supabase.functions.invoke('claude-assistant', {
-                  body: { 
-                    message: transcriptionData.text, 
-                    context: conversationContext.current 
-                  }
-                });
-                assistantData = data;
-                assistantError = error;
-                console.log('✅ Claude assistant utilisé');
-              } catch (claudeError) {
-                console.warn('⚠️ Claude échoué, basculement vers OpenAI:', claudeError);
-                
-                // Fallback vers OpenAI si Claude échoue
+              if (assistantProvider === 'claude') {
+                // Utiliser Claude
+                try {
+                  const { data, error } = await supabase.functions.invoke('claude-assistant', {
+                    body: { 
+                      message: transcriptionData.text, 
+                      context: conversationContext.current 
+                    }
+                  });
+                  assistantData = data;
+                  assistantError = error;
+                  console.log('✅ Claude assistant utilisé');
+                } catch (claudeError) {
+                  console.warn('⚠️ Claude échoué, basculement vers OpenAI:', claudeError);
+                  
+                  // Fallback automatique vers OpenAI si Claude échoue
+                  const { data, error } = await supabase.functions.invoke('sst-assistant', {
+                    body: { 
+                      message: transcriptionData.text, 
+                      context: conversationContext.current 
+                    }
+                  });
+                  assistantData = data;
+                  assistantError = error;
+                  console.log('🔄 OpenAI fallback utilisé');
+                }
+              } else {
+                // Utiliser OpenAI directement
                 const { data, error } = await supabase.functions.invoke('sst-assistant', {
                   body: { 
                     message: transcriptionData.text, 
@@ -250,7 +264,7 @@ const AssistantVocal = () => {
                 });
                 assistantData = data;
                 assistantError = error;
-                console.log('🔄 OpenAI fallback utilisé');
+                console.log('🤖 OpenAI assistant utilisé');
               }
               
               if (assistantError) {
@@ -820,6 +834,44 @@ const AssistantVocal = () => {
                       <Badge variant={connectionStatus === 'connected' ? 'default' : 'destructive'}>
                         {connectionStatus === 'connected' ? '🟢 Connecté' : '🔴 Déconnecté'}
                       </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Configuration Assistant */}
+                <Card className="border-secondary/20">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Brain className="h-4 w-4 text-primary" />
+                      Configuration IA
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="assistant-provider" className="text-xs">Assistant IA</Label>
+                      <Select value={assistantProvider} onValueChange={(value: 'claude' | 'openai') => setAssistantProvider(value)}>
+                        <SelectTrigger className="h-8">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="claude">
+                            <div className="flex items-center gap-2">
+                              <span>🤖 Claude</span>
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="openai">
+                            <div className="flex items-center gap-2">
+                              <span>🔥 OpenAI GPT-4</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        {assistantProvider === 'claude' 
+                          ? '🎯 Claude offre des réponses plus nuancées et contextualles'
+                          : '⚡ OpenAI GPT-4 pour des réponses rapides et précises'
+                        }
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
