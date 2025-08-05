@@ -33,7 +33,7 @@ const AssistantVocal = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [audioLevel, setAudioLevel] = useState<number>(0);
-  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connected');
+  const [connectionStatus, setConnectionStatus] = useState<'connected' | 'disconnected' | 'connecting'>('disconnected');
   const [sessionStats, setSessionStats] = useState({ questions: 0, totalTime: 0 });
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -169,30 +169,28 @@ const AssistantVocal = () => {
               
               if (transcriptionError) {
                 console.error('Transcription error:', transcriptionError);
-                
-                let errorMessage = 'Erreur de transcription';
-                if (transcriptionError.message && (transcriptionError.message.includes('quota') || transcriptionError.message.includes('insufficient_quota'))) {
-                  errorMessage = '❌ Quota OpenAI dépassé pour la transcription. Veuillez recharger votre compte OpenAI ou réessayer plus tard.';
-                } else if (transcriptionError.message && transcriptionError.message.includes('non-2xx')) {
-                  errorMessage = '❌ Service OpenAI temporairement indisponible. Le quota peut être dépassé.';
-                } else {
-                  errorMessage = `❌ Erreur de transcription: ${transcriptionError.message || 'Service temporairement indisponible'}`;
-                }
-                
-                // Ajouter un message d'erreur dans la conversation
-                const errorMsg: Message = {
-                  id: (Date.now() + 3).toString(),
-                  type: 'assistant',
-                  content: `${errorMessage}\n\n💡 **Solution:** Vérifiez votre quota OpenAI sur https://platform.openai.com/usage`,
-                  timestamp: new Date(),
-                  confidence: 0
-                };
-                
-                setMessages(prev => [...prev, errorMsg]);
                 setIsProcessing(false);
                 setConnectionStatus('disconnected');
                 
-                throw new Error(errorMessage);
+                // Afficher toast d'erreur avec action
+                toast({
+                  title: "❌ Erreur de transcription",
+                  description: transcriptionError.message?.includes('quota') ? 
+                    "Quota OpenAI dépassé. Cliquez pour gérer votre quota." : 
+                    "Service temporairement indisponible",
+                  variant: "destructive",
+                  action: transcriptionError.message?.includes('quota') ? (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => window.open('https://platform.openai.com/usage', '_blank')}
+                    >
+                      Gérer quota
+                    </Button>
+                  ) : undefined
+                });
+                
+                throw new Error('Erreur de transcription');
               }
               
               const confidence = transcriptionData.confidence || 0.85;
@@ -377,16 +375,7 @@ const AssistantVocal = () => {
               setIsProcessing(false);
               setConnectionStatus('disconnected');
               
-              // Message d'erreur dans la conversation
-              const errorMessage: Message = {
-                id: (Date.now() + 2).toString(),
-                type: 'assistant',
-                content: `❌ Erreur: ${error.message || 'Service temporairement indisponible. Veuillez réessayer ou vérifier votre quota OpenAI.'}`,
-                timestamp: new Date(),
-                confidence: 0
-              };
-              
-              setMessages(prev => [...prev, errorMessage]);
+              // Pas de message d'erreur dupliqué dans la conversation
               
               toast({
                 title: "❌ Erreur de traitement",
@@ -403,16 +392,7 @@ const AssistantVocal = () => {
           setIsProcessing(false);
           setConnectionStatus('disconnected');
           
-          // Message d'erreur dans la conversation
-          const errorMessage: Message = {
-            id: (Date.now() + 2).toString(),
-            type: 'assistant',
-            content: `❌ Erreur: ${error.message || 'Service temporairement indisponible. Veuillez réessayer ou vérifier votre quota OpenAI.'}`,
-            timestamp: new Date(),
-            confidence: 0
-          };
-          
-          setMessages(prev => [...prev, errorMessage]);
+          // Pas de message d'erreur dupliqué dans la conversation
           
           toast({
             title: "❌ Erreur de traitement",
@@ -716,15 +696,20 @@ const AssistantVocal = () => {
                     <div className="flex flex-col items-center justify-center gap-6">
                       <div className="flex flex-col items-center gap-4">
                         {/* Bouton de démarrage - toujours visible */}
-                        <Button
-                          size="lg"
-                          onClick={handleStartListening}
-                          disabled={isListening || isProcessing || isSpeaking}
-                          className="h-24 w-24 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-4 border-green-300 shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                          aria-label="Démarrer l'enregistrement vocal"
-                        >
-                          <Mic className="h-12 w-12" />
-                        </Button>
+                         <div className="relative">
+                           <Button
+                             size="lg"
+                             onClick={handleStartListening}
+                             disabled={isListening || isProcessing || isSpeaking}
+                             className="h-24 w-24 rounded-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-4 border-green-300 shadow-lg shadow-green-500/30 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                             aria-label="Démarrer l'enregistrement vocal"
+                           >
+                             <Mic className="h-12 w-12" />
+                           </Button>
+                           {isListening && (
+                             <div className="absolute -inset-2 rounded-full bg-red-500/20 animate-ping border-2 border-red-500/50" />
+                           )}
+                         </div>
                         
                         {/* Bouton d'arrêt - visible seulement pendant l'enregistrement */}
                         {isListening && (
@@ -738,19 +723,19 @@ const AssistantVocal = () => {
                           </Button>
                         )}
                         
-                        <div className="text-center">
-                          <p className="text-lg font-medium">
-                            {isListening ? "🎤 ENREGISTREMENT EN COURS" : 
-                             isProcessing ? "⚡ Traitement en cours..." : 
-                             isSpeaking ? "🔊 Assistant en train de parler..." : 
-                             "🎙️ Prêt à vous écouter"}
-                          </p>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            {isListening ? "Cliquez sur STOP pour finaliser" : 
-                             isProcessing ? "Analyse de votre question SST" : 
-                             isSpeaking ? "Réponse en cours de lecture" :
-                             "Cliquez sur le micro vert pour commencer"}
-                          </p>
+                         <div className="text-center">
+                           <p className={`text-lg font-medium ${isListening ? 'text-red-600 animate-pulse' : ''}`}>
+                             {isListening ? "🎤 ENREGISTREMENT EN COURS" : 
+                              isProcessing ? "⚡ Traitement en cours..." : 
+                              isSpeaking ? "🔊 Assistant en train de parler..." : 
+                              "🎙️ Prêt à vous écouter"}
+                           </p>
+                           <p className="text-sm text-muted-foreground mt-1">
+                             {isListening ? "Parlez maintenant, cliquez STOP quand vous avez terminé" : 
+                              isProcessing ? "Analyse de votre question SST en cours" : 
+                              isSpeaking ? "Réponse en cours de lecture" :
+                              "Cliquez sur le micro vert pour commencer votre question"}
+                           </p>
                           
                           {/* Indicateur de niveau audio */}
                           {isListening && audioLevel > 0 && (
@@ -831,9 +816,9 @@ const AssistantVocal = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-muted-foreground">Statut</span>
-                      <Badge variant={connectionStatus === 'connected' ? 'default' : 'destructive'}>
-                        {connectionStatus === 'connected' ? '🟢 Connecté' : '🔴 Déconnecté'}
-                      </Badge>
+                       <Badge variant={connectionStatus === 'connected' ? 'default' : connectionStatus === 'connecting' ? 'secondary' : 'outline'} className={connectionStatus === 'connected' ? 'bg-green-100 text-green-800 border-green-200' : connectionStatus === 'connecting' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-gray-100 text-gray-600 border-gray-200'}>
+                         {connectionStatus === 'connected' ? '🟢 Connecté' : connectionStatus === 'connecting' ? '🟡 En cours...' : '⚪ Hors ligne'}
+                       </Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -885,18 +870,18 @@ const AssistantVocal = () => {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="tts-provider" className="text-xs">Provider TTS</Label>
-                      <Select value={ttsProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setTtsProvider(value)}>
-                        <SelectTrigger className="h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="openai">OpenAI</SelectItem>
-                          <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                     <div className="space-y-2">
+                       <Label htmlFor="tts-provider" className="text-xs">Fournisseur vocal</Label>
+                       <Select value={ttsProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setTtsProvider(value)}>
+                         <SelectTrigger className="h-8">
+                           <SelectValue />
+                         </SelectTrigger>
+                         <SelectContent>
+                           <SelectItem value="openai">OpenAI</SelectItem>
+                           <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
+                         </SelectContent>
+                       </Select>
+                     </div>
                     
                     <div className="space-y-2">
                       <Label htmlFor="voice-select" className="text-xs">Voix</Label>
@@ -950,23 +935,73 @@ const AssistantVocal = () => {
                           "Évaluation des risques",
                           "Équipements de protection",
                           "Procédures d'urgence"
-                        ].map((suggestion, index) => (
-                          <Button
-                            key={index}
-                            variant="ghost"
-                            size="sm"
-                            className="w-full justify-start text-xs h-auto py-2 px-3 hover:bg-primary/10"
-                            onClick={() => {
-                              toast({
-                                title: "💡 Suggestion",
-                                description: `Dites: "Parle-moi de ${suggestion.toLowerCase()}"`,
-                                duration: 3000,
-                              });
-                            }}
-                          >
-                            • {suggestion}
-                          </Button>
-                        ))}
+                         ].map((suggestion, index) => (
+                           <Button
+                             key={index}
+                             variant="ghost"
+                             size="sm"
+                             className="w-full justify-start text-xs h-auto py-2 px-3 hover:bg-primary/10 transition-all"
+                             disabled={isListening || isProcessing || isSpeaking}
+                             onClick={async () => {
+                               if (!isListening && !isProcessing && !isSpeaking) {
+                                 // Simuler une question vocale en lançant l'assistant
+                                 toast({
+                                   title: "🎤 Question suggérée",
+                                   description: `Traitement de: "${suggestion}"`,
+                                   duration: 2000,
+                                 });
+                                 
+                                 // Créer directement la question
+                                 const userMessage: Message = {
+                                   id: Date.now().toString(),
+                                   type: 'user',
+                                   content: `Parle-moi de ${suggestion.toLowerCase()}`,
+                                   timestamp: new Date(),
+                                   confidence: 1
+                                 };
+                                 
+                                 setMessages(prev => [...prev, userMessage]);
+                                 setIsProcessing(true);
+                                 setConnectionStatus('connecting');
+                                 
+                                 try {
+                                   // Obtenir la réponse de l'assistant
+                                   const { data: assistantData, error: assistantError } = await supabase.functions.invoke(
+                                     assistantProvider === 'claude' ? 'claude-assistant' : 'sst-assistant', 
+                                     {
+                                       body: { 
+                                         message: userMessage.content, 
+                                         context: conversationContext.current 
+                                       }
+                                     }
+                                   );
+                                   
+                                   if (!assistantError && assistantData) {
+                                     const assistantMessage: Message = {
+                                       id: (Date.now() + 1).toString(),
+                                       type: 'assistant',
+                                       content: assistantData.response,
+                                       timestamp: new Date(),
+                                       confidence: 1,
+                                       tokens: assistantData.tokens_used || 0
+                                     };
+                                     
+                                     setMessages(prev => [...prev, assistantMessage]);
+                                     setSessionStats(prev => ({ questions: prev.questions + 1, totalTime: prev.totalTime + 1000 }));
+                                   }
+                                 } catch (error) {
+                                   console.error('Erreur suggestion:', error);
+                                 }
+                                 
+                                 setIsProcessing(false);
+                                 setConnectionStatus('connected');
+                               }
+                             }}
+                           >
+                             <MessageSquare className="h-3 w-3 mr-2" />
+                             {suggestion}
+                           </Button>
+                         ))}
                       </div>
                     </div>
                     
