@@ -66,6 +66,9 @@ verify_jwt = false
 [functions.text-to-voice-elevenlabs]
 verify_jwt = false
 
+[functions.claude-assistant]
+verify_jwt = false
+
 [edge-runtime]
 enabled = true
 port = 54330

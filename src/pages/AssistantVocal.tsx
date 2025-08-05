@@ -223,14 +223,35 @@ const AssistantVocal = () => {
                 }
               });
               
-              // Obtenir la réponse de l'assistant SST
+              // Obtenir la réponse de l'assistant SST - Essayer Claude d'abord, puis OpenAI
               const assistantStartTime = Date.now();
-              const { data: assistantData, error: assistantError } = await supabase.functions.invoke('sst-assistant', {
-                body: { 
-                  message: transcriptionData.text, 
-                  context: conversationContext.current 
-                }
-              });
+              let assistantData, assistantError;
+              
+              // Essayer Claude en premier
+              try {
+                const { data, error } = await supabase.functions.invoke('claude-assistant', {
+                  body: { 
+                    message: transcriptionData.text, 
+                    context: conversationContext.current 
+                  }
+                });
+                assistantData = data;
+                assistantError = error;
+                console.log('✅ Claude assistant utilisé');
+              } catch (claudeError) {
+                console.warn('⚠️ Claude échoué, basculement vers OpenAI:', claudeError);
+                
+                // Fallback vers OpenAI si Claude échoue
+                const { data, error } = await supabase.functions.invoke('sst-assistant', {
+                  body: { 
+                    message: transcriptionData.text, 
+                    context: conversationContext.current 
+                  }
+                });
+                assistantData = data;
+                assistantError = error;
+                console.log('🔄 OpenAI fallback utilisé');
+              }
               
               if (assistantError) {
                 console.error('Assistant error:', assistantError);
