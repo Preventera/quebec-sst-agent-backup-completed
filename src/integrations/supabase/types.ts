@@ -467,6 +467,42 @@ export type Database = {
           },
         ]
       }
+      sst_crawling_sources: {
+        Row: {
+          crawl_frequency: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          source_type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          crawl_frequency?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          source_type: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          crawl_frequency?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          source_type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       sst_notifications: {
         Row: {
           affected_sectors: string[] | null
