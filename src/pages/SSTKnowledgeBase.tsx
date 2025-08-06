@@ -7,7 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2, ArrowUpDown, Calendar, Hash, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
@@ -41,6 +42,11 @@ const SSTKnowledgeBase = () => {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [allContent, setAllContent] = useState<SSTKnowledge[]>([]);
+  const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'title' | 'source'>('relevance');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [dateFilter, setDateFilter] = useState<'all' | 'last_month' | 'last_3_months' | 'last_year'>('all');
   const [stats, setStats] = useState<SearchStats>({
     totalDocuments: 0,
     totalSources: 0,
@@ -88,9 +94,16 @@ const SSTKnowledgeBase = () => {
       // Extraire les sources uniques
       const sources = [...new Set(transformedContent.map(item => item.source_name))];
       
+      // Extraire tous les tags uniques
+      const allTags = transformedContent
+        .flatMap(item => item.tags || [])
+        .filter((tag, index, arr) => arr.indexOf(tag) === index)
+        .sort();
+      
       setAllContent(transformedContent);
       setAvailableSources(sources);
       setSelectedSources(sources); // Sélectionner toutes les sources par défaut
+      setAvailableTags(allTags);
       
       setStats({
         totalDocuments: transformedContent.length,
@@ -124,10 +137,17 @@ const SSTKnowledgeBase = () => {
       const query = searchQuery.toLowerCase();
       
       // Filtrer les résultats
-      const filteredResults = allContent
+      let filteredResults = allContent
         .filter(item => {
           // Filtre par source
           const sourceMatch = selectedSources.includes(item.source_name);
+          
+          // Filtre par tags
+          const tagMatch = selectedTags.length === 0 || 
+            (item.tags && selectedTags.some(tag => item.tags!.includes(tag)));
+          
+          // Filtre par date
+          const dateMatch = applyDateFilter(item.created_at);
           
           // Recherche textuelle
           const titleMatch = item.title.toLowerCase().includes(query);
@@ -138,14 +158,18 @@ const SSTKnowledgeBase = () => {
           const sectionMatch = item.section ? item.section.toLowerCase().includes(query) : false;
           const articleMatch = item.article_number ? item.article_number.toLowerCase().includes(query) : false;
           
-          return sourceMatch && (titleMatch || contentMatch || tagsMatch || sectionMatch || articleMatch);
+          return sourceMatch && tagMatch && dateMatch && (titleMatch || contentMatch || tagsMatch || sectionMatch || articleMatch);
         })
         .map(item => ({
           ...item,
           relevance_score: calculateRelevanceScore(item, query)
-        }))
-        .sort((a, b) => (b.relevance_score || 0) - (a.relevance_score || 0))
-        .slice(0, maxResults[0]);
+        }));
+
+      // Appliquer le tri
+      filteredResults = applySorting(filteredResults);
+      
+      // Limiter les résultats
+      filteredResults = filteredResults.slice(0, maxResults[0]);
       
       setResults(filteredResults);
       setStats(prev => ({ ...prev, searchResults: filteredResults.length }));
@@ -207,6 +231,57 @@ const SSTKnowledgeBase = () => {
     );
   };
 
+  const handleTagToggle = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const applyDateFilter = (dateString: string): boolean => {
+    if (dateFilter === 'all') return true;
+    
+    const itemDate = new Date(dateString);
+    const now = new Date();
+    const diffTime = now.getTime() - itemDate.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    switch (dateFilter) {
+      case 'last_month':
+        return diffDays <= 30;
+      case 'last_3_months':
+        return diffDays <= 90;
+      case 'last_year':
+        return diffDays <= 365;
+      default:
+        return true;
+    }
+  };
+
+  const applySorting = (items: (SSTKnowledge & { relevance_score: number })[]): (SSTKnowledge & { relevance_score: number })[] => {
+    return items.sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'relevance':
+          comparison = b.relevance_score - a.relevance_score;
+          break;
+        case 'date':
+          comparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'source':
+          comparison = a.source_name.localeCompare(b.source_name);
+          break;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  };
+
 
   // Charger les données au montage du composant
   useEffect(() => {
@@ -218,7 +293,7 @@ const SSTKnowledgeBase = () => {
     if (searchQuery) {
       performSearch();
     }
-  }, [selectedSources, maxResults, allContent]);
+  }, [selectedSources, selectedTags, dateFilter, sortBy, sortOrder, maxResults, allContent]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -300,10 +375,63 @@ const SSTKnowledgeBase = () => {
 
                 <Separator />
 
+                {/* Tri */}
+                <div className="space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <ArrowUpDown className="h-4 w-4" />
+                    Trier par
+                  </h4>
+                  <div className="space-y-2">
+                    <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="relevance">Pertinence</SelectItem>
+                        <SelectItem value="date">Date</SelectItem>
+                        <SelectItem value="title">Titre</SelectItem>
+                        <SelectItem value="source">Source</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={sortOrder} onValueChange={(value: any) => setSortOrder(value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="desc">Décroissant</SelectItem>
+                        <SelectItem value="asc">Croissant</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Filtre par date */}
+                <div className="space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Période
+                  </h4>
+                  <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les dates</SelectItem>
+                      <SelectItem value="last_month">Dernier mois</SelectItem>
+                      <SelectItem value="last_3_months">3 derniers mois</SelectItem>
+                      <SelectItem value="last_year">Dernière année</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Separator />
+
                 {/* Filtres par source */}
                 <div className="space-y-3">
                   <h4 className="font-medium">Sources</h4>
-                  <ScrollArea className="h-40">
+                  <ScrollArea className="h-32">
                     <div className="space-y-2">
                       {availableSources.map((source) => (
                         <div key={source} className="flex items-center space-x-2">
@@ -321,6 +449,46 @@ const SSTKnowledgeBase = () => {
                           </label>
                         </div>
                       ))}
+                      {isLoadingData && (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                <Separator />
+
+                {/* Filtres par tags */}
+                <div className="space-y-3">
+                  <h4 className="font-medium flex items-center gap-2">
+                    <Tag className="h-4 w-4" />
+                    Tags ({selectedTags.length})
+                  </h4>
+                  <ScrollArea className="h-32">
+                    <div className="space-y-2">
+                      {availableTags.slice(0, 20).map((tag) => (
+                        <div key={tag} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`tag-${tag}`}
+                            checked={selectedTags.includes(tag)}
+                            onCheckedChange={() => handleTagToggle(tag)}
+                            disabled={isLoadingData}
+                          />
+                          <label 
+                            htmlFor={`tag-${tag}`}
+                            className="text-sm cursor-pointer"
+                          >
+                            {tag}
+                          </label>
+                        </div>
+                      ))}
+                      {availableTags.length > 20 && (
+                        <p className="text-xs text-muted-foreground">
+                          +{availableTags.length - 20} autres tags disponibles
+                        </p>
+                      )}
                       {isLoadingData && (
                         <div className="flex items-center justify-center py-4">
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -375,9 +543,15 @@ const SSTKnowledgeBase = () => {
             {/* Résultats */}
             {!isLoadingData && results.length > 0 && (
               <div className="space-y-4">
-                <h2 className="text-xl font-semibold">
-                  Résultats de recherche ({results.length})
-                </h2>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-semibold">
+                    Résultats de recherche ({results.length})
+                  </h2>
+                  <div className="flex gap-2 text-sm text-muted-foreground">
+                    <span>Triés par: {sortBy === 'relevance' ? 'Pertinence' : sortBy === 'date' ? 'Date' : sortBy === 'title' ? 'Titre' : 'Source'}</span>
+                    <span>({sortOrder === 'desc' ? 'Décroissant' : 'Croissant'})</span>
+                  </div>
+                </div>
                 
                 {results.map((result) => (
                   <Card key={result.id} className="hover:shadow-lg transition-shadow">
