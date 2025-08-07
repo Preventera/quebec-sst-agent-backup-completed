@@ -22,6 +22,9 @@ interface SSTKnowledge {
   url: string;
   section: string | null;
   article_number: string | null;
+  semantic_category: string | null;
+  sector: string | null;
+  importance: number | null;
   created_at: string;
   relevance_score?: number;
 }
@@ -42,11 +45,15 @@ const SSTKnowledgeBase = () => {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [allContent, setAllContent] = useState<SSTKnowledge[]>([]);
-  const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'title' | 'source'>('relevance');
+  const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'title' | 'source' | 'category' | 'importance'>('relevance');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [dateFilter, setDateFilter] = useState<'all' | 'last_month' | 'last_3_months' | 'last_year'>('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
+  const [availableSectors, setAvailableSectors] = useState<string[]>([]);
   const [stats, setStats] = useState<SearchStats>({
     totalDocuments: 0,
     totalSources: 0,
@@ -69,6 +76,9 @@ const SSTKnowledgeBase = () => {
           url,
           section,
           article_number,
+          semantic_category,
+          sector,
+          importance,
           created_at,
           sst_sources!inner(name)
         `)
@@ -88,6 +98,9 @@ const SSTKnowledgeBase = () => {
         url: item.url,
         section: item.section,
         article_number: item.article_number,
+        semantic_category: item.semantic_category,
+        sector: item.sector,
+        importance: item.importance,
         created_at: item.created_at
       }));
 
@@ -99,11 +112,25 @@ const SSTKnowledgeBase = () => {
         .flatMap(item => item.tags || [])
         .filter((tag, index, arr) => arr.indexOf(tag) === index)
         .sort();
+
+      // Extraire les catégories sémantiques uniques
+      const categories = [...new Set(transformedContent
+        .map(item => item.semantic_category)
+        .filter(Boolean)
+      )].sort();
+
+      // Extraire les secteurs uniques
+      const sectors = [...new Set(transformedContent
+        .map(item => item.sector)
+        .filter(Boolean)
+      )].sort();
       
       setAllContent(transformedContent);
       setAvailableSources(sources);
       setSelectedSources(sources); // Sélectionner toutes les sources par défaut
       setAvailableTags(allTags);
+      setAvailableCategories(categories);
+      setAvailableSectors(sectors);
       
       setStats({
         totalDocuments: transformedContent.length,
@@ -146,6 +173,14 @@ const SSTKnowledgeBase = () => {
           const tagMatch = selectedTags.length === 0 || 
             (item.tags && selectedTags.some(tag => item.tags!.includes(tag)));
           
+          // Filtre par catégorie sémantique
+          const categoryMatch = selectedCategories.length === 0 || 
+            (item.semantic_category && selectedCategories.includes(item.semantic_category));
+          
+          // Filtre par secteur
+          const sectorMatch = selectedSectors.length === 0 || 
+            (item.sector && selectedSectors.includes(item.sector));
+          
           // Filtre par date
           const dateMatch = applyDateFilter(item.created_at);
           
@@ -158,7 +193,7 @@ const SSTKnowledgeBase = () => {
           const sectionMatch = item.section ? item.section.toLowerCase().includes(query) : false;
           const articleMatch = item.article_number ? item.article_number.toLowerCase().includes(query) : false;
           
-          return sourceMatch && tagMatch && dateMatch && (titleMatch || contentMatch || tagsMatch || sectionMatch || articleMatch);
+          return sourceMatch && tagMatch && categoryMatch && sectorMatch && dateMatch && (titleMatch || contentMatch || tagsMatch || sectionMatch || articleMatch);
         })
         .map(item => ({
           ...item,
@@ -239,6 +274,22 @@ const SSTKnowledgeBase = () => {
     );
   };
 
+  const handleCategoryToggle = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleSectorToggle = (sector: string) => {
+    setSelectedSectors(prev => 
+      prev.includes(sector)
+        ? prev.filter(s => s !== sector)
+        : [...prev, sector]
+    );
+  };
+
   const applyDateFilter = (dateString: string): boolean => {
     if (dateFilter === 'all') return true;
     
@@ -276,6 +327,12 @@ const SSTKnowledgeBase = () => {
         case 'source':
           comparison = a.source_name.localeCompare(b.source_name);
           break;
+        case 'category':
+          comparison = (a.semantic_category || '').localeCompare(b.semantic_category || '');
+          break;
+        case 'importance':
+          comparison = (b.importance || 1) - (a.importance || 1);
+          break;
       }
       
       return sortOrder === 'asc' ? comparison : -comparison;
@@ -293,7 +350,7 @@ const SSTKnowledgeBase = () => {
     if (searchQuery) {
       performSearch();
     }
-  }, [selectedSources, selectedTags, dateFilter, sortBy, sortOrder, maxResults, allContent]);
+  }, [selectedSources, selectedTags, selectedCategories, selectedSectors, dateFilter, sortBy, sortOrder, maxResults, allContent]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -391,6 +448,8 @@ const SSTKnowledgeBase = () => {
                         <SelectItem value="date">Date</SelectItem>
                         <SelectItem value="title">Titre</SelectItem>
                         <SelectItem value="source">Source</SelectItem>
+                        <SelectItem value="category">Catégorie</SelectItem>
+                        <SelectItem value="importance">Importance</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={sortOrder} onValueChange={(value: any) => setSortOrder(value)}>
@@ -497,6 +556,71 @@ const SSTKnowledgeBase = () => {
                     </div>
                   </ScrollArea>
                 </div>
+
+                <Separator />
+
+                {/* Filtres par catégorie sémantique */}
+                {availableCategories.length > 0 && (
+                  <div className="space-y-3">
+                    <h4 className="font-medium flex items-center gap-2">
+                      <Hash className="h-4 w-4" />
+                      Catégories ({selectedCategories.length})
+                    </h4>
+                    <ScrollArea className="h-24">
+                      <div className="space-y-2">
+                        {availableCategories.map((category) => (
+                          <div key={category} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`category-${category}`}
+                              checked={selectedCategories.includes(category)}
+                              onCheckedChange={() => handleCategoryToggle(category)}
+                              disabled={isLoadingData}
+                            />
+                            <label 
+                              htmlFor={`category-${category}`}
+                              className="text-sm cursor-pointer capitalize"
+                            >
+                              {category}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
+                )}
+
+                {/* Filtres par secteur */}
+                {availableSectors.length > 0 && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Secteurs ({selectedSectors.length})
+                      </h4>
+                      <ScrollArea className="h-24">
+                        <div className="space-y-2">
+                          {availableSectors.map((sector) => (
+                            <div key={sector} className="flex items-center space-x-2">
+                              <Checkbox
+                                id={`sector-${sector}`}
+                                checked={selectedSectors.includes(sector)}
+                                onCheckedChange={() => handleSectorToggle(sector)}
+                                disabled={isLoadingData}
+                              />
+                              <label 
+                                htmlFor={`sector-${sector}`}
+                                className="text-sm cursor-pointer capitalize"
+                              >
+                                {sector}
+                              </label>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -548,7 +672,14 @@ const SSTKnowledgeBase = () => {
                     Résultats de recherche ({results.length})
                   </h2>
                   <div className="flex gap-2 text-sm text-muted-foreground">
-                    <span>Triés par: {sortBy === 'relevance' ? 'Pertinence' : sortBy === 'date' ? 'Date' : sortBy === 'title' ? 'Titre' : 'Source'}</span>
+                    <span>Triés par: {
+                      sortBy === 'relevance' ? 'Pertinence' : 
+                      sortBy === 'date' ? 'Date' : 
+                      sortBy === 'title' ? 'Titre' : 
+                      sortBy === 'source' ? 'Source' :
+                      sortBy === 'category' ? 'Catégorie' :
+                      sortBy === 'importance' ? 'Importance' : sortBy
+                    }</span>
                     <span>({sortOrder === 'desc' ? 'Décroissant' : 'Croissant'})</span>
                   </div>
                 </div>
@@ -557,10 +688,20 @@ const SSTKnowledgeBase = () => {
                   <Card key={result.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-4">
-                        <div className="flex gap-2 flex-wrap">
+                  <div className="flex gap-2 flex-wrap">
                           <Badge variant="secondary">
                             {result.source_name}
                           </Badge>
+                          {result.semantic_category && (
+                            <Badge variant="outline" className="bg-primary/10 text-primary">
+                              {result.semantic_category}
+                            </Badge>
+                          )}
+                          {result.sector && (
+                            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                              {result.sector}
+                            </Badge>
+                          )}
                           {result.section && (
                             <Badge variant="outline">
                               {result.section}
@@ -569,6 +710,11 @@ const SSTKnowledgeBase = () => {
                           {result.article_number && (
                             <Badge variant="outline">
                               Article {result.article_number}
+                            </Badge>
+                          )}
+                          {result.importance && result.importance > 1 && (
+                            <Badge variant="default" className="bg-orange-100 text-orange-800">
+                              Priorité {result.importance}
                             </Badge>
                           )}
                           {result.relevance_score && (
