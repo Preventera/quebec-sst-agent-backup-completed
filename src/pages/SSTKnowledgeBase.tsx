@@ -4,14 +4,17 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2, ArrowUpDown, Calendar, Hash, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
+import CustomBreadcrumb from '@/components/CustomBreadcrumb';
+import SearchSkeleton from '@/components/SearchSkeleton';
+import PopularSearches from '@/components/PopularSearches';
 
 interface SSTKnowledge {
   id: string;
@@ -40,13 +43,14 @@ const SSTKnowledgeBase = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState<SSTKnowledge[]>([]);
   const [selectedSources, setSelectedSources] = useState<string[]>([]);
-  const [maxResults, setMaxResults] = useState([10]);
+  const [resultsPerPage, setResultsPerPage] = useState<number>(10);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [availableSources, setAvailableSources] = useState<string[]>([]);
   const [allContent, setAllContent] = useState<SSTKnowledge[]>([]);
   const [sortBy, setSortBy] = useState<'relevance' | 'date' | 'title' | 'source' | 'category' | 'importance'>('relevance');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [combinedSort, setCombinedSort] = useState('relevance-desc');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [dateFilter, setDateFilter] = useState<'all' | 'last_month' | 'last_3_months' | 'last_year'>('all');
@@ -204,7 +208,7 @@ const SSTKnowledgeBase = () => {
       filteredResults = applySorting(filteredResults);
       
       // Limiter les résultats
-      filteredResults = filteredResults.slice(0, maxResults[0]);
+      filteredResults = filteredResults.slice(0, resultsPerPage);
       
       setResults(filteredResults);
       setStats(prev => ({ ...prev, searchResults: filteredResults.length }));
@@ -345,20 +349,40 @@ const SSTKnowledgeBase = () => {
     loadSSTData();
   }, []);
 
+  // Gérer le tri combiné
+  useEffect(() => {
+    const [sort, order] = combinedSort.split('-');
+    setSortBy(sort as any);
+    setSortOrder(order as 'asc' | 'desc');
+  }, [combinedSort]);
+
   // Effectuer la recherche quand les filtres changent
   useEffect(() => {
     if (searchQuery) {
       performSearch();
     }
-  }, [selectedSources, selectedTags, selectedCategories, selectedSectors, dateFilter, sortBy, sortOrder, maxResults, allContent]);
+  }, [selectedSources, selectedTags, selectedCategories, selectedSectors, dateFilter, sortBy, sortOrder, resultsPerPage, allContent]);
+
+  const handlePopularSearchClick = (query: string) => {
+    setSearchQuery(query);
+    setTimeout(() => performSearch(), 100);
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6">
+        {/* Breadcrumb */}
+        <CustomBreadcrumb 
+          items={[
+            { label: 'Ressources', href: '#' },
+            { label: 'Base de connaissances SST' }
+          ]} 
+        />
+
         {/* En-tête */}
-        <div className="text-center space-y-4 mb-8">
+        <div className="text-center space-y-4 mb-6">
           <div className="flex items-center justify-center gap-3">
             <Database className="h-8 w-8 text-primary" />
             <h1 className="text-3xl font-bold text-foreground">
@@ -377,7 +401,7 @@ const SSTKnowledgeBase = () => {
         </div>
 
         {/* Métriques */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <Card>
             <CardContent className="p-4 text-center">
               <FileText className="h-6 w-6 text-primary mx-auto mb-2" />
@@ -416,211 +440,207 @@ const SSTKnowledgeBase = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Nombre de résultats */}
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">
-                    Nombre de résultats: {maxResults[0]}
-                  </label>
-                  <Slider
-                    value={maxResults}
-                    onValueChange={setMaxResults}
-                    max={50}
-                    min={5}
-                    step={5}
-                  />
-                </div>
-
-                <Separator />
-
-                {/* Tri */}
+                {/* Tri et résultats par page */}
                 <div className="space-y-3">
                   <h4 className="font-medium flex items-center gap-2">
                     <ArrowUpDown className="h-4 w-4" />
                     Trier par
                   </h4>
-                  <div className="space-y-2">
-                    <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="relevance">Pertinence</SelectItem>
-                        <SelectItem value="date">Date</SelectItem>
-                        <SelectItem value="title">Titre</SelectItem>
-                        <SelectItem value="source">Source</SelectItem>
-                        <SelectItem value="category">Catégorie</SelectItem>
-                        <SelectItem value="importance">Importance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Select value={sortOrder} onValueChange={(value: any) => setSortOrder(value)}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="desc">Décroissant</SelectItem>
-                        <SelectItem value="asc">Croissant</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Filtre par date */}
-                <div className="space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Période
-                  </h4>
-                  <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+                  <Select value={combinedSort} onValueChange={setCombinedSort}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Toutes les dates</SelectItem>
-                      <SelectItem value="last_month">Dernier mois</SelectItem>
-                      <SelectItem value="last_3_months">3 derniers mois</SelectItem>
-                      <SelectItem value="last_year">Dernière année</SelectItem>
+                      <SelectItem value="relevance-desc">Pertinence ↓</SelectItem>
+                      <SelectItem value="relevance-asc">Pertinence ↑</SelectItem>
+                      <SelectItem value="date-desc">Date ↓</SelectItem>
+                      <SelectItem value="date-asc">Date ↑</SelectItem>
+                      <SelectItem value="title-asc">Titre ↑</SelectItem>
+                      <SelectItem value="title-desc">Titre ↓</SelectItem>
+                      <SelectItem value="source-asc">Source ↑</SelectItem>
+                      <SelectItem value="source-desc">Source ↓</SelectItem>
+                      <SelectItem value="category-asc">Catégorie ↑</SelectItem>
+                      <SelectItem value="category-desc">Catégorie ↓</SelectItem>
+                      <SelectItem value="importance-desc">Importance ↓</SelectItem>
+                      <SelectItem value="importance-asc">Importance ↑</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">
+                    Résultats par page
+                  </label>
+                  <Select value={resultsPerPage.toString()} onValueChange={(value) => setResultsPerPage(Number(value))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">50</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <Separator />
 
-                {/* Filtres par source */}
-                <div className="space-y-3">
-                  <h4 className="font-medium">Sources</h4>
-                  <ScrollArea className="h-32">
-                    <div className="space-y-2">
-                      {availableSources.map((source) => (
-                        <div key={source} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`source-${source}`}
-                            checked={selectedSources.includes(source)}
-                            onCheckedChange={() => handleSourceToggle(source)}
-                            disabled={isLoadingData}
-                          />
-                          <label 
-                            htmlFor={`source-${source}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {source}
-                          </label>
-                        </div>
-                      ))}
-                      {isLoadingData && (
-                        <div className="flex items-center justify-center py-4">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                <Separator />
-
-                {/* Filtres par tags */}
-                <div className="space-y-3">
-                  <h4 className="font-medium flex items-center gap-2">
-                    <Tag className="h-4 w-4" />
-                    Tags ({selectedTags.length})
-                  </h4>
-                  <ScrollArea className="h-32">
-                    <div className="space-y-2">
-                      {availableTags.slice(0, 20).map((tag) => (
-                        <div key={tag} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`tag-${tag}`}
-                            checked={selectedTags.includes(tag)}
-                            onCheckedChange={() => handleTagToggle(tag)}
-                            disabled={isLoadingData}
-                          />
-                          <label 
-                            htmlFor={`tag-${tag}`}
-                            className="text-sm cursor-pointer"
-                          >
-                            {tag}
-                          </label>
-                        </div>
-                      ))}
-                      {availableTags.length > 20 && (
-                        <p className="text-xs text-muted-foreground">
-                          +{availableTags.length - 20} autres tags disponibles
-                        </p>
-                      )}
-                      {isLoadingData && (
-                        <div className="flex items-center justify-center py-4">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  </ScrollArea>
-                </div>
-
-                <Separator />
-
-                {/* Filtres par catégorie sémantique */}
-                {availableCategories.length > 0 && (
-                  <div className="space-y-3">
-                    <h4 className="font-medium flex items-center gap-2">
-                      <Hash className="h-4 w-4" />
-                      Catégories ({selectedCategories.length})
-                    </h4>
-                    <ScrollArea className="h-24">
-                      <div className="space-y-2">
-                        {availableCategories.map((category) => (
-                          <div key={category} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`category-${category}`}
-                              checked={selectedCategories.includes(category)}
-                              onCheckedChange={() => handleCategoryToggle(category)}
-                              disabled={isLoadingData}
-                            />
-                            <label 
-                              htmlFor={`category-${category}`}
-                              className="text-sm cursor-pointer capitalize"
-                            >
-                              {category}
-                            </label>
-                          </div>
-                        ))}
+                {/* Filtres avancés */}
+                <Accordion type="single" collapsible defaultValue="filters">
+                  <AccordionItem value="filters">
+                    <AccordionTrigger className="text-sm font-medium">
+                      Filtres avancés
+                    </AccordionTrigger>
+                    <AccordionContent className="space-y-4">
+                      {/* Filtre par date */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Période
+                        </h4>
+                        <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Toutes les dates</SelectItem>
+                            <SelectItem value="last_month">Dernier mois</SelectItem>
+                            <SelectItem value="last_3_months">3 derniers mois</SelectItem>
+                            <SelectItem value="last_year">Dernière année</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
-                    </ScrollArea>
-                  </div>
-                )}
 
-                {/* Filtres par secteur */}
-                {availableSectors.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="space-y-3">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        Secteurs ({selectedSectors.length})
-                      </h4>
-                      <ScrollArea className="h-24">
-                        <div className="space-y-2">
-                          {availableSectors.map((sector) => (
-                            <div key={sector} className="flex items-center space-x-2">
-                              <Checkbox
-                                id={`sector-${sector}`}
-                                checked={selectedSectors.includes(sector)}
-                                onCheckedChange={() => handleSectorToggle(sector)}
-                                disabled={isLoadingData}
-                              />
-                              <label 
-                                htmlFor={`sector-${sector}`}
-                                className="text-sm cursor-pointer capitalize"
-                              >
-                                {sector}
-                              </label>
+                      {/* Filtres par source */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium">Sources</h4>
+                        <ScrollArea className="h-24">
+                          <div className="space-y-2">
+                            {availableSources.map((source) => (
+                              <div key={source} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`source-${source}`}
+                                  checked={selectedSources.includes(source)}
+                                  onCheckedChange={() => handleSourceToggle(source)}
+                                  disabled={isLoadingData}
+                                />
+                                <label 
+                                  htmlFor={`source-${source}`}
+                                  className="text-sm cursor-pointer"
+                                >
+                                  {source}
+                                </label>
+                              </div>
+                            ))}
+                            {isLoadingData && (
+                              <div className="flex items-center justify-center py-4">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </div>
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
+
+                      {/* Filtres par tags */}
+                      <div className="space-y-3">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Tag className="h-4 w-4" />
+                          Tags ({selectedTags.length})
+                        </h4>
+                        <ScrollArea className="h-24">
+                          <div className="space-y-2">
+                            {availableTags.slice(0, 20).map((tag) => (
+                              <div key={tag} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`tag-${tag}`}
+                                  checked={selectedTags.includes(tag)}
+                                  onCheckedChange={() => handleTagToggle(tag)}
+                                  disabled={isLoadingData}
+                                />
+                                <label 
+                                  htmlFor={`tag-${tag}`}
+                                  className="text-sm cursor-pointer"
+                                >
+                                  {tag}
+                                </label>
+                              </div>
+                            ))}
+                            {availableTags.length > 20 && (
+                              <p className="text-xs text-muted-foreground">
+                                +{availableTags.length - 20} autres tags disponibles
+                              </p>
+                            )}
+                            {isLoadingData && (
+                              <div className="flex items-center justify-center py-4">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </div>
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
+
+                      {/* Filtres par catégorie sémantique */}
+                      {availableCategories.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium flex items-center gap-2">
+                            <Hash className="h-4 w-4" />
+                            Catégories ({selectedCategories.length})
+                          </h4>
+                          <ScrollArea className="h-20">
+                            <div className="space-y-2">
+                              {availableCategories.map((category) => (
+                                <div key={category} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`category-${category}`}
+                                    checked={selectedCategories.includes(category)}
+                                    onCheckedChange={() => handleCategoryToggle(category)}
+                                    disabled={isLoadingData}
+                                  />
+                                  <label 
+                                    htmlFor={`category-${category}`}
+                                    className="text-sm cursor-pointer capitalize"
+                                  >
+                                    {category}
+                                  </label>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          </ScrollArea>
                         </div>
-                      </ScrollArea>
-                    </div>
-                  </>
-                )}
+                      )}
+
+                      {/* Filtres par secteur */}
+                      {availableSectors.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="font-medium flex items-center gap-2">
+                            <Users className="h-4 w-4" />
+                            Secteurs ({selectedSectors.length})
+                          </h4>
+                          <ScrollArea className="h-20">
+                            <div className="space-y-2">
+                              {availableSectors.map((sector) => (
+                                <div key={sector} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`sector-${sector}`}
+                                    checked={selectedSectors.includes(sector)}
+                                    onCheckedChange={() => handleSectorToggle(sector)}
+                                    disabled={isLoadingData}
+                                  />
+                                  <label 
+                                    htmlFor={`sector-${sector}`}
+                                    className="text-sm cursor-pointer capitalize"
+                                  >
+                                    {sector}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </ScrollArea>
+                        </div>
+                      )}
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </CardContent>
             </Card>
           </div>
@@ -629,11 +649,11 @@ const SSTKnowledgeBase = () => {
           <div className="lg:col-span-3 space-y-6">
             {/* Barre de recherche */}
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-6 space-y-4">
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <Input
-                      placeholder="Rechercher dans la base de connaissances SST... (ex: prévention des chutes, EPI, risques chimiques)"
+                      placeholder="Rechercher (ex: 'article 51', 'prévention chutes', 'EPI')"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && performSearch()}
@@ -649,10 +669,19 @@ const SSTKnowledgeBase = () => {
                     {isLoading ? "Recherche..." : "Rechercher"}
                   </Button>
                 </div>
+                
+                {/* Recherches populaires */}
+                {!searchQuery && !isLoadingData && (
+                  <PopularSearches onSearchClick={handlePopularSearchClick} />
+                )}
               </CardContent>
             </Card>
 
             {/* État de chargement */}
+            {isLoading && searchQuery && (
+              <SearchSkeleton />
+            )}
+
             {isLoadingData && (
               <Card>
                 <CardContent className="p-8 text-center">
@@ -665,7 +694,7 @@ const SSTKnowledgeBase = () => {
             )}
 
             {/* Résultats */}
-            {!isLoadingData && results.length > 0 && (
+            {!isLoadingData && !isLoading && results.length > 0 && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl font-semibold">
