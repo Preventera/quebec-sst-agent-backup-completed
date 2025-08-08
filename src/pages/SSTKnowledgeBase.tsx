@@ -8,7 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2, ArrowUpDown, Calendar, Hash, Tag } from 'lucide-react';
+import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2, ArrowUpDown, Calendar, Hash, Tag, RotateCcw, AlertCircle, Lightbulb, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
@@ -63,6 +63,8 @@ const SSTKnowledgeBase = () => {
     totalSources: 0,
     searchResults: 0
   });
+  const [searchMode, setSearchMode] = useState<'mixed' | 'lexical' | 'semantic'>('mixed');
+  const [hasActiveFilters, setHasActiveFilters] = useState(false);
 
   // Charger les données depuis Supabase
   const loadSSTData = async () => {
@@ -410,6 +412,77 @@ const SSTKnowledgeBase = () => {
     setTimeout(() => performSearch(), 100);
   };
 
+  const clearAllFilters = () => {
+    setSelectedSources(availableSources);
+    setSelectedTags([]);
+    setSelectedCategories([]);
+    setSelectedSectors([]);
+    setDateFilter('all');
+    setSearchQuery('');
+    setResults([]);
+    setStats(prev => ({ ...prev, searchResults: 0 }));
+  };
+
+  const getAlternativeQueries = (originalQuery: string) => {
+    const alternatives = {
+      'prévention des chutes': ['travail en hauteur', 'antichute', 'ligne de vie', 'échelles', 'protections collectives'],
+      'epi': ['équipements protection individuelle', 'casque', 'gants', 'harnais'],
+      'formation': ['sensibilisation', 'éducation sst', 'apprentissage'],
+      'risque': ['danger', 'analyse risque', 'évaluation'],
+    };
+    
+    const key = originalQuery.toLowerCase();
+    return alternatives[key] || ['sécurité travail', 'prévention accident', 'cnesst', 'réglementation'];
+  };
+
+  const getRecommendedFilters = () => {
+    return [
+      { type: 'category', label: 'Prévention des accidents', value: 'Prévention des accidents' },
+      { type: 'sector', label: 'Construction', value: 'Construction' },
+      { type: 'source', label: 'CNESST', value: 'CNESST' }
+    ].filter(filter => {
+      switch (filter.type) {
+        case 'category': return !selectedCategories.includes(filter.value);
+        case 'sector': return !selectedSectors.includes(filter.value);
+        case 'source': return !selectedSources.includes(filter.value);
+        default: return false;
+      }
+    });
+  };
+
+  const getFilterCounts = () => {
+    const getFilteredCount = (type: string, value: string) => {
+      return allContent.filter(item => {
+        switch (type) {
+          case 'source': return item.source_name === value;
+          case 'category': return item.semantic_category === value;
+          case 'sector': return item.sector === value;
+          case 'tag': return item.tags?.includes(value);
+          default: return false;
+        }
+      }).length;
+    };
+
+    return {
+      sources: availableSources.map(source => ({ name: source, count: getFilteredCount('source', source) })),
+      categories: availableCategories.map(cat => ({ name: cat, count: getFilteredCount('category', cat) })),
+      sectors: availableSectors.map(sector => ({ name: sector, count: getFilteredCount('sector', sector) })),
+      tags: availableTags.map(tag => ({ name: tag, count: getFilteredCount('tag', tag) }))
+    };
+  };
+
+  // Update hasActiveFilters when filters change
+  useEffect(() => {
+    const hasFilters = selectedTags.length > 0 || 
+                     selectedCategories.length > 0 || 
+                     selectedSectors.length > 0 || 
+                     selectedSources.length < availableSources.length ||
+                     dateFilter !== 'all';
+    setHasActiveFilters(hasFilters);
+  }, [selectedTags, selectedCategories, selectedSectors, selectedSources, availableSources, dateFilter]);
+
+  const filterCounts = getFilterCounts();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -555,23 +628,28 @@ const SSTKnowledgeBase = () => {
 
                       {/* Filtres par source */}
                       <div className="space-y-3">
-                        <h4 className="font-medium">Sources</h4>
+                        <h4 className="font-medium">Sources ({selectedSources.length}/{availableSources.length})</h4>
                         <ScrollArea className="h-24">
                           <div className="space-y-2">
-                            {availableSources.map((source) => (
-                              <div key={source} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`source-${source}`}
-                                  checked={selectedSources.includes(source)}
-                                  onCheckedChange={() => handleSourceToggle(source)}
-                                  disabled={isLoadingData}
-                                />
-                                <label 
-                                  htmlFor={`source-${source}`}
-                                  className="text-sm cursor-pointer"
-                                >
-                                  {source}
-                                </label>
+                            {filterCounts.sources.map((sourceData) => (
+                              <div key={sourceData.name} className="flex items-center justify-between space-x-2">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`source-${sourceData.name}`}
+                                    checked={selectedSources.includes(sourceData.name)}
+                                    onCheckedChange={() => handleSourceToggle(sourceData.name)}
+                                    disabled={isLoadingData}
+                                  />
+                                  <label 
+                                    htmlFor={`source-${sourceData.name}`}
+                                    className="text-sm cursor-pointer"
+                                  >
+                                    {sourceData.name}
+                                  </label>
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {sourceData.count}
+                                </Badge>
                               </div>
                             ))}
                             {isLoadingData && (
@@ -625,24 +703,29 @@ const SSTKnowledgeBase = () => {
                       <div className="space-y-3">
                         <h4 className="font-medium flex items-center gap-2">
                           <Hash className="h-4 w-4" />
-                          Catégories ({selectedCategories.length})
+                          Catégories ({selectedCategories.length}/{availableCategories.length})
                         </h4>
                         <ScrollArea className="h-32">
                           <div className="space-y-2">
-                            {availableCategories.map((category) => (
-                              <div key={category} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`category-${category}`}
-                                  checked={selectedCategories.includes(category)}
-                                  onCheckedChange={() => handleCategoryToggle(category)}
-                                  disabled={isLoadingData}
-                                />
-                                <label 
-                                  htmlFor={`category-${category}`}
-                                  className="text-sm cursor-pointer"
-                                >
-                                  {category}
-                                </label>
+                            {filterCounts.categories.map((categoryData) => (
+                              <div key={categoryData.name} className="flex items-center justify-between space-x-2">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`category-${categoryData.name}`}
+                                    checked={selectedCategories.includes(categoryData.name)}
+                                    onCheckedChange={() => handleCategoryToggle(categoryData.name)}
+                                    disabled={isLoadingData || categoryData.count === 0}
+                                  />
+                                  <label 
+                                    htmlFor={`category-${categoryData.name}`}
+                                    className={`text-sm cursor-pointer ${categoryData.count === 0 ? 'text-muted-foreground' : ''}`}
+                                  >
+                                    {categoryData.name}
+                                  </label>
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {categoryData.count}
+                                </Badge>
                               </div>
                             ))}
                             {isLoadingData && (
@@ -658,24 +741,29 @@ const SSTKnowledgeBase = () => {
                       <div className="space-y-3">
                         <h4 className="font-medium flex items-center gap-2">
                           <Users className="h-4 w-4" />
-                          Secteurs ({selectedSectors.length})
+                          Secteurs ({selectedSectors.length}/{availableSectors.length})
                         </h4>
                         <ScrollArea className="h-32">
                           <div className="space-y-2">
-                            {availableSectors.map((sector) => (
-                              <div key={sector} className="flex items-center space-x-2">
-                                <Checkbox
-                                  id={`sector-${sector}`}
-                                  checked={selectedSectors.includes(sector)}
-                                  onCheckedChange={() => handleSectorToggle(sector)}
-                                  disabled={isLoadingData}
-                                />
-                                <label 
-                                  htmlFor={`sector-${sector}`}
-                                  className="text-sm cursor-pointer"
-                                >
-                                  {sector}
-                                </label>
+                            {filterCounts.sectors.map((sectorData) => (
+                              <div key={sectorData.name} className="flex items-center justify-between space-x-2">
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`sector-${sectorData.name}`}
+                                    checked={selectedSectors.includes(sectorData.name)}
+                                    onCheckedChange={() => handleSectorToggle(sectorData.name)}
+                                    disabled={isLoadingData || sectorData.count === 0}
+                                  />
+                                  <label 
+                                    htmlFor={`sector-${sectorData.name}`}
+                                    className={`text-sm cursor-pointer ${sectorData.count === 0 ? 'text-muted-foreground' : ''}`}
+                                  >
+                                    {sectorData.name}
+                                  </label>
+                                </div>
+                                <Badge variant="outline" className="text-xs">
+                                  {sectorData.count}
+                                </Badge>
                               </div>
                             ))}
                             {isLoadingData && (
@@ -698,6 +786,29 @@ const SSTKnowledgeBase = () => {
             {/* Barre de recherche */}
             <Card>
               <CardContent className="p-6 space-y-4">
+                {/* Mode de recherche */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-4">
+                    <h3 className="text-sm font-medium">Mode de recherche :</h3>
+                    <Select value={searchMode} onValueChange={(value: any) => setSearchMode(value)}>
+                      <SelectTrigger className="w-40">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mixed">🔄 Mixte</SelectItem>
+                        <SelectItem value="lexical">📝 Lexicale</SelectItem>
+                        <SelectItem value="semantic">🧠 Sémantique</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {hasActiveFilters && (
+                    <Button variant="outline" size="sm" onClick={clearAllFilters}>
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Réinitialiser tous les filtres
+                    </Button>
+                  )}
+                </div>
+
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <Input
@@ -717,6 +828,17 @@ const SSTKnowledgeBase = () => {
                     {isLoading ? "Recherche..." : "Rechercher"}
                   </Button>
                 </div>
+
+                {/* Statistiques de filtrage */}
+                {hasActiveFilters && (
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <span>{stats.totalDocuments} documents indexés</span>
+                    <span>•</span>
+                    <span>{selectedSources.length} sources actives</span>
+                    <span>•</span>
+                    <span>{stats.searchResults} résultats</span>
+                  </div>
+                )}
                 
                 {/* Recherches populaires */}
                 {!searchQuery && !isLoadingData && (
@@ -900,22 +1022,98 @@ const SSTKnowledgeBase = () => {
             {/* Message si aucun résultat */}
             {!isLoadingData && searchQuery && results.length === 0 && !isLoading && (
               <Card>
-                <CardContent className="p-8 text-center">
-                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    Aucun résultat trouvé
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Votre recherche "{searchQuery}" n'a donné aucun résultat.
-                  </p>
-                  <div className="text-left max-w-md mx-auto">
-                    <h4 className="font-medium mb-2">Suggestions :</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      <li>• Vérifiez l'orthographe de vos mots-clés</li>
-                      <li>• Essayez des termes plus généraux</li>
-                      <li>• Modifiez les filtres de source</li>
-                      <li>• Utilisez des synonymes</li>
-                    </ul>
+                <CardContent className="p-8 space-y-6">
+                  <div className="text-center">
+                    <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      Aucun résultat trouvé
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      Votre recherche "{searchQuery}" n'a donné aucun résultat.
+                    </p>
+                  </div>
+
+                  {/* Suggestions de requêtes alternatives */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Lightbulb className="h-5 w-5 text-primary" />
+                      <h4 className="font-medium">Essayez plutôt :</h4>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {getAlternativeQueries(searchQuery).map((alternative, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePopularSearchClick(alternative)}
+                          className="text-sm"
+                        >
+                          {alternative}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Filtres recommandés */}
+                  {getRecommendedFilters().length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Filter className="h-5 w-5 text-primary" />
+                        <h4 className="font-medium">Filtres suggérés :</h4>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {getRecommendedFilters().map((filter, index) => (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              switch (filter.type) {
+                                case 'category':
+                                  handleCategoryToggle(filter.value);
+                                  break;
+                                case 'sector':
+                                  handleSectorToggle(filter.value);
+                                  break;
+                                case 'source':
+                                  handleSourceToggle(filter.value);
+                                  break;
+                              }
+                              setTimeout(() => performSearch(), 100);
+                            }}
+                            className="text-sm"
+                          >
+                            <Filter className="h-3 w-3 mr-1" />
+                            {filter.label}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Bouton pour élargir la recherche */}
+                  <div className="text-center space-y-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDateFilter('all');
+                        setSelectedSources(availableSources);
+                        setTimeout(() => performSearch(), 100);
+                      }}
+                      className="w-full"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Élargir la recherche (retirer les filtres)
+                    </Button>
+                    
+                    <div className="text-sm text-muted-foreground">
+                      <p>Vous pouvez aussi :</p>
+                      <ul className="mt-2 space-y-1">
+                        <li>• Vérifier l'orthographe de vos mots-clés</li>
+                        <li>• Essayer des termes plus généraux ou spécifiques</li>
+                        <li>• Utiliser le mode de recherche sémantique</li>
+                      </ul>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
