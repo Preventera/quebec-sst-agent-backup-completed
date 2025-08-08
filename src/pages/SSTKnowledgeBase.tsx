@@ -117,17 +117,59 @@ const SSTKnowledgeBase = () => {
         .filter((tag, index, arr) => arr.indexOf(tag) === index)
         .sort();
 
-      // Extraire les catégories sémantiques uniques
-      const categories = [...new Set(transformedContent
+      // Catégories prédéfinies pour la SST
+      const predefinedCategories = [
+        'Prévention des accidents',
+        'Équipements de protection individuelle (EPI)',
+        'Hygiène industrielle',
+        'Ergonomie et troubles musculo-squelettiques',
+        'Substances dangereuses',
+        'Sécurité incendie',
+        'Premiers secours',
+        'Formation en SST',
+        'Inspection et audit',
+        'Gestion des risques',
+        'Conformité réglementaire',
+        'Santé mentale au travail',
+        'Espaces clos',
+        'Travail en hauteur',
+        'Machines et équipements',
+        'Transport et manutention'
+      ];
+
+      // Secteurs d'activité prédéfinis
+      const predefinedSectors = [
+        'Construction',
+        'Industrie manufacturière',
+        'Agriculture et foresterie',
+        'Transport et entreposage',
+        'Commerce de détail',
+        'Services de santé',
+        'Éducation',
+        'Administration publique',
+        'Services professionnels',
+        'Hébergement et restauration',
+        'Mines et extraction',
+        'Utilities (électricité, gaz)',
+        'Technologies de l\'information',
+        'Finance et assurances',
+        'Arts et spectacles',
+        'Autres services'
+      ];
+
+      // Extraire les catégories sémantiques uniques + prédéfinies
+      const contentCategories = [...new Set(transformedContent
         .map(item => item.semantic_category)
         .filter(Boolean)
-      )].sort();
+      )];
+      const categories = [...new Set([...predefinedCategories, ...contentCategories])].sort();
 
-      // Extraire les secteurs uniques
-      const sectors = [...new Set(transformedContent
+      // Extraire les secteurs uniques + prédéfinis
+      const contentSectors = [...new Set(transformedContent
         .map(item => item.sector)
         .filter(Boolean)
-      )].sort();
+      )];
+      const sectors = [...new Set([...predefinedSectors, ...contentSectors])].sort();
       
       setAllContent(transformedContent);
       setAvailableSources(sources);
