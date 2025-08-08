@@ -622,64 +622,70 @@ const SSTKnowledgeBase = () => {
                       </div>
 
                       {/* Filtres par catégorie sémantique */}
-                      {availableCategories.length > 0 && (
-                        <div className="space-y-3">
-                          <h4 className="font-medium flex items-center gap-2">
-                            <Hash className="h-4 w-4" />
-                            Catégories ({selectedCategories.length})
-                          </h4>
-                          <ScrollArea className="h-20">
-                            <div className="space-y-2">
-                              {availableCategories.map((category) => (
-                                <div key={category} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`category-${category}`}
-                                    checked={selectedCategories.includes(category)}
-                                    onCheckedChange={() => handleCategoryToggle(category)}
-                                    disabled={isLoadingData}
-                                  />
-                                  <label 
-                                    htmlFor={`category-${category}`}
-                                    className="text-sm cursor-pointer capitalize"
-                                  >
-                                    {category}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                        </div>
-                      )}
+                      <div className="space-y-3">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Hash className="h-4 w-4" />
+                          Catégories ({selectedCategories.length})
+                        </h4>
+                        <ScrollArea className="h-32">
+                          <div className="space-y-2">
+                            {availableCategories.map((category) => (
+                              <div key={category} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`category-${category}`}
+                                  checked={selectedCategories.includes(category)}
+                                  onCheckedChange={() => handleCategoryToggle(category)}
+                                  disabled={isLoadingData}
+                                />
+                                <label 
+                                  htmlFor={`category-${category}`}
+                                  className="text-sm cursor-pointer"
+                                >
+                                  {category}
+                                </label>
+                              </div>
+                            ))}
+                            {isLoadingData && (
+                              <div className="flex items-center justify-center py-4">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </div>
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
 
                       {/* Filtres par secteur */}
-                      {availableSectors.length > 0 && (
-                        <div className="space-y-3">
-                          <h4 className="font-medium flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            Secteurs ({selectedSectors.length})
-                          </h4>
-                          <ScrollArea className="h-20">
-                            <div className="space-y-2">
-                              {availableSectors.map((sector) => (
-                                <div key={sector} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`sector-${sector}`}
-                                    checked={selectedSectors.includes(sector)}
-                                    onCheckedChange={() => handleSectorToggle(sector)}
-                                    disabled={isLoadingData}
-                                  />
-                                  <label 
-                                    htmlFor={`sector-${sector}`}
-                                    className="text-sm cursor-pointer capitalize"
-                                  >
-                                    {sector}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          </ScrollArea>
-                        </div>
-                      )}
+                      <div className="space-y-3">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Users className="h-4 w-4" />
+                          Secteurs ({selectedSectors.length})
+                        </h4>
+                        <ScrollArea className="h-32">
+                          <div className="space-y-2">
+                            {availableSectors.map((sector) => (
+                              <div key={sector} className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`sector-${sector}`}
+                                  checked={selectedSectors.includes(sector)}
+                                  onCheckedChange={() => handleSectorToggle(sector)}
+                                  disabled={isLoadingData}
+                                />
+                                <label 
+                                  htmlFor={`sector-${sector}`}
+                                  className="text-sm cursor-pointer"
+                                >
+                                  {sector}
+                                </label>
+                              </div>
+                            ))}
+                            {isLoadingData && (
+                              <div className="flex items-center justify-center py-4">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              </div>
+                            )}
+                          </div>
+                        </ScrollArea>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
