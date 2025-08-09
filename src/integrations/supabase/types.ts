@@ -146,6 +146,69 @@ export type Database = {
         }
         Relationships: []
       }
+      lesions_professionnelles: {
+        Row: {
+          agent_causal: string | null
+          annee: number
+          cout_total: number | null
+          created_at: string | null
+          evenement_accident: string | null
+          genre_blessure: string | null
+          gravite: string | null
+          id: string
+          nature_lesion: string | null
+          nb_cas: number | null
+          nb_jours_perdus: number | null
+          partie_lesee: string | null
+          province: string | null
+          scian_code: string | null
+          secteur_activite: string
+          source: string | null
+          type_lesion: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_causal?: string | null
+          annee: number
+          cout_total?: number | null
+          created_at?: string | null
+          evenement_accident?: string | null
+          genre_blessure?: string | null
+          gravite?: string | null
+          id: string
+          nature_lesion?: string | null
+          nb_cas?: number | null
+          nb_jours_perdus?: number | null
+          partie_lesee?: string | null
+          province?: string | null
+          scian_code?: string | null
+          secteur_activite: string
+          source?: string | null
+          type_lesion: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_causal?: string | null
+          annee?: number
+          cout_total?: number | null
+          created_at?: string | null
+          evenement_accident?: string | null
+          genre_blessure?: string | null
+          gravite?: string | null
+          id?: string
+          nature_lesion?: string | null
+          nb_cas?: number | null
+          nb_jours_perdus?: number | null
+          partie_lesee?: string | null
+          province?: string | null
+          scian_code?: string | null
+          secteur_activite?: string
+          source?: string | null
+          type_lesion?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       preventive_measures: {
         Row: {
           company_id: string
