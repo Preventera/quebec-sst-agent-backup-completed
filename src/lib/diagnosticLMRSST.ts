@@ -1,3 +1,5 @@
+import { lesionsDataIntegrator } from './lesionsDataIntegration';
+
 export interface DiagnosticParams {
   taille: number;
   registreIncidents: boolean;
@@ -24,13 +26,13 @@ export interface DiagnosticResult {
   recommandations: Recommandation[];
 }
 
-export function diagnosticLMRSST({ 
+export async function diagnosticLMRSST({ 
   taille, 
   registreIncidents, 
   formationDate, 
   programmePrevention, 
   secteur 
-}: DiagnosticParams): DiagnosticResult {
+}: DiagnosticParams): Promise<DiagnosticResult> {
   const recommandations: Recommandation[] = [];
   const nonConformités: NonConformite[] = [];
 
@@ -90,11 +92,26 @@ export function diagnosticLMRSST({
     });
   }
 
-  return {
+  // Enrichissement avec les données réelles de lésions professionnelles
+  const diagnosticBase = {
     secteur,
     taille,
     conformitéGlobale: nonConformités.length === 0,
     nonConformités,
     recommandations
   };
+
+  try {
+    // Enrichir avec les données SafetyAgentic
+    const diagnosticEnrichi = await lesionsDataIntegrator.enrichirDiagnostic(
+      diagnosticBase,
+      secteur,
+      undefined // Ajouter SCIAN si disponible
+    );
+    
+    return diagnosticEnrichi;
+  } catch (error) {
+    console.warn('Impossible d\'enrichir le diagnostic avec les données réelles:', error);
+    return diagnosticBase;
+  }
 }

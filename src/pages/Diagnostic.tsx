@@ -38,11 +38,25 @@ const Diagnostic = () => {
     "Autre"
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const diagnosticResults = diagnosticLMRSST(formData);
-    setResults(diagnosticResults);
-    setCurrentStep('results');
+    try {
+      const diagnosticResults = await diagnosticLMRSST(formData);
+      setResults(diagnosticResults);
+      setCurrentStep('results');
+    } catch (error) {
+      console.error('Erreur lors du diagnostic:', error);
+      // Fallback vers diagnostic de base en cas d'erreur
+      const diagnosticResults = {
+        secteur: formData.secteur,
+        taille: formData.taille,
+        conformitéGlobale: true,
+        nonConformités: [],
+        recommandations: []
+      };
+      setResults(diagnosticResults);
+      setCurrentStep('results');
+    }
   };
 
   const resetDiagnostic = () => {

@@ -7,8 +7,8 @@ export class LesionsDataIntegrator {
   private cacheExpiry: number = 24 * 60 * 60 * 1000; // 24 heures
 
   constructor(gitRepoUrl?: string) {
-    // URL de votre dépôt Git avec les données SST
-    this.gitApiBase = gitRepoUrl || 'https://api.github.com/repos/votre-depot/sst-lesions-quebec';
+    // URL du dépôt SafetyAgentic de Preventera
+    this.gitApiBase = gitRepoUrl || 'https://api.github.com/repos/Preventera/SafetyAgentic';
   }
 
   /**

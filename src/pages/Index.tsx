@@ -5,6 +5,7 @@ import DiagnosticButton from "@/components/DiagnosticButton";
 import QuickActions from "@/components/QuickActions";
 import AgentCards from "@/components/AgentCards";
 import ComplianceFeedback, { ComplianceStatus } from "@/components/ComplianceFeedback";
+import { SafetyDataSync } from "@/components/SafetyDataSync";
 import { useAccessibilityContext } from "@/components/AccessibilityProvider";
 import { useActionLogger } from "@/hooks/useActionLogger";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -203,6 +204,16 @@ const Index = () => {
                 <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions rapides</h3>
               </HelpTooltip>
               <QuickActions />
+            </section>
+
+            <section className="space-y-4">
+              <HelpTooltip 
+                content="Synchronisation avec les données réelles de lésions professionnelles du Québec pour des insights basés sur les preuves"
+                title="Données SafetyAgentic"
+              >
+                <h3 className="text-lg md:text-xl font-semibold">Intégration des données réelles</h3>
+              </HelpTooltip>
+              <SafetyDataSync />
             </section>
           </TabsContent>
         </Tabs>
