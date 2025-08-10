@@ -36,8 +36,12 @@ export function SafetyDataSync() {
         body: {
           action: 'sync_lesions_data',
           gitRepoUrl: 'https://github.com/Preventera/SafetyAgentic',
-          dataPath: 'data',
-          filters: { province: 'QC' }
+          dataPath: 'donnees',
+          filters: { 
+            province: 'QC',
+            anneeDebut: 2020,
+            anneeFin: 2024
+          }
         }
       });
 
