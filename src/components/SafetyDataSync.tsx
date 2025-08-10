@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { 
@@ -15,8 +16,12 @@ import {
   Download,
   GitBranch,
   Calendar,
-  BarChart3
+  BarChart3,
+  Upload,
+  Globe
 } from 'lucide-react';
+import { CnesstDataImport } from './CnesstDataImport';
+import { ManualDataUpload } from './ManualDataUpload';
 
 export function SafetyDataSync() {
   const { toast } = useToast();
@@ -120,8 +125,40 @@ export function SafetyDataSync() {
 
   return (
     <div className="space-y-6">
-      {/* En-tête */}
+      {/* En-tête avec onglets */}
       <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Database className="h-5 w-5" />
+                Intégration des données de lésions
+              </CardTitle>
+              <CardDescription>
+                Synchronisation et import de données réelles de lésions professionnelles
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="git" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="git" className="flex items-center gap-2">
+                <GitBranch className="h-4 w-4" />
+                SafetyAgentic
+              </TabsTrigger>
+              <TabsTrigger value="cnesst" className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Import CNESST
+              </TabsTrigger>
+              <TabsTrigger value="manual" className="flex items-center gap-2">
+                <Upload className="h-4 w-4" />
+                Upload manuel
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="git" className="mt-6">
+              <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -169,6 +206,18 @@ export function SafetyDataSync() {
               Stats du dépôt
             </Button>
           </div>
+        </CardContent>
+      </Card>
+            </TabsContent>
+
+            <TabsContent value="cnesst" className="mt-6">
+              <CnesstDataImport />
+            </TabsContent>
+
+            <TabsContent value="manual" className="mt-6">
+              <ManualDataUpload />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
