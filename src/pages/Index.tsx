@@ -133,7 +133,7 @@ const Index = () => {
 
         {/* Main Content - Tabbed Layout */}
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className={`${isMobileMenuOpen ? 'grid' : 'hidden md:grid'} w-full grid-cols-2 md:grid-cols-4 mb-6`} id="mobile-tab-menu">
+          <TabsList className={`${isMobileMenuOpen ? 'grid' : 'hidden md:grid'} w-full grid-cols-2 md:grid-cols-5 mb-6`} id="mobile-tab-menu">
             <TabsTrigger value="overview" className="text-xs md:text-sm flex items-center gap-1">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Vue</span> Globale
@@ -145,6 +145,10 @@ const Index = () => {
             <TabsTrigger value="details" className="text-xs md:text-sm flex items-center gap-1">
               <AlertCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Non-</span>Conformités
+            </TabsTrigger>
+            <TabsTrigger value="donnees" className="text-xs md:text-sm flex items-center gap-1">
+              <Info className="h-4 w-4" />
+              <span className="hidden sm:inline">Données</span>
             </TabsTrigger>
             <TabsTrigger value="actions" className="text-xs md:text-sm flex items-center gap-1">
               <Zap className="h-4 w-4" />
@@ -194,6 +198,18 @@ const Index = () => {
             </section>
           </TabsContent>
 
+          <TabsContent value="donnees" className="space-y-6 mt-0">
+            <section className="space-y-4">
+              <HelpTooltip 
+                content="Synchronisation avec les données réelles de lésions professionnelles du Québec pour des insights basés sur les preuves"
+                title="Données SafetyAgentic"
+              >
+                <h3 className="text-lg md:text-xl font-semibold">Intégration des données réelles</h3>
+              </HelpTooltip>
+              <SafetyDataSync />
+            </section>
+          </TabsContent>
+
           <TabsContent value="actions" className="space-y-6 mt-0">
             {/* Quick Actions */}
             <section className="space-y-4" aria-labelledby="quick-actions-title">
@@ -204,16 +220,6 @@ const Index = () => {
                 <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions rapides</h3>
               </HelpTooltip>
               <QuickActions />
-            </section>
-
-            <section className="space-y-4">
-              <HelpTooltip 
-                content="Synchronisation avec les données réelles de lésions professionnelles du Québec pour des insights basés sur les preuves"
-                title="Données SafetyAgentic"
-              >
-                <h3 className="text-lg md:text-xl font-semibold">Intégration des données réelles</h3>
-              </HelpTooltip>
-              <SafetyDataSync />
             </section>
           </TabsContent>
         </Tabs>

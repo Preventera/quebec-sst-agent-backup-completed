@@ -55,8 +55,19 @@ async function syncLesionsData(
   console.log(`Synchronisation des données depuis: ${gitRepoUrl}/${dataPath}`);
 
   try {
-    // 1. Récupérer les données depuis le dépôt Git
-    const gitData = await fetchDataFromGit(gitRepoUrl, dataPath, filters);
+    // 1. Tenter de récupérer les données depuis le dépôt Git
+    console.log('Tentative de récupération depuis:', gitRepoUrl);
+    let gitData = await fetchDataFromGit(gitRepoUrl, dataPath, filters);
+    let dataSource = 'SafetyAgentic Repository';
+    
+    // Si aucune donnée réelle, utiliser les données simulées
+    if (!gitData || gitData.length === 0) {
+      console.log('Aucune donnée réelle trouvée, génération de données simulées basées sur CNESST');
+      gitData = await generateMockLesionsData(filters);
+      dataSource = 'Données simulées CNESST';
+    } else {
+      console.log(`Données réelles récupérées: ${gitData.length} enregistrements`);
+    }
     
     // 2. Traiter et normaliser les données
     const processedData = await processLesionsData(gitData);
@@ -69,11 +80,14 @@ async function syncLesionsData(
 
     return new Response(JSON.stringify({
       success: true,
-      message: 'Synchronisation réussie',
+      message: dataSource === 'Données simulées CNESST' 
+        ? 'Données simulées synchronisées (SafetyAgentic inaccessible)'
+        : 'Synchronisation réelle réussie',
       data: {
         recordsProcessed: processedData.length,
-        recordsInserted: syncResults.inserted,
-        recordsUpdated: syncResults.updated,
+        recordsInserted: syncResults.inserted || syncResults.recordsInserted,
+        recordsUpdated: syncResults.updated || 0,
+        dataSource,
         statistics,
         lastSync: new Date().toISOString()
       }
