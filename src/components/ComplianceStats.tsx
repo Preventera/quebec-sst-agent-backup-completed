@@ -8,10 +8,12 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const ComplianceStats = () => {
   const navigate = useNavigate();
 
-  // Séparer la métrique principale des autres
+  // Séparer la métrique principale des autres avec indicateurs de tendance
   const mainMetric = {
     title: "Conformité générale",
     value: "78%",
+    trend: "+5%",
+    trendDirection: "up" as const,
     icon: TrendingUp,
     status: "warning",
     description: "Évaluation globale LMRSST",
@@ -25,6 +27,8 @@ const ComplianceStats = () => {
     {
       title: "Obligations respectées",
       value: "23/30",
+      trend: "+2",
+      trendDirection: "up" as const,
       icon: CheckCircle,
       status: "success",
       description: "Articles conformes",
@@ -35,6 +39,8 @@ const ComplianceStats = () => {
     {
       title: "Actions critiques",
       value: "4",
+      trend: "Urgent",
+      trendDirection: "critical" as const,
       icon: XCircle,
       status: "destructive",
       description: "Nécessitent action immédiate",
@@ -45,6 +51,8 @@ const ComplianceStats = () => {
     {
       title: "Échéances à venir",
       value: "7",
+      trend: "30 jours",
+      trendDirection: "warning" as const,
       icon: Clock,
       status: "warning",
       description: "Dans les 30 prochains jours",
@@ -100,7 +108,16 @@ const ComplianceStats = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="text-4xl md:text-5xl font-bold text-foreground">{mainMetric.value}</div>
+        <div className="flex items-baseline gap-3">
+          <div className="text-4xl md:text-5xl font-bold text-foreground">{mainMetric.value}</div>
+          <div className="flex items-center gap-1 text-sm">
+            {mainMetric.trendDirection === "up" && <TrendingUp className="h-4 w-4 text-success" />}
+            <span className="text-success font-medium">
+              {mainMetric.trend}
+            </span>
+            <span className="text-muted-foreground">vs dernier mois</span>
+          </div>
+        </div>
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm text-muted-foreground flex-1">{mainMetric.description}</p>
           <div className="flex items-center gap-2">
@@ -143,15 +160,30 @@ const ComplianceStats = () => {
           <stat.icon className={`h-5 w-5 ${getIconColor(stat.status)}`} aria-hidden="true" />
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="text-2xl font-bold">{stat.value}</div>
+          <div className="flex items-baseline gap-2">
+            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className="flex items-center gap-1 text-xs">
+              {stat.trendDirection === "up" && <TrendingUp className="h-3 w-3 text-success" />}
+              {stat.trendDirection === "critical" && <AlertTriangle className="h-3 w-3 text-destructive" />}
+              {stat.trendDirection === "warning" && <Clock className="h-3 w-3 text-warning" />}
+              <span className={
+                stat.trendDirection === "up" ? "text-success font-medium" :
+                stat.trendDirection === "critical" ? "text-destructive font-medium" :
+                stat.trendDirection === "warning" ? "text-warning font-medium" :
+                "text-muted-foreground"
+              }>
+                {stat.trend}
+              </span>
+            </div>
+          </div>
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs text-muted-foreground flex-1">{stat.description}</p>
             <div className="flex items-center gap-1">
               <stat.statusIcon className={`h-3 w-3 ${getIconColor(stat.status)}`} aria-hidden="true" />
               <Badge variant={getBadgeVariant(stat.status)} className="text-xs font-medium">
-                {stat.status === "success" && "Conforme"}
-                {stat.status === "warning" && "Attention"}
-                {stat.status === "destructive" && "Critique"}
+                {stat.status === "success" && "✓ Conforme"}
+                {stat.status === "warning" && "⚠ Attention"}
+                {stat.status === "destructive" && "⚠ Critique"}
               </Badge>
             </div>
           </div>

@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { LegalTooltip, HelpTooltip } from "@/components/LegalTooltip";
 import { useEffect, useState } from "react";
 import { BarChart3, Users, AlertCircle, Zap, Menu, X, Brain, Mic, Info, TrendingUp, Activity } from "lucide-react";
+import ActionKanbanBoard from "@/components/ActionKanbanBoard";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -217,8 +218,9 @@ const Index = () => {
                 content="Actions prioritaires pour maintenir et améliorer votre conformité LMRSST"
                 title="Actions recommandées"
               >
-                <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions rapides</h3>
+                <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions prioritaires</h3>
               </HelpTooltip>
+              <ActionKanbanBoard />
               <QuickActions />
             </section>
           </TabsContent>
