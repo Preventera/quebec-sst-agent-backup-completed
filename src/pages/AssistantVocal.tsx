@@ -13,6 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import { useActionLogger } from "@/hooks/useActionLogger";
 import { useConversationLogger } from "@/hooks/useConversationLogger";
+import { InteractiveFAQ } from "@/components/InteractiveFAQ";
+import { ConnectionStatusIndicator } from "@/components/ConnectionStatusIndicator";
+import { VoiceSettings } from "@/components/VoiceSettings";
+import { ConversationHistory } from "@/components/ConversationHistory";
 
 interface Message {
   id: string;
@@ -48,6 +52,8 @@ const AssistantVocal = () => {
   const [ttsProvider, setTtsProvider] = useState<'openai' | 'elevenlabs'>('openai');
   const [assistantProvider, setAssistantProvider] = useState<'claude' | 'openai'>('claude');
   const [selectedVoice, setSelectedVoice] = useState('alloy');
+  const [showHistoryDialog, setShowHistoryDialog] = useState(false);
+  const [guidedMode, setGuidedMode] = useState(false);
   
   // Réinitialiser la voix quand on change de provider
   useEffect(() => {
@@ -473,6 +479,95 @@ const AssistantVocal = () => {
     });
   }, [messages, logAction]);
 
+  // Fonction pour traiter les questions sélectionnées depuis FAQ
+  const handleQuestionSelect = useCallback(async (question: string) => {
+    if (isListening || isProcessing || isSpeaking) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      type: 'user',
+      content: question,
+      timestamp: new Date(),
+      confidence: 1
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
+    setIsProcessing(true);
+    setConnectionStatus('connecting');
+    
+    try {
+      const { data: assistantData, error: assistantError } = await supabase.functions.invoke(
+        assistantProvider === 'claude' ? 'claude-assistant' : 'sst-assistant', 
+        {
+          body: { 
+            message: question, 
+            context: conversationContext.current 
+          }
+        }
+      );
+      
+      if (!assistantError && assistantData) {
+        const assistantMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          type: 'assistant',
+          content: assistantData.response,
+          timestamp: new Date(),
+          confidence: 1,
+          tokens: assistantData.tokens_used || 0
+        };
+        
+        setMessages(prev => [...prev, assistantMessage]);
+        setSessionStats(prev => ({ 
+          questions: prev.questions + 1, 
+          totalTime: prev.totalTime + 1000 
+        }));
+
+        // Ajouter au contexte
+        conversationContext.current.push(
+          { role: 'user', content: question },
+          { role: 'assistant', content: assistantData.response }
+        );
+
+        await logAgentInteraction('AssistantVocalSST', question, assistantData.response);
+      }
+    } catch (error) {
+      console.error('Erreur suggestion:', error);
+    }
+    
+    setIsProcessing(false);
+    setConnectionStatus('connected');
+  }, [isListening, isProcessing, isSpeaking, assistantProvider, logAgentInteraction]);
+
+  // Fonction pour tester la voix
+  const handleTestVoice = useCallback(async (text: string) => {
+    try {
+      setIsSpeaking(true);
+      const voiceFunction = ttsProvider === 'elevenlabs' ? 'text-to-voice-elevenlabs' : 'text-to-voice';
+      const voiceParam = { text, voice: selectedVoice };
+      
+      const { data: voiceData, error: voiceError } = await supabase.functions.invoke(voiceFunction, {
+        body: voiceParam
+      });
+      
+      if (!voiceError) {
+        const audio = new Audio(`data:audio/mp3;base64,${voiceData.audioContent}`);
+        audio.volume = volume;
+        await audio.play();
+        audio.onended = () => setIsSpeaking(false);
+      } else {
+        setIsSpeaking(false);
+        toast({
+          title: "❌ Erreur",
+          description: "Impossible de tester la voix",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      setIsSpeaking(false);
+      console.error('Erreur test voix:', error);
+    }
+  }, [ttsProvider, selectedVoice, volume]);
+
   const handleExportConversation = useCallback(() => {
     const conversationText = messages.map(msg => 
       `[${msg.timestamp.toLocaleTimeString()}] ${msg.type === 'user' ? 'Vous' : 'Assistant'}: ${msg.content}`
@@ -562,41 +657,12 @@ const AssistantVocal = () => {
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleExportConversation}
-                          disabled={messages.length <= 1}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Exporter la conversation</TooltipContent>
-                    </Tooltip>
+                    <ConnectionStatusIndicator status={connectionStatus} />
                     
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={handleClearHistory}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Effacer l'historique</TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Paramètres</TooltipContent>
-                    </Tooltip>
+                    <ConversationHistory 
+                      messages={messages}
+                      onClearHistory={handleClearHistory}
+                    />
                   </div>
                 </div>
               </div>
@@ -797,228 +863,39 @@ const AssistantVocal = () => {
 
               {/* Sidebar d'aide et statistiques */}
               <div className="lg:col-span-1 space-y-4">
+                {/* FAQ Interactive */}
+                <InteractiveFAQ onQuestionSelect={handleQuestionSelect} />
+                
                 {/* Statistiques de session */}
                 <Card className="border-primary/20">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center gap-2">
                       <Brain className="h-4 w-4 text-primary" />
-                      Statistiques de session
+                      Session
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Questions posées</span>
+                      <span className="text-sm text-muted-foreground">Questions</span>
                       <Badge variant="outline">{sessionStats.questions}</Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Temps total</span>
+                      <span className="text-sm text-muted-foreground">Temps</span>
                       <Badge variant="outline">{Math.round(sessionStats.totalTime / 1000)}s</Badge>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">Statut</span>
-                       <Badge variant={connectionStatus === 'connected' ? 'default' : connectionStatus === 'connecting' ? 'secondary' : 'outline'} className={connectionStatus === 'connected' ? 'bg-green-100 text-green-800 border-green-200' : connectionStatus === 'connecting' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' : 'bg-gray-100 text-gray-600 border-gray-200'}>
-                         {connectionStatus === 'connected' ? '🟢 Connecté' : connectionStatus === 'connecting' ? '🟡 En cours...' : '⚪ Hors ligne'}
-                       </Badge>
-                    </div>
                   </CardContent>
                 </Card>
 
-                {/* Configuration Assistant */}
-                <Card className="border-secondary/20">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Brain className="h-4 w-4 text-primary" />
-                      Configuration IA
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="assistant-provider" className="text-xs">Assistant IA</Label>
-                      <Select value={assistantProvider} onValueChange={(value: 'claude' | 'openai') => setAssistantProvider(value)}>
-                        <SelectTrigger className="h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="claude">
-                            <div className="flex items-center gap-2">
-                              <span>🤖 Claude</span>
-                            </div>
-                          </SelectItem>
-                          <SelectItem value="openai">
-                            <div className="flex items-center gap-2">
-                              <span>🔥 OpenAI GPT-4</span>
-                            </div>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">
-                        {assistantProvider === 'claude' 
-                          ? '🎯 Claude offre des réponses plus nuancées et contextualles'
-                          : '⚡ OpenAI GPT-4 pour des réponses rapides et précises'
-                        }
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Configuration TTS */}
-                <Card className="border-secondary/20">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Volume2 className="h-4 w-4 text-primary" />
-                      Audio & Voix
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                     <div className="space-y-2">
-                       <Label htmlFor="tts-provider" className="text-xs">Fournisseur vocal</Label>
-                       <Select value={ttsProvider} onValueChange={(value: 'openai' | 'elevenlabs') => setTtsProvider(value)}>
-                         <SelectTrigger className="h-8">
-                           <SelectValue />
-                         </SelectTrigger>
-                         <SelectContent>
-                           <SelectItem value="openai">OpenAI</SelectItem>
-                           <SelectItem value="elevenlabs">ElevenLabs</SelectItem>
-                         </SelectContent>
-                       </Select>
-                     </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="voice-select" className="text-xs">Voix</Label>
-                      <Select value={selectedVoice} onValueChange={setSelectedVoice}>
-                        <SelectTrigger className="h-8">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ttsProvider === 'openai' ? (
-                            <>
-                              <SelectItem value="alloy">Alloy</SelectItem>
-                              <SelectItem value="echo">Echo</SelectItem>
-                              <SelectItem value="fable">Fable</SelectItem>
-                              <SelectItem value="onyx">Onyx</SelectItem>
-                              <SelectItem value="nova">Nova</SelectItem>
-                              <SelectItem value="shimmer">Shimmer</SelectItem>
-                            </>
-                          ) : (
-                            <>
-                              <SelectItem value="Aria">Aria</SelectItem>
-                              <SelectItem value="Sarah">Sarah</SelectItem>
-                              <SelectItem value="Laura">Laura</SelectItem>
-                              <SelectItem value="Charlotte">Charlotte</SelectItem>
-                              <SelectItem value="Alice">Alice</SelectItem>
-                              <SelectItem value="Matilda">Matilda</SelectItem>
-                              <SelectItem value="Jessica">Jessica</SelectItem>
-                              <SelectItem value="Lily">Lily</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Suggestions d'utilisation */}
-                <Card className="border-secondary/20">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-sm flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      Suggestions
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-sm">
-                      <p className="font-medium mb-2 text-primary">Questions fréquentes :</p>
-                      <div className="space-y-2">
-                        {[
-                          "Obligations légales SST",
-                          "Formation des employés", 
-                          "Évaluation des risques",
-                          "Équipements de protection",
-                          "Procédures d'urgence"
-                         ].map((suggestion, index) => (
-                           <Button
-                             key={index}
-                             variant="ghost"
-                             size="sm"
-                             className="w-full justify-start text-xs h-auto py-2 px-3 hover:bg-primary/10 transition-all"
-                             disabled={isListening || isProcessing || isSpeaking}
-                             onClick={async () => {
-                               if (!isListening && !isProcessing && !isSpeaking) {
-                                 // Simuler une question vocale en lançant l'assistant
-                                 toast({
-                                   title: "🎤 Question suggérée",
-                                   description: `Traitement de: "${suggestion}"`,
-                                   duration: 2000,
-                                 });
-                                 
-                                 // Créer directement la question
-                                 const userMessage: Message = {
-                                   id: Date.now().toString(),
-                                   type: 'user',
-                                   content: `Parle-moi de ${suggestion.toLowerCase()}`,
-                                   timestamp: new Date(),
-                                   confidence: 1
-                                 };
-                                 
-                                 setMessages(prev => [...prev, userMessage]);
-                                 setIsProcessing(true);
-                                 setConnectionStatus('connecting');
-                                 
-                                 try {
-                                   // Obtenir la réponse de l'assistant
-                                   const { data: assistantData, error: assistantError } = await supabase.functions.invoke(
-                                     assistantProvider === 'claude' ? 'claude-assistant' : 'sst-assistant', 
-                                     {
-                                       body: { 
-                                         message: userMessage.content, 
-                                         context: conversationContext.current 
-                                       }
-                                     }
-                                   );
-                                   
-                                   if (!assistantError && assistantData) {
-                                     const assistantMessage: Message = {
-                                       id: (Date.now() + 1).toString(),
-                                       type: 'assistant',
-                                       content: assistantData.response,
-                                       timestamp: new Date(),
-                                       confidence: 1,
-                                       tokens: assistantData.tokens_used || 0
-                                     };
-                                     
-                                     setMessages(prev => [...prev, assistantMessage]);
-                                     setSessionStats(prev => ({ questions: prev.questions + 1, totalTime: prev.totalTime + 1000 }));
-                                   }
-                                 } catch (error) {
-                                   console.error('Erreur suggestion:', error);
-                                 }
-                                 
-                                 setIsProcessing(false);
-                                 setConnectionStatus('connected');
-                               }
-                             }}
-                           >
-                             <MessageSquare className="h-3 w-3 mr-2" />
-                             {suggestion}
-                           </Button>
-                         ))}
-                      </div>
-                    </div>
-                    
-                    <Separator />
-                    
-                    <div className="text-sm">
-                      <p className="font-medium mb-2 text-primary">Commandes vocales :</p>
-                      <div className="space-y-1 text-muted-foreground text-xs">
-                        <p>• "Génère un rapport de conformité"</p>
-                        <p>• "Liste mes obligations légales"</p>
-                        <p>• "Aide-moi avec l'article X"</p>
-                        <p>• "Recommandations pour mon secteur"</p>
-                        <p>• "Exporte notre conversation"</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Configuration IA et voix */}
+                <VoiceSettings
+                  ttsProvider={ttsProvider}
+                  setTtsProvider={setTtsProvider}
+                  assistantProvider={assistantProvider}
+                  setAssistantProvider={setAssistantProvider}
+                  selectedVoice={selectedVoice}
+                  setSelectedVoice={setSelectedVoice}
+                  onTestVoice={handleTestVoice}
+                />
 
                 {/* Guide d'utilisation rapide */}
                 <Card className="border-accent/20 bg-gradient-to-br from-accent/5 to-transparent">
