@@ -15,11 +15,15 @@ import { useEffect, useState } from "react";
 import { BarChart3, Users, AlertCircle, Zap, Menu, X, Brain, Mic, Info, TrendingUp, Activity } from "lucide-react";
 import ActionKanbanBoard from "@/components/ActionKanbanBoard";
 import { Link } from "react-router-dom";
+import RoleSelector, { UserRole } from "@/components/RoleSelector";
+import RoleBasedDashboard from "@/components/RoleBasedDashboard";
 
 const Index = () => {
   const { announce } = useAccessibilityContext();
   const { logComplianceAction } = useActionLogger();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>('direction');
+  const [viewMode, setViewMode] = useState<'classic' | 'role-based'>('role-based');
 
   // Log page access for audit trail
   useEffect(() => {
@@ -106,15 +110,38 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Compliance Statistics - Always visible */}
+        {/* Role Selection */}
         <section className="space-y-4 mb-6 md:mb-8">
-          <HelpTooltip 
-            content="Vue d'ensemble de votre conformité aux obligations de la Loi modernisant le régime de santé et sécurité du travail"
-            title="Aperçu de la conformité LMRSST"
-          >
-            <h3 className="text-lg md:text-xl font-semibold">Aperçu de la conformité</h3>
-          </HelpTooltip>
-          <ComplianceStats />
+          <div className="flex items-center justify-between">
+            <HelpTooltip 
+              content="Personnalisez votre tableau de bord selon votre rôle pour voir les informations les plus pertinentes"
+              title="Personnalisation par rôle"
+            >
+              <h3 className="text-lg md:text-xl font-semibold">Tableau de bord personnalisé</h3>
+            </HelpTooltip>
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'role-based' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('role-based')}
+              >
+                Vue par rôle
+              </Button>
+              <Button
+                variant={viewMode === 'classic' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('classic')}
+              >
+                Vue classique
+              </Button>
+            </div>
+          </div>
+          
+          {viewMode === 'role-based' && (
+            <RoleSelector selectedRole={selectedRole} onRoleChange={setSelectedRole} />
+          )}
+          
+          {viewMode === 'classic' && <ComplianceStats />}
         </section>
 
         {/* Mobile Tab Navigation */}
@@ -132,99 +159,100 @@ const Index = () => {
           </Button>
         </div>
 
-        {/* Main Content - Tabbed Layout */}
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className={`${isMobileMenuOpen ? 'grid' : 'hidden md:grid'} w-full grid-cols-2 md:grid-cols-5 mb-6`} id="mobile-tab-menu">
-            <TabsTrigger value="overview" className="text-xs md:text-sm flex items-center gap-1">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Vue</span> Globale
-            </TabsTrigger>
-            <TabsTrigger value="agents" className="text-xs md:text-sm flex items-center gap-1">
-              <Activity className="h-4 w-4" />
-              <span className="hidden sm:inline">Perf.</span> Agents
-            </TabsTrigger>
-            <TabsTrigger value="details" className="text-xs md:text-sm flex items-center gap-1">
-              <AlertCircle className="h-4 w-4" />
-              <span className="hidden sm:inline">Non-</span>Conformités
-            </TabsTrigger>
-            <TabsTrigger value="donnees" className="text-xs md:text-sm flex items-center gap-1">
-              <Info className="h-4 w-4" />
-              <span className="hidden sm:inline">Données</span>
-            </TabsTrigger>
-            <TabsTrigger value="actions" className="text-xs md:text-sm flex items-center gap-1">
-              <Zap className="h-4 w-4" />
-              <span className="hidden sm:inline">Actions</span> Prioritaires
-            </TabsTrigger>
-          </TabsList>
+        {/* Main Content */}
+        {viewMode === 'role-based' ? (
+          <RoleBasedDashboard 
+            selectedRole={selectedRole} 
+            complianceExamples={complianceExamples} 
+          />
+        ) : (
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className={`${isMobileMenuOpen ? 'grid' : 'hidden md:grid'} w-full grid-cols-2 md:grid-cols-5 mb-6`} id="mobile-tab-menu">
+              <TabsTrigger value="overview" className="text-xs md:text-sm flex items-center gap-1">
+                <BarChart3 className="h-4 w-4" />
+                <span className="hidden sm:inline">Vue</span> Globale
+              </TabsTrigger>
+              <TabsTrigger value="agents" className="text-xs md:text-sm flex items-center gap-1">
+                <Activity className="h-4 w-4" />
+                <span className="hidden sm:inline">Perf.</span> Agents
+              </TabsTrigger>
+              <TabsTrigger value="details" className="text-xs md:text-sm flex items-center gap-1">
+                <AlertCircle className="h-4 w-4" />
+                <span className="hidden sm:inline">Non-</span>Conformités
+              </TabsTrigger>
+              <TabsTrigger value="donnees" className="text-xs md:text-sm flex items-center gap-1">
+                <Info className="h-4 w-4" />
+                <span className="hidden sm:inline">Données</span>
+              </TabsTrigger>
+              <TabsTrigger value="actions" className="text-xs md:text-sm flex items-center gap-1">
+                <Zap className="h-4 w-4" />
+                <span className="hidden sm:inline">Actions</span> Prioritaires
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="overview" className="space-y-6 mt-0">
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
-              {/* Left Column - Diagnostic */}
-              <div className="lg:col-span-1">
-                <DiagnosticButton />
+            <TabsContent value="overview" className="space-y-6 mt-0">
+              <ComplianceStats />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+                <div className="lg:col-span-1">
+                  <DiagnosticButton />
+                </div>
+                <div className="lg:col-span-2">
+                  <AlertPanel />
+                </div>
               </div>
-              
-              {/* Right Column - Alerts */}
-              <div className="lg:col-span-2">
-                <AlertPanel />
-              </div>
-            </div>
-          </TabsContent>
+            </TabsContent>
 
-          <TabsContent value="agents" className="space-y-6 mt-0">
-            {/* Multi-Agent System */}
-            <AgentCards />
-          </TabsContent>
+            <TabsContent value="agents" className="space-y-6 mt-0">
+              <AgentCards />
+            </TabsContent>
 
-          <TabsContent value="details" className="space-y-6 mt-0">
-            {/* Compliance Feedback Examples */}
-            <section className="space-y-4" aria-labelledby="compliance-feedback-title">
-              <HelpTooltip 
-                content="Analyse détaillée de votre conformité par article de loi avec recommandations d'actions"
-                title="Statut de conformité par obligation"
-              >
-                <h3 id="compliance-feedback-title" className="text-lg md:text-xl font-semibold">
-                  Statut de conformité détaillé
-                </h3>
-              </HelpTooltip>
-              <div className="space-y-4">
-                {complianceExamples.map((status, index) => (
-                  <ComplianceFeedback 
-                    key={index} 
-                    status={status}
-                  />
-                ))}
-              </div>
-            </section>
-          </TabsContent>
+            <TabsContent value="details" className="space-y-6 mt-0">
+              <section className="space-y-4" aria-labelledby="compliance-feedback-title">
+                <HelpTooltip 
+                  content="Analyse détaillée de votre conformité par article de loi avec recommandations d'actions"
+                  title="Statut de conformité par obligation"
+                >
+                  <h3 id="compliance-feedback-title" className="text-lg md:text-xl font-semibold">
+                    Statut de conformité détaillé
+                  </h3>
+                </HelpTooltip>
+                <div className="space-y-4">
+                  {complianceExamples.map((status, index) => (
+                    <ComplianceFeedback 
+                      key={index} 
+                      status={status}
+                    />
+                  ))}
+                </div>
+              </section>
+            </TabsContent>
 
-          <TabsContent value="donnees" className="space-y-6 mt-0">
-            <section className="space-y-4">
-              <HelpTooltip 
-                content="Synchronisation avec les données réelles de lésions professionnelles du Québec pour des insights basés sur les preuves"
-                title="Données SafetyAgentic"
-              >
-                <h3 className="text-lg md:text-xl font-semibold">Intégration des données réelles</h3>
-              </HelpTooltip>
-              <SafetyDataSync />
-            </section>
-          </TabsContent>
+            <TabsContent value="donnees" className="space-y-6 mt-0">
+              <section className="space-y-4">
+                <HelpTooltip 
+                  content="Synchronisation avec les données réelles de lésions professionnelles du Québec pour des insights basés sur les preuves"
+                  title="Données SafetyAgentic"
+                >
+                  <h3 className="text-lg md:text-xl font-semibold">Intégration des données réelles</h3>
+                </HelpTooltip>
+                <SafetyDataSync />
+              </section>
+            </TabsContent>
 
-          <TabsContent value="actions" className="space-y-6 mt-0">
-            {/* Quick Actions */}
-            <section className="space-y-4" aria-labelledby="quick-actions-title">
-              <HelpTooltip 
-                content="Actions prioritaires pour maintenir et améliorer votre conformité LMRSST"
-                title="Actions recommandées"
-              >
-                <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions prioritaires</h3>
-              </HelpTooltip>
-              <ActionKanbanBoard />
-              <QuickActions />
-            </section>
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="actions" className="space-y-6 mt-0">
+              <section className="space-y-4" aria-labelledby="quick-actions-title">
+                <HelpTooltip 
+                  content="Actions prioritaires pour maintenir et améliorer votre conformité LMRSST"
+                  title="Actions recommandées"
+                >
+                  <h3 id="quick-actions-title" className="text-lg md:text-xl font-semibold">Actions prioritaires</h3>
+                </HelpTooltip>
+                <ActionKanbanBoard />
+                <QuickActions />
+              </section>
+            </TabsContent>
+          </Tabs>
+        )}
 
         {/* Footer Info */}
         <div className="text-center pt-6 md:pt-8 border-t mt-8 space-y-4">
