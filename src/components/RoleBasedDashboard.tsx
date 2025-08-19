@@ -75,7 +75,7 @@ const RoleBasedDashboard = ({ selectedRole, complianceExamples }: RoleBasedDashb
       },
       data: {
         title: "Intégration des données",
-        component: <SafetyDataSync />,
+        component: <SafetyDataSync userRole={role} />,
         priority: 'low' as const,
         icon: Shield
       },

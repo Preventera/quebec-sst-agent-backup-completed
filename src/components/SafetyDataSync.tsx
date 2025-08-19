@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import { 
@@ -18,16 +19,25 @@ import {
   Calendar,
   BarChart3,
   Upload,
-  Globe
+  Globe,
+  ChevronDown,
+  Info
 } from 'lucide-react';
 import { CnesstDataImport } from './CnesstDataImport';
 import { ManualDataUpload } from './ManualDataUpload';
+import { DataIntegrationStatus } from './DataIntegrationStatus';
+import { UserRole } from './RoleSelector';
 
-export function SafetyDataSync() {
+interface SafetyDataSyncProps {
+  userRole?: UserRole;
+}
+
+export function SafetyDataSync({ userRole = 'consultant' }: SafetyDataSyncProps) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [syncStats, setSyncStats] = useState<any>(null);
-  const [lastSync, setLastSync] = useState<string | null>(null);
+  const [lastSync, setLastSync] = useState<string | null>('2025-08-16T12:30:00Z');
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const handleSyncData = async () => {
     setIsLoading(true);
@@ -123,103 +133,130 @@ export function SafetyDataSync() {
     }
   };
 
+  // Vue rôle spécifique pour la status
+  const syncStatus = {
+    status: lastSync ? 'success' as const : 'pending' as const,
+    lastSync,
+    nextSync: '2025-08-23T12:30:00Z',
+    recordsCount: syncStats?.recordsProcessed || 3245,
+    confidence: 95
+  };
+
   return (
     <div className="space-y-6">
-      {/* En-tête avec onglets */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Intégration des données de lésions
-              </CardTitle>
-              <CardDescription>
-                Synchronisation et import de données réelles de lésions professionnelles
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="git" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="git" className="flex items-center gap-2">
-                <GitBranch className="h-4 w-4" />
-                SafetyAgentic
-              </TabsTrigger>
-              <TabsTrigger value="cnesst" className="flex items-center gap-2">
-                <Globe className="h-4 w-4" />
-                Import CNESST
-              </TabsTrigger>
-              <TabsTrigger value="manual" className="flex items-center gap-2">
-                <Upload className="h-4 w-4" />
-                Upload manuel
-              </TabsTrigger>
-            </TabsList>
+      {/* Status adapté au rôle */}
+      <DataIntegrationStatus 
+        userRole={userRole}
+        syncStatus={syncStatus}
+        onSync={handleSyncData}
+        onViewTrends={handleAnalyzeTrends}
+        onViewDetails={() => setIsDetailsOpen(!isDetailsOpen)}
+        isLoading={isLoading}
+      />
 
-            <TabsContent value="git" className="mt-6">
-              <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <GitBranch className="h-5 w-5" />
-                Synchronisation SafetyAgentic
-              </CardTitle>
-              <CardDescription>
-                Intégration des données réelles de lésions professionnelles du Québec
-              </CardDescription>
-            </div>
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Database className="h-3 w-3" />
-              Preventera/SafetyAgentic
-            </Badge>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-3">
-            <Button 
-              onClick={handleSyncData} 
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-              Synchroniser les données
+      {/* Détails techniques (collapsible pour rôles non-techniques) */}
+      {(userRole === 'consultant' || userRole === 'responsable') && (
+        <Collapsible open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-between">
+              <span className="flex items-center gap-2">
+                <Info className="h-4 w-4" />
+                Détails techniques de l'intégration
+              </span>
+              <ChevronDown className={`h-4 w-4 transition-transform ${isDetailsOpen ? 'rotate-180' : ''}`} />
             </Button>
-            
-            <Button 
-              variant="outline" 
-              onClick={handleAnalyzeTrends}
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <TrendingUp className="h-4 w-4" />
-              Analyser les tendances
-            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Database className="h-5 w-5" />
+                  Sources de données
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="git" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="git" className="flex items-center gap-2">
+                      <GitBranch className="h-4 w-4" />
+                      SafetyAgentic
+                    </TabsTrigger>
+                    <TabsTrigger value="cnesst" className="flex items-center gap-2">
+                      <Globe className="h-4 w-4" />
+                      Import CNESST
+                    </TabsTrigger>
+                    <TabsTrigger value="manual" className="flex items-center gap-2">
+                      <Upload className="h-4 w-4" />
+                      Upload manuel
+                    </TabsTrigger>
+                  </TabsList>
 
-            <Button 
-              variant="ghost" 
-              onClick={handleFetchRepoStats}
-              className="flex items-center gap-2"
-            >
-              <BarChart3 className="h-4 w-4" />
-              Stats du dépôt
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-            </TabsContent>
+                  <TabsContent value="git" className="mt-6">
+                    <Card>
+                      <CardHeader>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2">
+                              <GitBranch className="h-5 w-5" />
+                              Synchronisation SafetyAgentic
+                            </CardTitle>
+                            <CardDescription>
+                              Intégration des données réelles de lésions professionnelles du Québec
+                            </CardDescription>
+                          </div>
+                          <Badge variant="outline" className="flex items-center gap-1">
+                            <Database className="h-3 w-3" />
+                            Preventera/SafetyAgentic
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-wrap gap-3">
+                          <Button 
+                            onClick={handleSyncData} 
+                            disabled={isLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                            Synchroniser les données
+                          </Button>
+                          
+                          <Button 
+                            variant="outline" 
+                            onClick={handleAnalyzeTrends}
+                            disabled={isLoading}
+                            className="flex items-center gap-2"
+                          >
+                            <TrendingUp className="h-4 w-4" />
+                            Analyser les tendances
+                          </Button>
 
-            <TabsContent value="cnesst" className="mt-6">
-              <CnesstDataImport />
-            </TabsContent>
+                          <Button 
+                            variant="ghost" 
+                            onClick={handleFetchRepoStats}
+                            className="flex items-center gap-2"
+                          >
+                            <BarChart3 className="h-4 w-4" />
+                            Stats du dépôt
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
 
-            <TabsContent value="manual" className="mt-6">
-              <ManualDataUpload />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+                  <TabsContent value="cnesst" className="mt-6">
+                    <CnesstDataImport />
+                  </TabsContent>
+
+                  <TabsContent value="manual" className="mt-6">
+                    <ManualDataUpload />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
 
       {/* Statistiques de synchronisation */}
       {syncStats && (
@@ -334,29 +371,51 @@ export function SafetyDataSync() {
         </Card>
       )}
 
-      {/* Informations sur l'intégration */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertCircle className="h-5 w-5" />
-            À propos de l'intégration
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <p>
-            <strong>Source:</strong> Dépôt SafetyAgentic (Preventera) avec données CNESST réelles
-          </p>
-          <p>
-            <strong>Fréquence:</strong> Synchronisation manuelle ou automatique via webhook Git
-          </p>
-          <p>
-            <strong>Données:</strong> Lésions professionnelles, statistiques sectorielles, analyses prédictives
-          </p>
-          <p>
-            <strong>Enrichissement:</strong> Diagnostics, recommandations et insights basés sur données réelles
-          </p>
-        </CardContent>
-      </Card>
+      {/* Informations contextuelles (uniquement pour consultants/experts) */}
+      {(userRole === 'consultant' || userRole === 'responsable') && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              À propos de l'intégration
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <Database className="h-4 w-4 mt-1 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Source</p>
+                  <p className="text-xs text-muted-foreground">Dépôt SafetyAgentic (Preventera) avec données CNESST réelles</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Calendar className="h-4 w-4 mt-1 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Fréquence</p>
+                  <p className="text-xs text-muted-foreground">Synchronisation automatique via webhook Git</p>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="h-4 w-4 mt-1 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Données</p>
+                  <p className="text-xs text-muted-foreground">Lésions professionnelles, statistiques sectorielles, analyses prédictives</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <TrendingUp className="h-4 w-4 mt-1 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Enrichissement</p>
+                  <p className="text-xs text-muted-foreground">Diagnostics, recommandations et insights basés sur données réelles</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
