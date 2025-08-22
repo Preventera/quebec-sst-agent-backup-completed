@@ -65,7 +65,26 @@ build:docker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# ===== STAGE 3: Déploiement Staging =====
+# ===== STAGE 3: Déploiement Netlify Production =====
+deploy:netlify:
+  stage: deploy
+  image: node:18-alpine
+  before_script:
+    - npm install
+    - npm install -g netlify-cli
+  script:
+    - echo "🚀 Déploiement vers Netlify..."
+    - npm run build
+    - netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+    - echo "✅ AgenticSST Québec™ déployé avec succès !"
+    - echo "🌐 URL Production: https://regal-phoenix-35bba1.netlify.app"
+  environment:
+    name: production
+    url: https://regal-phoenix-35bba1.netlify.app
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# ===== STAGE 4: Déploiement Staging =====
 deploy:staging:
   stage: deploy
   image: alpine:latest
@@ -79,17 +98,17 @@ deploy:staging:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# ===== STAGE 4: Déploiement Production (Manuel) =====
-deploy:production:
+# ===== STAGE 5: Déploiement Production Docker (Manuel) =====
+deploy:production-docker:
   stage: deploy
   image: alpine:latest
   script:
-    - echo "🎯 Déploiement vers production..."
+    - echo "🎯 Déploiement Docker vers production..."
     - echo "Image déployée $DOCKER_IMAGE"
-    - echo "✅ Pipeline production complété avec succès"
+    - echo "✅ Pipeline production Docker complété"
   environment:
-    name: production
-    url: https://app.agentic-sst.quebec
+    name: production-docker
+    url: https://docker.agentic-sst.quebec
   when: manual
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
