@@ -25,10 +25,10 @@ test:lint:
     - echo "🔍 Vérification du code..."
     - npm run lint || echo "Lint non configuré - ignoré"
     - npm run type-check || echo "TypeScript check non configuré - ignoré"
-  only:
-    - merge_requests
-    - main
-    - develop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 test:build:
   stage: test
@@ -42,10 +42,10 @@ test:build:
     paths:
       - dist/
     expire_in: 1 hour
-  only:
-    - merge_requests
-    - main
-    - develop
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # ===== STAGE 2: Build Docker =====
 build:docker:
@@ -61,9 +61,9 @@ build:docker:
     - docker push $DOCKER_IMAGE
     - docker tag $DOCKER_IMAGE $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:latest
-  only:
-    - main
-    - develop
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # ===== STAGE 3: Déploiement Staging =====
 deploy:staging:
@@ -71,13 +71,13 @@ deploy:staging:
   image: alpine:latest
   script:
     - echo "🚀 Déploiement vers staging..."
-    - echo "Image déployée: $DOCKER_IMAGE"
+    - echo "Image déployée $DOCKER_IMAGE"
     - echo "✅ Pipeline staging complété avec succès"
   environment:
     name: staging
     url: https://staging.agentic-sst.quebec
-  only:
-    - develop
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
 
 # ===== STAGE 4: Déploiement Production (Manuel) =====
 deploy:production:
@@ -85,11 +85,11 @@ deploy:production:
   image: alpine:latest
   script:
     - echo "🎯 Déploiement vers production..."
-    - echo "Image déployée: $DOCKER_IMAGE"
+    - echo "Image déployée $DOCKER_IMAGE"
     - echo "✅ Pipeline production complété avec succès"
   environment:
     name: production
     url: https://app.agentic-sst.quebec
   when: manual
-  only:
-    - main
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
