@@ -76,8 +76,8 @@ deploy:netlify:
     - echo "🚀 Déploiement vers Netlify..."
     - npm run build
     - netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-    - echo "✅ AgenticSST Québec™ déployé avec succès !"
-    - echo "🌐 URL Production: https://regal-phoenix-35bba1.netlify.app"
+    - echo "✅ AgenticSST déployé avec succès !"
+    - echo "🌐 URL Production https://regal-phoenix-35bba1.netlify.app"
   environment:
     name: production
     url: https://regal-phoenix-35bba1.netlify.app
