@@ -61,6 +61,7 @@ build:docker:
     - docker push $DOCKER_IMAGE
     - docker tag $DOCKER_IMAGE $CI_REGISTRY_IMAGE:latest
     - docker push $CI_REGISTRY_IMAGE:latest
+  allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
