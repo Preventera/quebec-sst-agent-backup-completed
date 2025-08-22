@@ -20,7 +20,7 @@ test:lint:
   stage: test
   image: node:18-alpine
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - npm install
   script:
     - echo "🔍 Vérification du code..."
     - npm run lint || echo "Lint non configuré - ignoré"
@@ -34,7 +34,7 @@ test:build:
   stage: test
   image: node:18-alpine
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - npm install
   script:
     - echo "🏗️ Test de build..."
     - npm run build
