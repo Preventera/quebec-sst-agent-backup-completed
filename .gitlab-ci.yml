@@ -99,6 +99,6 @@ deploy:staging:
     - echo "✅ Staging déployé avec succès !"
   environment:
     name: staging
-    url: https://staging.agenticssт-quebec.netlify.app
+    url: https://staging.agenticsstquebec.netlify.app
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
