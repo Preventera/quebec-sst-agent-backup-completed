@@ -48,19 +48,20 @@ build:docker:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-deploy:netlify:
+pages:
   stage: deploy
   image: node:18-alpine
   before_script:
     - npm install
-    - npm install -g netlify-cli
   script: |
-    echo "Déploiement vers Netlify..."
+    echo "🚀 Déploiement vers GitLab Pages..."
     npm run build
-    netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-    echo "AgenticSST déployé avec succès!"
-  environment:
-    name: production
-    url: https://agenticsstquebec.netlify.app
+    mkdir public
+    cp -r dist/* public/
+    echo "✅ AgenticSST Québec™ déployé sur GitLab Pages !"
+    echo "🌐 URL: https://agenticsafety.gitlab.io/quebec-sst-agent"
+  artifacts:
+    paths:
+      - public
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
