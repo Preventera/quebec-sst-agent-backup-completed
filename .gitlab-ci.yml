@@ -8,14 +8,12 @@ variables:
   NODE_VERSION: "18"
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
-# Cache pour accélérer les builds
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
     - .npm/
 
-# ===== STAGE 1: Tests et Qualité =====
 test:lint:
   stage: test
   image: node:18-alpine
@@ -47,7 +45,6 @@ test:build:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# ===== STAGE 2: Build Docker (Optionnel) =====
 build:docker:
   stage: build
   image: docker:24.0.5
@@ -66,7 +63,6 @@ build:docker:
     - if: $CI_COMMIT_BRANCH == "main"
     - if: $CI_COMMIT_BRANCH == "develop"
 
-# ===== STAGE 3: Déploiement Netlify Production =====
 deploy:netlify:
   stage: deploy
   image: node:18-alpine
@@ -85,7 +81,6 @@ deploy:netlify:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
 
-# ===== STAGE 4: Déploiement Staging =====
 deploy:staging:
   stage: deploy
   image: node:18-alpine
