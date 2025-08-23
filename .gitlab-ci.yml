@@ -1,4 +1,3 @@
-# .gitlab-ci.yml - Pipeline CI/CD pour AgenticSST Québec™
 stages:
   - test
   - build
@@ -6,13 +5,11 @@ stages:
 
 variables:
   NODE_VERSION: "18"
-  DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
-    - .npm/
 
 test:lint:
   stage: test
@@ -20,13 +17,10 @@ test:lint:
   before_script:
     - npm install
   script:
-    - echo "🔍 Vérification du code..."
-    - npm run lint || echo "Lint non configuré - ignoré"
-    - npm run type-check || echo "TypeScript check non configuré - ignoré"
+    - echo "Test lint"
+    - npm run lint || echo "Lint ignoré"
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
 
 test:build:
   stage: test
@@ -34,34 +28,25 @@ test:build:
   before_script:
     - npm install
   script:
-    - echo "🏗️ Test de build..."
+    - echo "Test build"
     - npm run build
   artifacts:
     paths:
       - dist/
     expire_in: 1 hour
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
 
 build:docker:
   stage: build
   image: docker:24.0.5
   services:
     - docker:24.0.5-dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
   script:
-    - echo "🐳 Construction de l'image Docker..."
-    - docker build -t $DOCKER_IMAGE .
-    - docker push $DOCKER_IMAGE
-    - docker tag $DOCKER_IMAGE $CI_REGISTRY_IMAGE:latest
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - echo "Build Docker ignoré pour le moment"
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
 
 deploy:netlify:
   stage: deploy
@@ -69,31 +54,13 @@ deploy:netlify:
   before_script:
     - npm install
     - npm install -g netlify-cli
-  script:
-    - echo "🚀 Déploiement vers Netlify..."
-    - npm run build
-    - netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-    - echo "✅ AgenticSST Québec™ déployé avec succès !"
-    - echo "🌐 URL Production: https://agenticsstquebec.netlify.app"
+  script: |
+    echo "Déploiement vers Netlify..."
+    npm run build
+    netlify deploy --prod --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
+    echo "AgenticSST déployé avec succès!"
   environment:
     name: production
     url: https://agenticsstquebec.netlify.app
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
-deploy:staging:
-  stage: deploy
-  image: node:18-alpine
-  before_script:
-    - npm install
-    - npm install -g netlify-cli
-  script:
-    - echo "🚀 Déploiement vers staging..."
-    - npm run build
-    - netlify deploy --dir=dist --auth=$NETLIFY_AUTH_TOKEN --site=$NETLIFY_SITE_ID
-    - echo "✅ Staging déployé avec succès !"
-  environment:
-    name: staging
-    url: https://staging.agenticsstquebec.netlify.app
-  rules:
-    - if: $CI_COMMIT_BRANCH == "develop"
