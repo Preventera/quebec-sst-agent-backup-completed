@@ -1,11 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from "recharts";
-import { TrendingUp, Bot, CheckCircle, XCircle, Target, Award, Calendar, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, Bot, CheckCircle, XCircle, Target, Award, Calendar, Users, BarChart3, PieChart } from "lucide-react";
 import Header from "@/components/Header";
+
+// ⚡ LAZY LOADING des composants de graphiques
+const AccuracyChart = React.lazy(() => import("@/components/charts/AccuracyChart"));
+const AnnotationsChart = React.lazy(() => import("@/components/charts/AnnotationsChart"));
 
 interface LearningMetric {
   id: string;
@@ -30,9 +34,9 @@ const LearningDashboard = () => {
   const [agentStats, setAgentStats] = useState<AgentStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("7d");
+  const [showCharts, setShowCharts] = useState(false);
 
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
-  const colors = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8", "#82CA9D", "#FFC658", "#FF7C7C"];
 
   useEffect(() => {
     fetchDashboardData();
@@ -224,53 +228,81 @@ const LearningDashboard = () => {
           </Card>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Graphique de précision par agent */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Précision par Agent</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="agent" />
-                  <YAxis domain={[0, 100]} />
-                  <Tooltip formatter={(value) => [`${value}%`, "Précision"]} />
-                  <Bar dataKey="accuracy" fill="#0088FE" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+        {/* ⚡ GRAPHIQUES EN LAZY LOADING */}
+        {!showCharts ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Précision par Agent</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center justify-center h-[300px] space-y-4">
+                <BarChart3 className="h-16 w-16 text-muted-foreground" />
+                <p className="text-muted-foreground text-center">
+                  Cliquez pour charger les graphiques interactifs
+                </p>
+                <Button 
+                  onClick={() => setShowCharts(true)}
+                  className="w-full max-w-xs"
+                >
+                  Charger les Graphiques
+                </Button>
+              </CardContent>
+            </Card>
 
-          {/* Répartition des annotations */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Répartition des Annotations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Répartition des Annotations</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center justify-center h-[300px] space-y-4">
+                <PieChart className="h-16 w-16 text-muted-foreground" />
+                <p className="text-muted-foreground text-center">
+                  Graphiques en camembert interactifs
+                </p>
+                <Button 
+                  onClick={() => setShowCharts(true)}
+                  variant="outline"
+                  className="w-full max-w-xs"
+                >
+                  Afficher les Données
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <Suspense fallback={
+              <Card>
+                <CardHeader>
+                  <CardTitle>Précision par Agent</CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center h-[300px]">
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="text-sm text-muted-foreground">Chargement du graphique...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            }>
+              <AccuracyChart data={chartData} />
+            </Suspense>
+
+            <Suspense fallback={
+              <Card>
+                <CardHeader>
+                  <CardTitle>Répartition des Annotations</CardTitle>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center h-[300px]">
+                  <div className="flex flex-col items-center space-y-2">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <p className="text-sm text-muted-foreground">Chargement du graphique...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            }>
+              <AnnotationsChart data={pieData} />
+            </Suspense>
+          </div>
+        )}
 
         {/* Détails par agent */}
         <Card>
