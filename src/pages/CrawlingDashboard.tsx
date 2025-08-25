@@ -7,7 +7,6 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertCircle, Bot, Calendar, Database, Download, Globe, Loader2, RefreshCw, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import Header from '@/components/Header';
 
 interface SSTSource {
   id: string;
@@ -326,8 +325,7 @@ export default function CrawlingDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto p-6 space-y-6">
+            <div className="container mx-auto p-6 space-y-6">
       {/* En-tête */}
       <div className="flex items-center justify-between">
         <div>

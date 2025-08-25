@@ -5,13 +5,11 @@ import { TestTube, Bot, FileText } from "lucide-react";
 import TestSuite from "@/components/TestSuite";
 import AgentDemo from "@/components/AgentDemo";
 import AgentSimulator from "@/components/AgentSimulator";
-import Header from "@/components/Header";
 
 const Tests = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="text-center space-y-4 mb-8">
           <h1 className="text-3xl font-bold text-foreground">

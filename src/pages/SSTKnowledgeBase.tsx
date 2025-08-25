@@ -11,7 +11,6 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Search, Filter, BookOpen, ExternalLink, TrendingUp, Database, Users, FileText, BarChart3, Loader2, ArrowUpDown, Calendar, Hash, Tag, RotateCcw, AlertCircle, Lightbulb, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import Header from '@/components/Header';
 import CustomBreadcrumb from '@/components/CustomBreadcrumb';
 import SearchSkeleton from '@/components/SearchSkeleton';
 import PopularSearches from '@/components/PopularSearches';
@@ -485,8 +484,7 @@ const SSTKnowledgeBase = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
+            
       <main className="container mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <CustomBreadcrumb 

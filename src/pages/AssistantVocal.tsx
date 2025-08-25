@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Mic, MicOff, Volume2, VolumeX, Settings, History, Trash2, Zap, Brain, Copy, Download, Share2, Sparkles, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
 import { useActionLogger } from "@/hooks/useActionLogger";
 import { useConversationLogger } from "@/hooks/useConversationLogger";
 import { InteractiveFAQ } from "@/components/InteractiveFAQ";
@@ -615,8 +614,7 @@ const AssistantVocal = () => {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-background">
-        <Header />
-        
+                
         <div className="min-h-[calc(100vh-80px)] bg-gradient-to-br from-primary/5 to-secondary/5">
           {/* Page Header amélioré */}
           <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

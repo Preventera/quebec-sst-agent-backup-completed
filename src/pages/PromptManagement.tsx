@@ -12,7 +12,6 @@ import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle,
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
 import orchestrationPrompts from "@/data/orchestrationPrompts.json";
 
@@ -259,8 +258,7 @@ Cite toujours les articles exacts et reste factuel.`
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="flex items-center justify-between mb-8">
           <div>

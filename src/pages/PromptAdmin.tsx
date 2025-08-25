@@ -12,7 +12,6 @@ import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle,
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Header from "@/components/Header";
 import Pagination from "@/components/Pagination";
 import { useUserProfile } from "@/hooks/useUserProfile";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -268,8 +267,7 @@ Cite toujours les articles exacts et reste factuel.`
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8">
         {/* En-tête avec indication d'accès admin */}
         <div className="flex items-center justify-between mb-8">
           <div>
