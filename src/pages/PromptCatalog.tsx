@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Search, Play, BookOpen, Zap } from "lucide-react";
+import { Search, Play, BookOpen, Zap, Users, Clock, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Pagination from "@/components/Pagination";
 import orchestrationPrompts from "@/data/orchestrationPrompts.json";
@@ -28,194 +28,267 @@ const PromptCatalog = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
+  const itemsPerPage = 8;
 
-  // Filtrage des prompts d'orchestration
-  const filteredOrchestrationPrompts = orchestrationPrompts.filter((prompt: OrchestrationPrompt) => {
+  // Simulation de données si le JSON n'est pas disponible
+  const defaultPrompts: OrchestrationPrompt[] = [
+    {
+      id: 1,
+      title: "Comité SST pour entreprises +20 travailleurs",
+      description: "Orchestrer DocuGen, Hugo et CoSS pour démontrer la mise en place du comité SST exigé par la LMRSST dans une entreprise de plus de 20 travailleurs.",
+      agents: ["DocuGen", "Hugo", "CoSS"],
+      article_lmrsst: "Art. 90",
+      category: "Comité SST",
+      priority: "Élevée",
+      scope: "Multi-agents",
+      orchestration_prompt: "",
+      expected_deliverables: ["Documentation comité SST", "Plan de mise en place", "Validation conformité"]
+    },
+    {
+      id: 2,
+      title: "Calendrier prévention article 101",
+      description: "Utiliser LexiNorm et Prioris pour générer un calendrier annuel des activités de prévention conforme à l'article 101 LMRSST.",
+      agents: ["LexiNorm", "Prioris"],
+      article_lmrsst: "Art. 101",
+      category: "Programme prévention",
+      priority: "Élevée",
+      scope: "Multi-agents",
+      orchestration_prompt: "",
+      expected_deliverables: ["Calendrier annuel", "Activités priorisées", "Référentiel légal"]
+    },
+    {
+      id: 3,
+      title: "Programme prévention à jour",
+      description: "Orchestrer DocuGen, Hugo et CoSS pour démontrer la mise à jour du programme de prévention.",
+      agents: ["DocuGen", "Hugo"],
+      article_lmrsst: "Art. 90",
+      category: "Programme prévention",
+      priority: "Critique",
+      scope: "Multi-agents", 
+      orchestration_prompt: "",
+      expected_deliverables: ["Templates PV", "Système archivage", "Conformité réglementaire"]
+    },
+    {
+      id: 4,
+      title: "Validation modalités comité SST",
+      description: "Lancer une orchestration pour valider les modalités de fonctionnement du comité SST (art. 90 LMRSST).",
+      agents: ["CoSS", "LexiNorm", "DocuGen"],
+      article_lmrsst: "Art. 90",
+      category: "Comité SST", 
+      priority: "Élevée",
+      scope: "Multi-agents",
+      orchestration_prompt: "",
+      expected_deliverables: ["Validation modalités", "Guide fonctionnement", "Conformité réglementaire"]
+    }
+  ];
+
+  const prompts = orchestrationPrompts?.length > 0 ? orchestrationPrompts : defaultPrompts;
+
+  // Fonctions de filtrage
+  const filteredPrompts = prompts.filter(prompt => {
     const matchesSearch = prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prompt.agents.some(agent => agent.toLowerCase().includes(searchTerm.toLowerCase()));
+                         prompt.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory;
     const matchesPriority = selectedPriority === "all" || prompt.priority === selectedPriority;
     
     return matchesSearch && matchesCategory && matchesPriority;
   });
 
-  // Pagination pour les prompts d'orchestration
-  const totalItems = filteredOrchestrationPrompts.length;
+  // Pagination
+  const totalPages = Math.ceil(filteredPrompts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedPrompts = filteredOrchestrationPrompts.slice(startIndex, endIndex);
+  const currentPrompts = filteredPrompts.slice(startIndex, startIndex + itemsPerPage);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedPriority]);
-
-  const categories = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.category))];
-  const priorities = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.priority))];
-
-  const executeWorkflow = (prompt: OrchestrationPrompt) => {
+  // Fonction de lancement de workflow
+  const handleLaunchWorkflow = (prompt: OrchestrationPrompt) => {
     toast({
-      title: "Workflow lancé",
-      description: `Le workflow "${prompt.title}" a été démarré avec succès.`,
+      title: "Workflow lancé !",
+      description: `Orchestration "${prompt.title}" démarrée avec ${prompt.agents.join(", ")}`,
     });
+  };
+
+  // Fonctions utilitaires pour les badges
+  const getPriorityColor = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'critique':
+        return 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200';
+      case 'élevée':
+        return 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200';
+      case 'moyenne':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200 hover:bg-gray-200';
+    }
+  };
+
+  const getPriorityIcon = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case 'critique':
+        return <AlertCircle className="w-3 h-3 mr-1" />;
+      case 'élevée':
+        return <Zap className="w-3 h-3 mr-1" />;
+      default:
+        return <Clock className="w-3 h-3 mr-1" />;
+    }
   };
 
   return (
     <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-8">
-        {/* En-tête */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <BookOpen className="h-8 w-8 text-primary" />
-              Catalogue des Orchestrations
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Workflows d'orchestration intelligente LMRSST prêts à l'emploi
-            </p>
+      <main className="container mx-auto px-4 py-8" role="main">
+        {/* En-tête de page */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <BookOpen className="w-8 h-8 text-primary" />
+            <h1 className="text-3xl font-bold text-foreground">Catalogue des Orchestrations</h1>
           </div>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            Workflows d'orchestration intelligente LMRSST prêts à l'emploi
+          </p>
         </div>
 
-        {/* Filtres de recherche */}
-        <Card className="mb-6">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher un workflow..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        {/* Barre de recherche et filtres */}
+        <div className="bg-white rounded-lg border p-6 mb-8 space-y-4">
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Recherche */}
+            <div className="flex-1 relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Rechercher un workflow..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            
+            {/* Filtres */}
+            <div className="flex gap-4">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Catégorie" />
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Toutes catégories" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Toutes catégories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
-                  ))}
+                  <SelectItem value="Comité SST">Comité SST</SelectItem>
+                  <SelectItem value="Programme prévention">Programme prévention</SelectItem>
                 </SelectContent>
               </Select>
+
               <Select value={selectedPriority} onValueChange={setSelectedPriority}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Priorité" />
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="Toutes priorités" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Toutes priorités</SelectItem>
-                  {priorities.map((priority) => (
-                    <SelectItem key={priority} value={priority}>
-                      {priority === "critical" ? "Critique" : 
-                       priority === "high" ? "Élevée" : 
-                       priority === "medium" ? "Moyenne" : "Faible"}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="Critique">Critique</SelectItem>
+                  <SelectItem value="Élevée">Élevée</SelectItem>
+                  <SelectItem value="Moyenne">Moyenne</SelectItem>
                 </SelectContent>
               </Select>
-              <div className="text-sm text-muted-foreground flex items-center">
-                {filteredOrchestrationPrompts.length} workflow{filteredOrchestrationPrompts.length > 1 ? 's' : ''} disponible{filteredOrchestrationPrompts.length > 1 ? 's' : ''}
-              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          
+          {/* Compteur de résultats */}
+          <div className="flex justify-between items-center text-sm text-muted-foreground">
+            <span>{filteredPrompts.length} workflows disponibles</span>
+          </div>
+        </div>
 
-        {/* Grille des workflows */}
+        {/* Grille des cartes normalisées */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {paginatedPrompts.map((prompt: OrchestrationPrompt) => {
-            const isOrchestrator = prompt.agents.length > 1;
-            const randomStatus = ['production', 'test'][Math.floor(Math.random() * 2)]; // Seuls les prompts validés sont dans le catalogue
-            
-            return (
-            <Card key={prompt.id} className="group hover:shadow-lg transition-all duration-200">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CardTitle className="text-lg">{prompt.title}</CardTitle>
-                      {isOrchestrator && (
-                        <Badge variant="default" className="bg-primary/10 text-primary">
-                          Multi-agents
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={
-                        prompt.priority === "critical" ? "destructive" :
-                        prompt.priority === "high" ? "default" :
-                        prompt.priority === "medium" ? "secondary" : "outline"
-                      }>
-                        {prompt.priority === "critical" ? "Critique" : 
-                         prompt.priority === "high" ? "Élevée" : 
-                         prompt.priority === "medium" ? "Moyenne" : "Faible"}
-                      </Badge>
-                      <Badge variant="outline">{prompt.category}</Badge>
-                      <Badge variant="default" className="bg-green-500/10 text-green-700 border-green-200">
-                        Disponible
-                      </Badge>
-                    </div>
+          {currentPrompts.map((prompt) => (
+            <Card key={prompt.id} className="h-full flex flex-col hover:shadow-lg transition-shadow duration-200">
+              <CardHeader className="pb-4">
+                <div className="flex items-start justify-between gap-3">
+                  <CardTitle className="text-lg font-semibold leading-tight flex-1">
+                    {prompt.title}
+                  </CardTitle>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Badge 
+                      variant="outline" 
+                      className={`text-xs font-medium ${getPriorityColor(prompt.priority)}`}
+                    >
+                      {getPriorityIcon(prompt.priority)}
+                      {prompt.priority}
+                    </Badge>
                   </div>
-                  <Zap className="h-5 w-5 text-primary flex-shrink-0" />
+                </div>
+                
+                {/* Badges informatifs */}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <Badge variant="secondary" className="text-xs">
+                    <Zap className="w-3 h-3 mr-1" />
+                    {prompt.scope}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs">
+                    {prompt.category}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs text-blue-700 bg-blue-50 border-blue-200">
+                    {prompt.article_lmrsst}
+                  </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">{prompt.description}</p>
-                
-                <div className="space-y-2">
-                  <div className="text-sm">
-                    <strong>Agents impliqués:</strong>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {prompt.agents.map((agent, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {agent}
-                        </Badge>
-                      ))}
-                    </div>
+
+              <CardContent className="flex-1 flex flex-col">
+                {/* Description */}
+                <p className="text-sm text-muted-foreground mb-4 line-clamp-3 flex-shrink-0">
+                  {prompt.description}
+                </p>
+
+                {/* Agents impliqués */}
+                <div className="mb-4 flex-shrink-0">
+                  <div className="text-xs font-medium text-foreground mb-2 flex items-center">
+                    <Users className="w-3 h-3 mr-1" />
+                    Agents impliqués:
                   </div>
-                  
-                  <div className="text-sm">
-                    <strong>Article LMRSST:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs">{prompt.article_lmrsst}</code>
-                  </div>
-                  
-                  <div className="text-sm">
-                    <strong>Livrables attendus:</strong>
-                    <ul className="list-disc list-inside mt-1 text-xs text-muted-foreground">
-                      {prompt.expected_deliverables.map((deliverable, index) => (
-                        <li key={index}>{deliverable}</li>
-                      ))}
-                    </ul>
+                  <div className="flex flex-wrap gap-1">
+                    {prompt.agents.map((agent, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs bg-green-50 text-green-700 border-green-200">
+                        {agent}
+                      </Badge>
+                    ))}
                   </div>
                 </div>
-                
-                <div className="flex gap-2">
+
+                {/* Livrables attendus */}
+                <div className="mb-6 flex-1">
+                  <div className="text-xs font-medium text-foreground mb-2">
+                    Livrables attendus:
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-1">
+                    {prompt.expected_deliverables.map((deliverable, index) => (
+                      <li key={index} className="flex items-start">
+                        <span className="text-primary mr-1 flex-shrink-0">•</span>
+                        <span className="line-clamp-1">{deliverable}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* CTA aligné en bas */}
+                <div className="mt-auto pt-4 border-t">
                   <Button 
-                    className="flex-1" 
+                    onClick={() => handleLaunchWorkflow(prompt)} 
+                    className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5"
                     size="sm"
-                    onClick={() => executeWorkflow(prompt)}
                   >
-                    <Play className="h-4 w-4 mr-2" />
+                    <Play className="w-4 h-4 mr-2" />
                     Lancer le workflow
                   </Button>
                 </div>
               </CardContent>
             </Card>
-            );
-          })}
+          ))}
         </div>
 
         {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={setItemsPerPage}
-          totalItems={totalItems}
-        />
-      </div>
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
+      </main>
     </div>
   );
 };
