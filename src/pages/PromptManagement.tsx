@@ -8,12 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap, MoreVertical, Edit, Copy, Play } from "lucide-react";
+import { FileText, Bot, TrendingUp, RefreshCw, Save, AlertTriangle, CheckCircle, Search, Settings, Users, Zap, MoreVertical, Edit, Copy, Play, Shield, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import Pagination from "@/components/Pagination";
 import orchestrationPrompts from "@/data/orchestrationPrompts.json";
+import { validatedOrchestrator } from '@/lib/agentValidator';
 
 interface AgentFeedback {
   agent_name: string;
@@ -51,6 +51,73 @@ interface OrchestrationPrompt {
   expected_deliverables: string[];
 }
 
+interface ValidationSummary {
+  totalAgents: number;
+  validResponses: number;
+  invalidResponses: number;
+  correctedResponses: number;
+  overallConfiance: number;
+}
+
+interface ExecutionResult {
+  responses: any[];
+  validationSummary: ValidationSummary;
+  recommendReview: boolean;
+}
+
+// Composant Pagination simplifié avec protection d'erreurs
+const SafePagination = ({ 
+  currentPage, 
+  totalItems, 
+  itemsPerPage, 
+  onPageChange, 
+  onItemsPerPageChange 
+}: {
+  currentPage: number;
+  totalItems: number;
+  itemsPerPage: number;
+  onPageChange: (page: number) => void;
+  onItemsPerPageChange?: (items: number) => void;
+}) => {
+  const safeCurrentPage = Math.max(1, currentPage || 1);
+  const safeTotalItems = Math.max(0, totalItems || 0);
+  const safeItemsPerPage = Math.max(1, itemsPerPage || 12);
+  const totalPages = Math.max(1, Math.ceil(safeTotalItems / safeItemsPerPage));
+
+  return (
+    <div className="flex items-center justify-between">
+      <div className="text-sm text-muted-foreground">
+        {safeTotalItems > 0 ? (
+          `${(safeCurrentPage - 1) * safeItemsPerPage + 1}-${Math.min(safeCurrentPage * safeItemsPerPage, safeTotalItems)} sur ${safeTotalItems}`
+        ) : (
+          "Aucun élément"
+        )}
+      </div>
+      <div className="flex items-center space-x-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(Math.max(1, safeCurrentPage - 1))}
+          disabled={safeCurrentPage <= 1}
+        >
+          Précédent
+        </Button>
+        <div className="text-sm">
+          Page {safeCurrentPage} sur {totalPages}
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onPageChange(Math.min(totalPages, safeCurrentPage + 1))}
+          disabled={safeCurrentPage >= totalPages}
+        >
+          Suivant
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 const PromptManagement = () => {
   const { toast } = useToast();
   const [selectedAgent, setSelectedAgent] = useState("Hugo");
@@ -64,6 +131,51 @@ const PromptManagement = () => {
   const [selectedPriority, setSelectedPriority] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [executionResults, setExecutionResults] = useState<any[]>([]);
+  const [lastValidationSummary, setLastValidationSummary] = useState<ValidationSummary | null>(null);
+
+const handleExecutePrompt = async (promptId: number) => {
+  setIsExecuting(true);
+  try {
+    console.log('🚀 Exécution scénario avec validation:', promptId);
+    
+    const result = await validatedOrchestrator.executeValidatedOrchestration(
+      promptId,
+      "Exécution avec validation depuis interface",
+      'basic'
+    );
+    
+    setExecutionResults(result.responses);
+    setLastValidationSummary(result.validationSummary);
+    console.log('✅ Orchestration validée:', result);
+    
+    // Afficher le résumé de validation
+    if (result.recommendReview) {
+      toast({
+        title: "⚠️ Attention - Validation",
+        description: `Confiance: ${result.validationSummary.overallConfiance.toFixed(1)}% - Révision recommandée`,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "✅ Validation réussie",
+        description: `Confiance: ${result.validationSummary.overallConfiance.toFixed(1)}% - Documents validés`,
+        variant: "default"
+      });
+    }
+    
+  } catch (error) {
+    console.error('❌ Erreur orchestration validée:', error);
+    toast({
+      title: "Erreur d'exécution",
+      description: "Impossible d'exécuter l'orchestration avec validation",
+      variant: "destructive"
+    });
+  } finally {
+    setIsExecuting(false);
+  }
+}; 
 
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
 
@@ -229,21 +341,31 @@ Cite toujours les articles exacts et reste factuel.`
     });
   };
 
-  // Filtrage des prompts d'orchestration
-  const filteredOrchestrationPrompts = orchestrationPrompts.filter((prompt: OrchestrationPrompt) => {
-    const matchesSearch = prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prompt.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         prompt.agents.some(agent => agent.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory;
-    const matchesPriority = selectedPriority === "all" || prompt.priority === selectedPriority;
-    
-    return matchesSearch && matchesCategory && matchesPriority;
+  // Protection contre les erreurs de données
+  const safeOrchestrationPrompts = Array.isArray(orchestrationPrompts) ? orchestrationPrompts : [];
+
+  // Filtrage des prompts d'orchestration avec protection
+  const filteredOrchestrationPrompts = safeOrchestrationPrompts.filter((prompt: OrchestrationPrompt) => {
+    try {
+      const matchesSearch = prompt.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           prompt.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           prompt.agents?.some(agent => agent.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesCategory = selectedCategory === "all" || prompt.category === selectedCategory;
+      const matchesPriority = selectedPriority === "all" || prompt.priority === selectedPriority;
+      
+      return matchesSearch && matchesCategory && matchesPriority;
+    } catch (error) {
+      console.error('Erreur lors du filtrage:', error);
+      return false;
+    }
   });
 
-  // Pagination pour les prompts d'orchestration
-  const totalItems = filteredOrchestrationPrompts.length;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
+  // Pagination pour les prompts d'orchestration avec protection
+  const totalItems = filteredOrchestrationPrompts.length || 0;
+  const safeCurrentPage = Math.max(1, currentPage || 1);
+  const safeItemsPerPage = Math.max(1, itemsPerPage || 12);
+  const startIndex = (safeCurrentPage - 1) * safeItemsPerPage;
+  const endIndex = startIndex + safeItemsPerPage;
   const paginatedPrompts = filteredOrchestrationPrompts.slice(startIndex, endIndex);
 
   // Reset page when filters change
@@ -251,14 +373,49 @@ Cite toujours les articles exacts et reste factuel.`
     setCurrentPage(1);
   }, [searchTerm, selectedCategory, selectedPriority]);
 
-  const categories = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.category))];
-  const priorities = [...new Set(orchestrationPrompts.map((p: OrchestrationPrompt) => p.priority))];
+  const categories = [...new Set(safeOrchestrationPrompts.map((p: OrchestrationPrompt) => p.category).filter(Boolean))];
+  const priorities = [...new Set(safeOrchestrationPrompts.map((p: OrchestrationPrompt) => p.priority).filter(Boolean))];
 
   const currentAgentPrompt = agentPrompts[selectedAgent];
 
+  // Composant pour afficher le résumé de validation
+  const ValidationSummaryCard = ({ summary }: { summary: ValidationSummary }) => (
+    <Card className="mb-4 border-blue-200 bg-blue-50/30">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <Shield className="h-4 w-4 text-blue-600" />
+          Résumé de Validation
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+          <div className="text-center">
+            <div className="font-bold text-lg text-green-600">{summary.validResponses}</div>
+            <div className="text-muted-foreground">Validées</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-lg text-red-600">{summary.invalidResponses}</div>
+            <div className="text-muted-foreground">Invalides</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-lg text-orange-600">{summary.correctedResponses}</div>
+            <div className="text-muted-foreground">Corrigées</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold text-lg text-blue-600">{summary.overallConfiance.toFixed(1)}%</div>
+            <div className="text-muted-foreground">Confiance</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          <Progress value={summary.overallConfiance} className="h-2" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-background">
-            <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* En-tête */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -267,10 +424,13 @@ Cite toujours les articles exacts et reste factuel.`
               Gestion des Prompts d'Orchestration
             </h1>
             <p className="text-muted-foreground mt-2">
-              Prompts d'agents individuels et orchestration intelligente LMRSST
+              Prompts d'agents individuels et orchestration intelligente LMRSST avec validation croisée
             </p>
           </div>
         </div>
+
+        {/* Résumé de validation si disponible */}
+        {lastValidationSummary && <ValidationSummaryCard summary={lastValidationSummary} />}
 
         {/* Navigation par onglets */}
         <Tabs defaultValue="orchestration" className="w-full">
@@ -336,7 +496,7 @@ Cite toujours les articles exacts et reste factuel.`
             {/* Grille des prompts d'orchestration */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {paginatedPrompts.map((prompt: OrchestrationPrompt) => {
-                const isOrchestrator = prompt.agents.length > 1;
+                const isOrchestrator = prompt.agents?.length > 1;
                 const randomStatus = ['draft', 'test', 'production'][Math.floor(Math.random() * 3)];
                 
                 return (
@@ -345,12 +505,16 @@ Cite toujours les articles exacts et reste factuel.`
                     <div className="flex items-start justify-between">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">{prompt.title}</CardTitle>
+                          <CardTitle className="text-lg">{prompt.title || 'Titre manquant'}</CardTitle>
                           {isOrchestrator && (
                             <Badge variant="default" className="bg-primary/10 text-primary">
                               Orchestrateur
                             </Badge>
                           )}
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Validé
+                          </Badge>
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge variant={
@@ -362,7 +526,7 @@ Cite toujours les articles exacts et reste factuel.`
                              prompt.priority === "high" ? "Élevée" : 
                              prompt.priority === "medium" ? "Moyenne" : "Faible"}
                           </Badge>
-                          <Badge variant="outline">{prompt.category}</Badge>
+                          <Badge variant="outline">{prompt.category || 'Non catégorisé'}</Badge>
                           <Badge variant={
                             randomStatus === 'production' ? 'default' :
                             randomStatus === 'test' ? 'secondary' : 'outline'
@@ -378,7 +542,6 @@ Cite toujours les articles exacts et reste factuel.`
                       </div>
                       <div className="flex items-center gap-2">
                         <Zap className="h-5 w-5 text-primary flex-shrink-0" />
-                        {/* Menu contextuel au survol */}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                             <Settings className="h-4 w-4" />
@@ -388,13 +551,13 @@ Cite toujours les articles exacts et reste factuel.`
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground">{prompt.description}</p>
+                    <p className="text-sm text-muted-foreground">{prompt.description || 'Aucune description'}</p>
                     
                     <div className="space-y-2">
                       <div className="text-sm">
                         <strong>Agents impliqués:</strong>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {prompt.agents.map((agent, index) => (
+                          {(prompt.agents || []).map((agent, index) => (
                             <Badge key={index} variant="secondary" className="text-xs">
                               {agent}
                             </Badge>
@@ -403,13 +566,13 @@ Cite toujours les articles exacts et reste factuel.`
                       </div>
                       
                       <div className="text-sm">
-                        <strong>Article LMRSST:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs">{prompt.article_lmrsst}</code>
+                        <strong>Article LMRSST:</strong> <code className="bg-muted px-1 py-0.5 rounded text-xs">{prompt.article_lmrsst || 'Non spécifié'}</code>
                       </div>
                       
                       <div className="text-sm">
                         <strong>Livrables attendus:</strong>
                         <ul className="list-disc list-inside mt-1 text-xs text-muted-foreground">
-                          {prompt.expected_deliverables.map((deliverable, index) => (
+                          {(prompt.expected_deliverables || []).map((deliverable, index) => (
                             <li key={index}>{deliverable}</li>
                           ))}
                         </ul>
@@ -417,13 +580,27 @@ Cite toujours les articles exacts et reste factuel.`
                     </div>
                     
                     <div className="bg-muted/30 p-3 rounded text-xs font-mono">
-                      {prompt.orchestration_prompt}
+                      {prompt.orchestration_prompt || 'Prompt non défini'}
                     </div>
                     
                     <div className="flex gap-2">
-                      <Button className="flex-1" size="sm">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Exécuter
+                      <Button 
+                        className="flex-1" 
+                        size="sm"
+                        onClick={() => handleExecutePrompt(prompt.id)}
+                        disabled={isExecuting}
+                      >
+                        {isExecuting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Validation...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="h-4 w-4 mr-2" />
+                            Exécuter + Valider
+                          </>
+                        )}
                       </Button>
                       {randomStatus !== 'production' && (
                         <Button variant="outline" size="sm">
@@ -437,24 +614,29 @@ Cite toujours les articles exacts et reste factuel.`
               })}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination sécurisée */}
             {filteredOrchestrationPrompts.length > 0 && (
               <div className="mt-6">
-                <Pagination
-                  currentPage={currentPage}
+                <SafePagination
+                  currentPage={safeCurrentPage}
                   totalItems={totalItems}
-                  itemsPerPage={itemsPerPage}
+                  itemsPerPage={safeItemsPerPage}
                   onPageChange={setCurrentPage}
                   onItemsPerPageChange={setItemsPerPage}
-                  className="justify-center"
                 />
+              </div>
+            )}
+
+            {/* Message si aucun prompt */}
+            {filteredOrchestrationPrompts.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">Aucun prompt trouvé correspondant aux critères de recherche.</p>
               </div>
             )}
           </TabsContent>
 
           {/* Onglet Prompts Agents */}
           <TabsContent value="agents" className="space-y-6">
-
             {/* Sélection d'agent */}
             <Card className="mb-6">
               <CardContent className="pt-6">

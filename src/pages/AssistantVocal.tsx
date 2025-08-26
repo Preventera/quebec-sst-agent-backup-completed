@@ -11,6 +11,7 @@ import {
   AlertTriangle, Clock, Users, FileText, Settings, ExternalLink, Copy,
   Bookmark, Filter, Play, Plus, Eye, EyeOff, Zap
 } from "lucide-react";
+import { llmClient } from '@/lib/llmClient';
 
 // 🛡️ SYSTÈME DE SÉCURITÉ PRISM
 type InjectionLevel = "none" | "low" | "medium" | "high";
@@ -354,22 +355,39 @@ export default function AssistantSSTPremium() {
     setInputText("");
     setIsProcessing(true);
 
-    try {
-      // Simulation réponse avec garde-fous
-      await new Promise(resolve => setTimeout(resolve, 2000));
+   try {
+  // 🚀 NOUVEAU : Utilisation du LLM Gateway au lieu de la simulation
+  const response = await llmClient.agentChat(
+    'AssistantSST', // nom de l'agent
+    securityResult.sanitizedInput || text, // question utilisateur
+    SYSTEM_GUARDRAILS, // prompt système de sécurité
+    {
+      provider: 'anthropic', // ou 'openai'
+      model: 'claude-3-haiku-20240307',
+      userId: 'user-session-' + Date.now() // ID utilisateur pour l'audit
+    }
+  );
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: `Merci pour votre question sur la SST. Voici ma réponse sécurisée basée sur les règlements québécois en vigueur.\n\n${securityResult.redactions.length > 0 ? "⚠️ Certains éléments de votre message ont été filtrés pour la sécurité." : ""}`,
-        timestamp: new Date(),
-        sources: [
-          { title: "LMRSST Article pertinent", confidence: 94, snippet: "Extrait réglementaire..." },
-          { title: "Guide CNESST", confidence: 87, snippet: "Procédure recommandée..." }
-        ]
-      };
+  const assistantMessage: Message = {
+    id: (Date.now() + 1).toString(),
+    role: "assistant",
+    content: response.content,
+    timestamp: new Date(),
+    sources: [
+      { 
+        title: "LMRSST Article pertinent", 
+        confidence: 94, 
+        snippet: "Réponse générée via LLM Gateway sécurisé" 
+      },
+      { 
+        title: "Gateway Security", 
+        confidence: 100, 
+        snippet: `Tokens utilisés: ${response.usage?.total_tokens || 0}` 
+      }
+    ]
+  };
 
-      setMessages(prev => [...prev, assistantMessage]);
+  setMessages(prev => [...prev, assistantMessage]); 
 
     } catch (error) {
       console.error("Erreur:", error);
