@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
+import { useHITLAgents } from '@/lib/hitlAgentsService';
 
 interface Message {
   id: string;
@@ -71,98 +73,163 @@ const demoAgents: Agent[] = [
   {
     name: "Prioris",
     role: "Plan d'action",
-    description: "Je génère vos plans d'action personnalisés",
+    description: "Je génère les plans d'action prioritaires",
     icon: FileText,
     color: "warning",
-    capabilities: ["Priorisation intelligente", "Plans sectoriels", "Suivi d'avancement"],
+    capabilities: ["Priorisation intelligente", "Plans d'action", "Échéanciers"],
     responses: [
-      "Basé sur votre diagnostic, je vais créer un plan d'action structuré par priorité.",
-      "Action critique #1: Créer le programme de prévention (échéance: 30 jours)",
-      "J'ai généré un plan adapté à votre secteur avec 12 actions réparties sur 6 mois.",
-      "Plan mis à jour ! 3 actions complétées, 5 en cours, échéance respectée à 85%."
+      "Basé sur votre diagnostic, voici les 5 actions prioritaires à mettre en place.",
+      "L'action la plus critique est la mise en place du comité SST (échéance: 30 jours).",
+      "Je recommande de commencer par la formation RSS avant le programme de prévention.",
+      "Voici votre plan d'action personnalisé avec budget estimé et ressources nécessaires."
     ]
   },
   {
     name: "Sentinelle",
     role: "Alertes réglementaires",
-    description: "Je surveille vos échéances et obligations",
+    description: "Je surveille et alerte sur les échéances",
     icon: AlertTriangle,
     color: "destructive",
-    capabilities: ["Surveillance continue", "Alertes multi-canaux", "Escalade intelligente"],
+    capabilities: ["Surveillance continue", "Alertes préventives", "Monitoring conformité"],
     responses: [
-      "🚨 ALERTE: Formation du comité SST expire dans 15 jours !",
-      "Rappel: Inspection annuelle programmée le 15 mars - Checklist envoyée.",
-      "Notification envoyée sur Teams et par email. Voulez-vous programmer un rappel ?",
-      "Détection d'un incident non déclaré. Procédure d'urgence activée."
+      "ALERTE: Votre formation RSS expire dans 15 jours !",
+      "Je détecte une non-conformité émergente dans votre secteur d'activité.",
+      "Rappel: Réunion comité SST obligatoire avant le 30 du mois.",
+      "Nouvelle réglementation CNESST en vigueur - analyse d'impact en cours."
     ]
   },
   {
     name: "DocuGen",
     role: "Générateur de rapports",
-    description: "Je compile vos rapports de conformité",
+    description: "Je compile les rapports de conformité",
     icon: FileCheck,
     color: "success",
-    capabilities: ["Rapports PDF", "Export CNESST", "Documentation légale"],
+    capabilities: ["Génération automatique", "Rapports CNESST", "Documentation"],
     responses: [
-      "Je génère votre rapport de conformité complet avec signature numérique.",
-      "Rapport PDF créé: 23 pages incluant diagnostic, plan d'action et références légales.",
-      "Export JSON formaté pour soumission CNESST - Validation réussie ✓",
-      "Rapport bilingue généré avec annexes techniques et justifications légales."
+      "Je prépare votre rapport de conformité pour inspection CNESST.",
+      "Document généré: Programme de prévention adapté à votre secteur.",
+      "Votre registre d'accidents est maintenant prêt pour audit.",
+      "Export terminé: 23 documents de conformité générés avec références légales."
     ]
   },
   {
     name: "CoSS",
     role: "Comité SST virtuel",
-    description: "Je simule les décisions de votre comité SST",
+    description: "Je simule les décisions du comité SST",
     icon: Users,
     color: "primary",
-    capabilities: ["Vote collectif", "Réunions virtuelles", "Décisions consensuelles"],
+    capabilities: ["Consultation paritaire", "Prise de décision", "Recommandations"],
     responses: [
-      "Convocation du comité SST virtuel. 5 membres connectés pour validation.",
-      "Vote sur le programme de prévention: 4 pour, 1 abstention. ✅ Approuvé !",
-      "Le comité recommande l'ajout d'un RSS spécialisé en ergonomie.",
-      "Réunion mensuelle programmée. Ordre du jour: suivi des 3 incidents récents."
+      "En tant que comité SST, nous recommandons l'achat d'EPI supplémentaires.",
+      "Le comité approuve à l'unanimité le nouveau programme de formation.",
+      "Décision: Investigation requise sur l'accident du 15 mars selon l'art. 62.",
+      "Le comité demande une inspection supplémentaire du département production."
     ]
   },
   {
     name: "ALSS",
     role: "Agent de liaison SST",
-    description: "Je représente les travailleurs dans les PME",
+    description: "Je gère la SST dans les petites entreprises",
     icon: User,
     color: "secondary",
-    capabilities: ["Médiation conflits", "Représentation employés", "Escalade CNESST"],
+    capabilities: ["Liaison externe", "Formation adaptée", "Support PME"],
     responses: [
-      "Un employé m'a contacté concernant un risque. Je traite sa demande confidentiellement.",
-      "Recommandation transmise à l'employeur: améliorer l'éclairage au poste de soudure.",
-      "Médiation en cours pour résoudre le différend sur les EPI obligatoires.",
-      "Escalade vers CNESST initiée. Dossier préparé avec preuves et témoignages."
+      "Comme ALSS, je vous accompagne dans votre démarche de conformité LMRSST.",
+      "Je planifie vos formations SST avec l'ASP de votre secteur.",
+      "Votre programme de prévention PME est maintenant conforme et opérationnel.",
+      "Je coordonne avec la CNESST pour votre première inspection d'établissement."
     ]
   }
 ];
 
 const AgentDemo = () => {
-  const [selectedAgent, setSelectedAgent] = useState<Agent>(demoAgents[0]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [currentMessage, setCurrentMessage] = useState("");
+  const [selectedAgent, setSelectedAgent] = useState<Agent>(demoAgents[0]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { toast } = useToast();
+  const { validateAgentAction } = useHITLAgents();
 
-  const sendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  // Fonction d'exécution avec HITL intégré
+  const executeAgentWithHITL = async (agent: Agent) => {
+    const context = {
+      agentName: agent.name as any,
+      action: `Exécution ${agent.role}`,
+      companyProfile: {
+        name: "Entreprise Demo",
+        size: 25,
+        sector: "Démonstration"
+      },
+      scenario: `Démonstration agent ${agent.name}`,
+      criticalityLevel: agent.name === 'Sentinelle' ? 'critical' as const :
+                       agent.name === 'DiagSST' ? 'high' as const :
+                       agent.name === 'Hugo' ? 'high' as const : 'medium' as const,
+      legalBasis: agent.name === 'LexiNorm' ? ['LMRSST Art. 88-91', 'RSST'] :
+                  agent.name === 'DiagSST' ? ['LMRSST Art. 88-102'] :
+                  agent.name === 'CoSS' ? ['LMRSST Art. 78', 'Art. 90'] :
+                  ['LMRSST générale'],
+      expectedOutputs: agent.capabilities
+    };
+
+    // Validation HITL AVANT exécution
+    const validation = await validateAgentAction(context);
+    
+    if (!validation.approved) {
+      toast({
+        title: `${agent.name} - Exécution annulée`,
+        description: "Validation HITL rejetée par l'utilisateur",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Agent approuvé - exécuter
+    toast({
+      title: `${agent.name} - Validation HITL approuvée`,
+      description: "Agent autorisé avec audit centralisé",
+    });
+
+    setIsProcessing(true);
+    
+    // Simulation d'exécution agent (remplacer par votre logique)
+    setTimeout(() => {
+      const randomResponse = agent.responses[Math.floor(Math.random() * agent.responses.length)];
+      
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        content: randomResponse,
+        sender: 'agent',
+        agentName: agent.name,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, newMessage]);
+      setIsProcessing(false);
+      
+      toast({
+        title: `${agent.name} exécuté avec succès`,
+        description: "Réponse générée avec traçabilité HITL",
+      });
+    }, 2000);
+  };
+
+  const sendMessage = () => {
+    if (!currentMessage.trim()) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: currentMessage,
       sender: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInputMessage("");
-    setIsTyping(true);
+    setCurrentMessage("");
 
-    // Simulation de réponse d'agent
+    // Simulation de réponse agent
     setTimeout(() => {
       const randomResponse = selectedAgent.responses[Math.floor(Math.random() * selectedAgent.responses.length)];
+      
       const agentMessage: Message = {
         id: (Date.now() + 1).toString(),
         content: randomResponse,
@@ -170,250 +237,169 @@ const AgentDemo = () => {
         agentName: selectedAgent.name,
         timestamp: new Date()
       };
-
+      
       setMessages(prev => [...prev, agentMessage]);
-      setIsTyping(false);
-    }, 1500 + Math.random() * 2000);
-  };
-
-  const startDemo = (demoType: string) => {
-    const demoMessages: Record<string, Message[]> = {
-      diagnostic: [
-        {
-          id: '1',
-          content: "Je voudrais faire un diagnostic de conformité pour mon entreprise",
-          sender: 'user',
-          timestamp: new Date()
-        },
-        {
-          id: '2',
-          content: "Parfait ! DiagSST va s'occuper de votre évaluation. Je vais analyser votre conformité LMRSST. Combien d'employés compte votre entreprise ?",
-          sender: 'agent',
-          agentName: 'Hugo',
-          timestamp: new Date()
-        }
-      ],
-      legal: [
-        {
-          id: '1',
-          content: "Quelles sont les obligations pour former un comité SST ?",
-          sender: 'user',
-          timestamp: new Date()
-        },
-        {
-          id: '2',
-          content: "LexiNorm peut vous aider ! L'article 78 de la LMRSST exige la formation du comité SST dans les 60 jours suivant sa constitution. Voici les détails...",
-          sender: 'agent',
-          agentName: 'Hugo',
-          timestamp: new Date()
-        }
-      ],
-      alert: [
-        {
-          id: '1',
-          content: "J'ai reçu une alerte sur mon tableau de bord",
-          sender: 'user',
-          timestamp: new Date()
-        },
-        {
-          id: '2',
-          content: "🚨 Sentinelle a détecté: Formation du comité SST expire dans 15 jours ! Voulez-vous que je programme les actions correctives ?",
-          sender: 'agent',
-          agentName: 'Hugo',
-          timestamp: new Date()
-        }
-      ]
-    };
-
-    setMessages(demoMessages[demoType] || []);
+    }, 1000);
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Mode Démo - Agents AgenticSST</h2>
-          <p className="text-muted-foreground">
-            Testez les interactions avec nos agents intelligents sans backend
-          </p>
-        </div>
-        <Badge variant="outline" className="text-xs">
-          Simulation Interactive
-        </Badge>
+      {/* Sélection d'agent */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {demoAgents.map((agent) => {
+          const IconComponent = agent.icon;
+          return (
+            <Card 
+              key={agent.name} 
+              className={`cursor-pointer transition-all hover:shadow-md ${
+                selectedAgent.name === agent.name ? 'ring-2 ring-blue-500' : ''
+              }`}
+              onClick={() => setSelectedAgent(agent)}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-blue-100">
+                    <IconComponent className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div className="flex-1">
+                    <CardTitle className="text-sm">{agent.name}</CardTitle>
+                    <Badge variant="outline" className="text-xs mt-1">
+                      {agent.role}
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="text-xs text-gray-600 mb-3">{agent.description}</p>
+                
+                {/* BOUTON EXÉCUTER AVEC HITL */}
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    executeAgentWithHITL(agent);
+                  }}
+                  disabled={isProcessing}
+                  className="w-full text-xs"
+                  variant={agent.name === selectedAgent.name ? "default" : "outline"}
+                >
+                  {isProcessing && selectedAgent.name === agent.name 
+                    ? "Exécution..." 
+                    : "Exécuter (HITL)"
+                  }
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Sélection d'agent */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Agents Disponibles</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {demoAgents.map((agent) => {
-              const IconComponent = agent.icon;
-              const isSelected = selectedAgent.name === agent.name;
-              
-              return (
-                <Button
-                  key={agent.name}
-                  variant={isSelected ? "default" : "ghost"}
-                  className="w-full justify-start h-auto p-3"
-                  onClick={() => setSelectedAgent(agent)}
-                >
-                  <div className="flex items-center gap-3">
-                    <IconComponent className="h-5 w-5" />
-                    <div className="text-left">
-                      <div className="font-medium text-sm">{agent.name}</div>
-                      <div className="text-xs text-muted-foreground">{agent.role}</div>
-                    </div>
+      {/* Zone de chat */}
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5" />
+                Conversation avec {selectedAgent.name}
+                <Badge variant="secondary">{selectedAgent.role}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-96 mb-4 p-4 border rounded-lg">
+                {messages.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <Bot className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                    <p>Aucune conversation en cours</p>
+                    <p className="text-sm">Envoyez un message ou exécutez un agent pour commencer</p>
                   </div>
-                </Button>
-              );
-            })}
-          </CardContent>
-        </Card>
-
-        {/* Interface de chat */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarFallback>
-                  <selectedAgent.icon className="h-5 w-5" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <CardTitle className="text-lg">{selectedAgent.name}</CardTitle>
-                <p className="text-sm text-muted-foreground">{selectedAgent.description}</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Boutons de démo rapide */}
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => startDemo('diagnostic')}
-              >
-                Démo Diagnostic
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => startDemo('legal')}
-              >
-                Démo Légal
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => startDemo('alert')}
-              >
-                Démo Alerte
-              </Button>
-            </div>
-
-            {/* Zone de chat */}
-            <Card className="bg-muted/10">
-              <ScrollArea className="h-80 p-4">
-                <div className="space-y-4">
-                  {messages.length === 0 && (
-                    <div className="text-center text-muted-foreground py-8">
-                      <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                      <p>Commencez une conversation ou utilisez une démo</p>
-                    </div>
-                  )}
-                  
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex gap-3 ${
-                        message.sender === 'user' ? 'justify-end' : 'justify-start'
-                      }`}
-                    >
-                      {message.sender === 'agent' && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-primary text-primary-foreground">
-                            <Bot className="h-4 w-4" />
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
+                ) : (
+                  <div className="space-y-4">
+                    {messages.map((message) => (
                       <div
-                        className={`max-w-xs px-3 py-2 rounded-lg ${
-                          message.sender === 'user'
-                            ? 'bg-primary text-primary-foreground'
-                            : 'bg-background border'
-                        }`}
+                        key={message.id}
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
-                        {message.sender === 'agent' && message.agentName && (
-                          <div className="text-xs text-muted-foreground mb-1">
-                            {message.agentName}
+                        <div className={`flex items-start gap-2 max-w-[80%] ${
+                          message.sender === 'user' ? 'flex-row-reverse' : 'flex-row'
+                        }`}>
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback>
+                              {message.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className={`rounded-lg p-3 ${
+                            message.sender === 'user' 
+                              ? 'bg-blue-600 text-white' 
+                              : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            {message.agentName && (
+                              <div className="text-xs font-semibold mb-1 opacity-75">
+                                {message.agentName}
+                              </div>
+                            )}
+                            <p className="text-sm">{message.content}</p>
+                            <div className="text-xs opacity-75 mt-1">
+                              {message.timestamp.toLocaleTimeString()}
+                            </div>
                           </div>
-                        )}
-                        <p className="text-sm">{message.content}</p>
-                      </div>
-                      {message.sender === 'user' && (
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-secondary">
-                            <User className="h-4 w-4" />
-                          </AvatarFallback>
-                        </Avatar>
-                      )}
-                    </div>
-                  ))}
-
-                  {isTyping && (
-                    <div className="flex gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          <Bot className="h-4 w-4" />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="bg-background border px-3 py-2 rounded-lg">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.1s]"></div>
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce [animation-delay:0.2s]"></div>
                         </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    ))}
+                  </div>
+                )}
               </ScrollArea>
-            </Card>
 
-            {/* Zone de saisie */}
-            <div className="flex gap-2">
-              <Input
-                placeholder="Tapez votre message..."
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                disabled={isTyping}
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={!inputMessage.trim() || isTyping}
-                size="icon"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Capacités de l'agent */}
-            <div>
-              <h4 className="font-medium mb-2">Capacités de {selectedAgent.name}</h4>
-              <div className="flex flex-wrap gap-1">
-                {selectedAgent.capabilities.map((capability, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {capability}
-                  </Badge>
-                ))}
+              <div className="flex gap-2">
+                <Input
+                  value={currentMessage}
+                  onChange={(e) => setCurrentMessage(e.target.value)}
+                  placeholder={`Posez votre question à ${selectedAgent.name}...`}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                />
+                <Button onClick={sendMessage} disabled={!currentMessage.trim()}>
+                  <Send className="h-4 w-4" />
+                </Button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Informations agent */}
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <selectedAgent.icon className="h-5 w-5" />
+                {selectedAgent.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-sm mb-2">Rôle</h4>
+                <p className="text-sm text-gray-600">{selectedAgent.description}</p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-sm mb-2">Capacités</h4>
+                <div className="space-y-1">
+                  {selectedAgent.capabilities.map((capability, idx) => (
+                    <Badge key={idx} variant="outline" className="text-xs mr-1 mb-1">
+                      {capability}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold text-sm mb-2 text-blue-800">Validation HITL</h4>
+                <p className="text-xs text-blue-700">
+                  Chaque exécution nécessite une validation humaine avec audit centralisé 
+                  selon votre architecture Zero-Trust.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

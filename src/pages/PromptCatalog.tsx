@@ -100,12 +100,34 @@ const PromptCatalog = () => {
   const currentPrompts = filteredPrompts.slice(startIndex, startIndex + itemsPerPage);
 
   // Fonction de lancement de workflow
-  const handleLaunchWorkflow = (prompt: OrchestrationPrompt) => {
+const handleLaunchWorkflow = (prompt: OrchestrationPrompt) => {
+  const hitlMessage = 
+    `VALIDATION HITL REQUISE\n\n` +
+    `Workflow: ${prompt.title}\n` +
+    `Agents: ${prompt.agents.join(" → ")}\n` +
+    `Priorité: ${prompt.priority}\n` +
+    `Article LMRSST: ${prompt.article_lmrsst}\n` +
+    `Catégorie: ${prompt.category}\n\n` +
+    `Livrables attendus:\n${prompt.expected_deliverables.map(d => `• ${d}`).join('\n')}\n\n` +
+    `Cette orchestration multi-agents va créer des obligations légales selon la LMRSST.\n\n` +
+    `Approuvez-vous le lancement de ce workflow ?`;
+
+  const userConfirm = window.confirm(hitlMessage);
+
+  if (!userConfirm) {
     toast({
-      title: "Workflow lancé !",
-      description: `Orchestration "${prompt.title}" démarrée avec ${prompt.agents.join(", ")}`,
+      title: "Workflow annulé",
+      description: `Orchestration "${prompt.title}" rejetée par l'utilisateur`,
+      variant: "destructive"
     });
-  };
+    return;
+  }
+
+  toast({
+    title: "Validation HITL réussie",
+    description: `Orchestration "${prompt.title}" approuvée et démarrée`,
+  });
+};
 
   // Fonctions utilitaires pour les badges
   const getPriorityColor = (priority: string) => {

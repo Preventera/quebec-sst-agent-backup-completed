@@ -173,7 +173,29 @@ const AgileFunctionsHub = () => {
   const filteredFunctions = filterAgileFunctions(searchTerm, selectedCategory === 'all' ? '' : selectedCategory, selectedPriority === 'all' ? '' : selectedPriority);
 
   const handleExecuteFunction = async (func: AgileFunction) => {
-    // Marquer la fonction comme en cours d'exécution
+  // VALIDATION HITL AVANT EXÉCUTION
+  const hitlApproved = window.confirm(`🛡️ VALIDATION HITL REQUISE
+
+Agent: ${func.agent_owner || 'Agent SST'}
+Action: ${func.fonction}
+Priorité: ${func.priorite}
+
+📋 Focus: ${func.focus}
+⚖️ Réglementation: ${func.liens_reglementaires}
+⏱️ Durée estimée: ${func.estimated_time || '5 min'}
+
+⚠️ Cette action nécessite une validation humaine selon votre architecture Zero-Trust.
+
+Autoriser l'exécution ?`);
+
+  if (!hitlApproved) {
+    toast.error(`Exécution de "${func.fonction}" annulée par validation HITL`);
+    return;
+  }
+
+  toast.success(`Validation HITL approuvée - Démarrage de "${func.fonction}"`);
+
+  // Marquer la fonction comme en cours d'exécution  // Marquer la fonction comme en cours d'exécution
     setExecutingFunctions(prev => new Set([...prev, func.id]));
     
     try {
