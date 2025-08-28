@@ -12,11 +12,9 @@ import { toast } from '@/components/ui/use-toast';
 import {
   Users, Bot, Settings, FileText, Target, Layers, Sparkles,
   Search, Filter, Download, Upload, RefreshCw, Save, TrendingUp,
-  Zap, AlertTriangle, CheckCircle, Clock, User, Edit3, Eye, Plus, X, Loader2
+  Zap, AlertTriangle, CheckCircle, Clock, User, Edit3, Eye, Plus, X
 } from 'lucide-react';
 import orchestrationPrompts from '@/data/orchestrationPrompts.json';
-import { DataForgeEngine } from '@/lib/dataForgeEngine';
-import type { ComplianceAnalysisResult, DocumentMetadata, DataForgeAnalysisState } from '@/types/index';
 
 // Codes SCIAN étendus
 const SCIAN_CODES = [
@@ -189,6 +187,165 @@ const EnhancedScenarioViewer = ({
     return matchesPriority && matchesLegislation;
   });
 
+  const ScenarioDetailDialog = ({ scenario, isEditing = false }) => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button 
+          variant={isEditing ? "outline" : "default"} 
+          size="sm"
+          onClick={() => isEditing ? setEditingScenario({...scenario}) : setSelectedScenario(scenario)}
+        >
+          {isEditing ? <Edit3 className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+          {isEditing ? 'Éditer' : 'Détails'}
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-yellow-500" />
+            {isEditing ? 'Édition du scénario' : 'Détails du scénario'} - {scenario?.title}
+          </DialogTitle>
+        </DialogHeader>
+        
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium">Titre</label>
+              {isEditing ? (
+                <Input 
+                  value={editingScenario?.title || ''}
+                  onChange={(e) => setEditingScenario({...editingScenario, title: e.target.value})}
+                />
+              ) : (
+                <p className="text-sm bg-gray-50 p-2 rounded">{scenario?.title}</p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium">Secteur SCIAN</label>
+              <p className="text-sm bg-gray-50 p-2 rounded">{scenario?.secteur_scian}</p>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Description</label>
+            {isEditing ? (
+              <Textarea 
+                value={editingScenario?.description || ''}
+                onChange={(e) => setEditingScenario({...editingScenario, description: e.target.value})}
+                rows={3}
+              />
+            ) : (
+              <p className="text-sm bg-gray-50 p-3 rounded">{scenario?.description}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Prompt d'orchestration</label>
+            {isEditing ? (
+              <Textarea 
+                value={editingScenario?.orchestration_prompt || `Orchestrer ${scenario?.agents?.join(' et ')} pour un scénario de ${scenario?.risque_principal} dans le secteur ${scenario?.secteur_scian} selon ${scenario?.legislation_context}.`}
+                onChange={(e) => setEditingScenario({...editingScenario, orchestration_prompt: e.target.value})}
+                rows={4}
+                className="font-mono text-sm"
+              />
+            ) : (
+              <div className="bg-blue-50 p-4 rounded-md">
+                <p className="text-sm font-mono">
+                  {scenario?.orchestration_prompt || `Orchestrer ${scenario?.agents?.join(' et ')} pour un scénario de ${scenario?.risque_principal} dans le secteur ${scenario?.secteur_scian} selon ${scenario?.legislation_context}.`}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium">Agents impliqués</label>
+              <div className="flex gap-1 mt-1">
+                {scenario?.agents?.map(agent => (
+                  <Badge key={agent} variant="secondary">{agent}</Badge>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Priorité</label>
+              {isEditing ? (
+                <Select 
+                  value={editingScenario?.priority || scenario?.priority}
+                  onValueChange={(value) => setEditingScenario({...editingScenario, priority: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Faible</SelectItem>
+                    <SelectItem value="medium">Moyenne</SelectItem>
+                    <SelectItem value="high">Élevée</SelectItem>
+                    <SelectItem value="critical">Critique</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Badge variant={scenario?.priority === 'critical' ? 'destructive' : 'default'}>
+                  {scenario?.priority}
+                </Badge>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium">Législation</label>
+              <Badge variant="outline">{scenario?.legislation_context}</Badge>
+            </div>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Livrables attendus</label>
+            <div className="bg-green-50 p-3 rounded-md">
+              <ul className="text-sm space-y-1">
+                {(scenario?.expected_deliverables || [
+                  "Rapport d'inspection détaillé",
+                  "Plan d'action correctif", 
+                  "Formation personnalisée",
+                  "Suivi de conformité"
+                ]).map((deliverable, idx) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    {deliverable}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-4 border-t">
+            {isEditing ? (
+              <>
+                <Button onClick={() => {
+                  onEditScenario(scenario, editingScenario);
+                  setEditingScenario(null);
+                }} className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder les modifications
+                </Button>
+                <Button variant="outline" onClick={() => setEditingScenario(null)}>
+                  Annuler
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={() => onSaveScenario(scenario)} className="flex-1">
+                  <Save className="h-4 w-4 mr-2" />
+                  Sauvegarder le scénario
+                </Button>
+                <Button variant="outline" onClick={() => onAddToDatabase(scenario)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter à la base
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+
   if (generatedScenarios.length === 0) {
     return (
       <div className="text-center py-12 text-gray-500">
@@ -302,6 +459,19 @@ const EnhancedScenarioViewer = ({
                   ))}
                 </div>
               </div>
+
+              <div className="flex gap-2 pt-2">
+                <ScenarioDetailDialog scenario={scenario} />
+                <ScenarioDetailDialog scenario={scenario} isEditing={true} />
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onAddToDatabase(scenario)}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Ajouter
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -309,6 +479,7 @@ const EnhancedScenarioViewer = ({
     </div>
   );
 };
+
 // Composant principal
 const PromptManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -332,24 +503,6 @@ const PromptManagement = () => {
   const [scianSearchTerm, setScianSearchTerm] = useState('');
   const [filteredCodes, setFilteredCodes] = useState(SCIAN_CODES);
 
-  // États DocuAnalyzer
-  const [documentContent, setDocumentContent] = useState("");
-  const [documentType, setDocumentType] = useState("");
-  const [analysisSector, setAnalysisSector] = useState("");
-  const [analysisLoading, setAnalysisLoading] = useState(false);
-  const [analysisResults, setAnalysisResults] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
-
-  // États DataForge
-  const [dataForgeAnalysis, setDataForgeAnalysis] = useState({
-    isLoading: false,
-    result: null,
-    error: null,
-    analysisStartTime: null,
-    processingStep: 'Prêt'
-  });
-  const [useDataForge, setUseDataForge] = useState(false);
-
   const agents = ["Hugo", "DiagSST", "LexiNorm", "Prioris", "Sentinelle", "DocuGen", "CoSS", "ALSS"];
   const categories = ["Inspection", "Formation", "Documentation", "Conformité", "Analyse", "Multi-établissements", "Politiques internes", "Évaluation postes"];
   const priorities = ["critical", "high", "medium", "low"];
@@ -370,80 +523,6 @@ const PromptManagement = () => {
     'montreal', 'quebec', 'saguenay', 'sherbrooke', 'trois-rivieres',
     'gatineau', 'chicoutimi', 'abitibi', 'bas-saint-laurent', 'gaspesie'
   ];
-
-  // === FONCTIONS DOCUANALYZER ===
-  const handleFileUpload = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setUploadedFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setDocumentContent(e.target.result as string);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const handleAnalyzeDocument = () => {
-    setAnalysisLoading(true);
-    setTimeout(() => {
-      setAnalysisResults({
-        conformity_score: 67,
-        document_type: documentType || "Document SST",
-        detected_sector: analysisSector || "Détection automatique", 
-        applicable_laws: ["LMRSST"],
-        criticality: "MEDIUM",
-        non_conformities: [{
-          article: "LMRSST Art.51",
-          severity: "ÉLEVÉE",
-          description: "Analyse basique - utilisez DataForge",
-          recommendation: "Activer DataForge pour analyse complète"
-        }],
-        dataforge_analysis: false
-      });
-      setAnalysisLoading(false);
-    }, 2000);
-  };
-
-  const handleAnalyzeDocumentWithDataForge = async () => {
-    if (!documentContent.trim()) {
-      alert("Veuillez saisir du contenu à analyser");
-      return;
-    }
-
-    setDataForgeAnalysis({
-      isLoading: true,
-      result: null,
-      error: null,
-      analysisStartTime: new Date(),
-      processingStep: 'Initialisation DataForge...'
-    });
-
-    setTimeout(() => {
-      setDataForgeAnalysis({
-        isLoading: false,
-        result: null,
-        error: null,
-        analysisStartTime: null,
-        processingStep: 'Terminé'
-      });
-      
-      setAnalysisResults({
-        conformity_score: 85,
-        document_type: documentType || 'Auto-détecté',
-        detected_sector: analysisSector || 'Multiple',
-        applicable_laws: ["LMRSST", "RSST"],
-        criticality: "HIGH",
-        non_conformities: [{
-          article: "LMRSST Art.51",
-          severity: "ÉLEVÉE", 
-          description: "Analyse DataForge complète",
-          recommendation: "Révision recommandée"
-        }],
-        dataforge_analysis: true
-      });
-    }, 3000);
-  };
 
   const handleSearchSCIAN = (term: string) => {
     setScianSearchTerm(term);
@@ -597,7 +676,7 @@ const PromptManagement = () => {
         {lastValidationSummary && <ValidationSummaryCard summary={lastValidationSummary} />}
 
         <Tabs defaultValue="orchestration" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-6">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
             <TabsTrigger value="orchestration" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Orchestration LMRSST
@@ -610,12 +689,9 @@ const PromptManagement = () => {
               <Zap className="h-4 w-4" />
               Générateur Multi-Législations
             </TabsTrigger>
-            <TabsTrigger value="docuanalyzer" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              DocuAnalyzer
-            </TabsTrigger>
           </TabsList>
-         <TabsContent value="orchestration" className="space-y-6">
+
+          <TabsContent value="orchestration" className="space-y-6">
             <Card>
               <CardContent className="pt-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -1022,233 +1098,10 @@ const PromptManagement = () => {
               </CardContent>
             </Card>
           </TabsContent>
-
-          <TabsContent value="docuanalyzer" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-6 w-6 text-blue-600" />
-                  Module DocuAnalyzer - Intelligence Documentaire SST + DataForge
-                </CardTitle>
-                <p className="text-sm text-gray-600">
-                  Analysez vos documents SST avec DataForge : corpus légal complet de 57 règlements québécois
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                
-                <div className="space-y-4">
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    <div className="space-y-2">
-                      <Upload className="h-8 w-8 text-gray-400 mx-auto" />
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          Téléversez votre document SST
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PDF, DOCX, TXT • Politique, procédure, manuel
-                        </p>
-                      </div>
-                      <input
-                        type="file"
-                        accept=".pdf,.docx,.txt"
-                        onChange={handleFileUpload}
-                        className="hidden"
-                        id="document-upload"
-                      />
-                      <Button 
-                        onClick={() => document.getElementById('document-upload')?.click()}
-                        variant="outline"
-                        className="mt-2"
-                      >
-                        <Upload className="h-4 w-4 mr-2" />
-                        Sélectionner fichier
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-gray-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="bg-white px-3 text-gray-500">ou saisie manuelle</span>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
-                      Contenu du document SST
-                    </label>
-                    <textarea
-                      placeholder="Exemple: 'POLITIQUE DE SANTÉ ET SÉCURITÉ - Notre entreprise s'engage...'"
-                      value={documentContent}
-                      onChange={(e) => setDocumentContent(e.target.value)}
-                      className="w-full h-32 p-3 border border-gray-300 rounded-lg text-sm resize-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Type de document
-                    </label>
-                    <Select value={documentType} onValueChange={setDocumentType}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="politique">Politique SST</SelectItem>
-                        <SelectItem value="procedure">Procédure</SelectItem>
-                        <SelectItem value="manuel">Manuel sécurité</SelectItem>
-                        <SelectItem value="rapport_inspection">Rapport inspection</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Secteur SCIAN
-                    </label>
-                    <Select value={analysisSector} onValueChange={setAnalysisSector}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Auto-détection" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="2361">2361 - Construction</SelectItem>
-                        <SelectItem value="3111">3111 - Alimentaire</SelectItem>
-                        <SelectItem value="auto">Auto-détection</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Moteur d'analyse
-                    </label>
-                    <div className="space-y-2">
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="engine"
-                          checked={!useDataForge}
-                          onChange={() => setUseDataForge(false)}
-                          className="text-blue-600"
-                        />
-                        <span className="text-sm">Standard</span>
-                      </label>
-                      <label className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="engine"
-                          checked={useDataForge}
-                          onChange={() => setUseDataForge(true)}
-                          className="text-blue-600"
-                        />
-                        <span className="text-sm font-medium text-purple-600">DataForge</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-center">
-                  {useDataForge ? (
-                    <Button 
-                      onClick={handleAnalyzeDocumentWithDataForge}
-                      disabled={dataForgeAnalysis.isLoading || (!uploadedFile && !documentContent)}
-                      className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                      size="lg"
-                    >
-                      {dataForgeAnalysis.isLoading ? (
-                        <div className="flex items-center">
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          <span>{dataForgeAnalysis.processingStep}</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Zap className="h-5 w-5 mr-2" />
-                          Analyser avec DataForge
-                        </>
-                      )}
-                    </Button>
-                  ) : (
-                    <Button 
-                      onClick={handleAnalyzeDocument}
-                      disabled={analysisLoading || (!uploadedFile && !documentContent)}
-                      className="px-8 py-3 bg-blue-600 hover:bg-blue-700"
-                      size="lg"
-                    >
-                      {analysisLoading ? (
-                        <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          Analyse standard...
-                        </>
-                      ) : (
-                        <>
-                          <Search className="h-5 w-5 mr-2" />
-                          Analyser (Standard)
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
-
-                {analysisResults && (
-                  <div className="space-y-6">
-                    <Card className="border-l-4 border-l-blue-500">
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-lg">Score de Conformité</CardTitle>
-                          <Badge variant={analysisResults.conformity_score >= 80 ? "default" : "destructive"} className="text-lg px-3 py-1">
-                            {analysisResults.conformity_score}/100
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <div>
-                            <span className="font-medium">Type:</span>
-                            <p className="text-gray-600">{analysisResults.document_type}</p>
-                          </div>
-                          <div>
-                            <span className="font-medium">Secteur:</span>
-                            <p className="text-gray-600">{analysisResults.detected_sector}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {analysisResults.non_conformities?.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <AlertTriangle className="h-5 w-5 text-red-500" />
-                            Non-conformités ({analysisResults.non_conformities.length})
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          {analysisResults.non_conformities.map((nc, index) => (
-                            <div key={index} className="border-l-4 border-l-red-400 bg-red-50 p-3 rounded mb-3">
-                              <h4 className="font-medium text-red-800">{nc.article}</h4>
-                              <p className="text-sm text-red-700">{nc.description}</p>
-                              <p className="text-xs text-red-600 mt-1">
-                                <strong>Recommandation:</strong> {nc.recommendation}
-                              </p>
-                            </div>
-                          ))}
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
         </Tabs>
       </div>
     </div>
   );
 };
 
-export default PromptManagement; 
+export default PromptManagement;

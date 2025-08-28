@@ -80,7 +80,13 @@ const App = () => {
                     <Route path="/prompts/catalog" element={<PromptCatalog />} />
                     <Route path="/prompts/admin" element={<PromptAdmin />} />
                     
-                    {/* Analytics et Users */}
+                    {/* Routes Admin - NOUVELLES ROUTES AJOUTÉES */}
+                    <Route path="/admin" element={<Navigate to="/admin/prompts" replace />} />
+                    <Route path="/admin/prompts" element={<PromptManagement />} />
+                    <Route path="/admin/users" element={<UserManagement />} />
+                    <Route path="/admin/analytics" element={<Analytics />} />
+                    
+                    {/* Analytics et Users - routes existantes maintenues */}
                     <Route path="/analytics" element={<Analytics />} />
                     <Route path="/users" element={<UserManagement />} />
                     
@@ -91,6 +97,8 @@ const App = () => {
                     
                     {/* Fonctions Agiles */}
                     <Route path="/agile-functions" element={<AgileFunctionsHub />} />
+                    <Route path="/agents" element={<AgileFunctionsHub />} />
+                    <Route path="/learning" element={<AgileFunctionsHub />} />
                     
                     {/* Base de connaissances */}
                     <Route path="/sst-knowledge" element={<SSTKnowledgeBase />} />
