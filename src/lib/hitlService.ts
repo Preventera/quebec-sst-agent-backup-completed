@@ -16,8 +16,8 @@ interface HITLDecision {
 }
 
 class HITLAuditService {
-  private readonly supabaseUrl = 'https://lljuzduaryqbzrenkfoo.supabase.co';
-  private readonly supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxsanV6ZHVhcnlxYnpyZW5rZm9vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjE4NDAyMywiZXhwIjoyMDY3NzYwMDIzfQ.CmOIkEhuk-BC9ASXZyeVAFEwUJRDUEzEz2lbjJ04Tk8';
+  private readonly supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  private readonly supabaseKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 
   async logHITLDecision(decision: HITLDecision): Promise<void> {
     try {
