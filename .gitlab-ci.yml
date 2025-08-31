@@ -1,16 +1,16 @@
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 stages:
   - test
   - build
   - deploy
-
 variables:
   NODE_VERSION: "18"
-
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
-
 test:lint:
   stage: test
   image: node:18-alpine
@@ -21,7 +21,6 @@ test:lint:
     - npm run lint || echo "Lint ignoré"
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
 test:build:
   stage: test
   image: node:18-alpine
@@ -36,7 +35,6 @@ test:build:
     expire_in: 1 hour
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
 build:docker:
   stage: build
   image: docker:24.0.5
@@ -47,7 +45,6 @@ build:docker:
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
-
 pages:
   stage: deploy
   image: node:18-alpine
