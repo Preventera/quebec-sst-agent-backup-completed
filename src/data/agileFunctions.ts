@@ -88,7 +88,8 @@ export const agileFunctions: AgileFunction[] = [
     kpi: "Temps de réaction < 30 min",
     exemple_usage: "Alertes push pour non-conformités critiques",
     agent_owner: "MonitoringAgent",
-    estimated_time: "Temps réel"
+    estimated_time: "Temps réel",
+    template_id: "notifications_temps_reel_v1"
   },
   {
     id: 7,

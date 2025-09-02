@@ -322,62 +322,8 @@ export const DOCUMENT_TEMPLATES: DocumentTemplate[] = [
       estimatedGenerationTime: 15,
       outputFormats: ['markdown', 'pdf']
     }
-  },
-{
-  id: 'notifications_temps_reel_v1',
-  name: 'Notifications temps réel non-conformités',
-  version: '1.0',
-  legislation: ['CNESST', 'LMRSST'],
-  subject: 'alertes-temps-reel',
-  targetSectors: ['tous'],
-  companySize: 'all',
-  priority: 'critical',
-  agent: 'MonitoringAgent',
-  templatePath: '/templates/notifications_nc.md.j2',
-  placeholders: [
-    {
-      id: 'alert_type',
-      name: 'Type d\'alerte',
-      type: 'enum',
-      required: true,
-      source: 'user_input',
-      values: ['critique', 'majeure', 'mineure']
-    }
-  ],
-  generationRules: [],
-  qualityChecks: [],
-  metadata: {
-    author: 'MonitoringAgent',
-    createdDate: '2025-09-01',
-    version: '1.0',
-    tags: ['notification', 'temps-reel'],
-    estimatedGenerationTime: 30,
-    outputFormats: ['json', 'notification']
   }
-  ,
-},
-{
-  id: 'diagnostic_lmrsst_v1',
-  name: 'Diagnostic conformité LMRSST complet',
-  version: '1.0',
-  legislation: ['LMRSST'],
-  subject: 'diagnostic-conformite',
-  targetSectors: ['tous'],
-  companySize: 'all',
-  priority: 'mandatory',
-  agent: 'DiagSST',
-  templatePath: '/templates/diagnostic_lmrsst.md.j2',
-  placeholders: [],
-  generationRules: [],
-  qualityChecks: [],
-  metadata: {
-    author: 'DiagSST',
-    estimatedGenerationTime: 180,
-    outputFormats: ['markdown', 'pdf', 'docx']
-  }
-} 
 ];
-
 
 // === MOTEUR DE GÉNÉRATION === //
 
@@ -561,19 +507,6 @@ export class DocuGenEngine {
       templateData[placeholder.id] = this.getPlaceholderValue(placeholder, request, legalContext);
     }
 
-    // Ajout manuel des données pour les notifications temps réel
-    if (template.id === 'notifications_temps_reel_v1') {
-      templateData.company_name = request.additionalData?.company_name || request.companyProfile?.name;
-      templateData.detection_timestamp = request.additionalData?.detection_timestamp;
-      templateData.responsible_agent = request.additionalData?.responsible_agent;
-      templateData.priority_level = request.additionalData?.priority_level;
-      templateData.incident_details = request.additionalData?.incident_details;
-      templateData.notification_channels = request.additionalData?.notification_channels;
-      templateData.generated_at = request.additionalData?.generated_at;
-    }
-
-    // Apply generation rules
-
     // Apply generation rules
     const processedData = this.applyGenerationRules(template.generationRules, templateData, request);
 
@@ -652,10 +585,7 @@ export class DocuGenEngine {
   private getPlaceholderValue(placeholder: any, request: DocumentGenerationRequest, legalContext?: any): any {
     switch (placeholder.source) {
       case 'user_input':
-        console.log('Cherche placeholder:', placeholder.id, 'avec source:', placeholder.source);
-        const result = this.extractFromProfile(placeholder.id, request.companyProfile, request.additionalData);
-        console.log('Résultat pour', placeholder.id, ':', result);
-        return result;
+        return this.extractFromProfile(placeholder.id, request.companyProfile, request.additionalData);
       case 'diagnostic_agent':
         return request.diagnosticData || [];
       case 'safety_graph':
@@ -675,13 +605,7 @@ export class DocuGenEngine {
       'alss_name': 'alss_name',
       'alss_position': 'alss_position',
       'responsible_person': 'responsible_person',
-      'committee_members': 'committee_members',
-      'detection_timestamp': 'detection_timestamp',
-      'responsible_agent': 'responsible_agent', 
-      'priority_level': 'priority_level',
-      'incident_details': 'incident_details',
-      'notification_channels': 'notification_channels',
-      'generated_at': 'generated_at'
+      'committee_members': 'committee_members'
     };
 
     const profileKey = mapping[placeholderId];
@@ -808,45 +732,7 @@ Conforme à l'article 123 de la LMRSST.
 **Agent désigné:** {{alss_name}}
 **Poste:** {{alss_position}}
 
-Conforme à l'article 101 de la LMRSST.`,
-'alertes-temps-reel': `# SYSTÈME DE NOTIFICATION TEMPS RÉEL
-## Non-conformités {{alert_type}}
-
-**Entreprise:** {{company_name}}
-**Date:** {{detection_timestamp}}
-**Agent responsable:** {{responsible_agent}}
-
-## DÉTAILS DE L'ALERTE
-**Type:** {{alert_type}}
-**Priorité:** {{priority_level}}
-**Incident:** {{incident_details}}
-
-## CANAUX ACTIVÉS
-{{notification_channels}}
-
-**Généré le:** {{generated_at}}
-*Système AgenticSST Québec*`
-,
-'diagnostic-conformite': `# DIAGNOSTIC DE CONFORMITÉ LMRSST
-**Entreprise:** {{company_name}}
-**Nombre d'employés:** {{company_size}}
-**Code SCIAN:** {{scian_code}}
-**Date du diagnostic:** {{generated_date}}
-
-## SCORE DE CONFORMITÉ GLOBAL
-**Score:** {{compliance_score}}/100
-
-## NON-CONFORMITÉS IDENTIFIÉES
-{{non_conformities}}
-
-## ACTIONS PRIORITAIRES
-{{priority_actions}}
-
-## EXIGENCES LÉGALES APPLICABLES
-{{legal_requirements}}
-
-**Rapport généré par:** DiagSST
-*Conforme aux articles 51 et 90 de la LMRSST*`
+Conforme à l'article 101 de la LMRSST.`
     };
 
     return templates[subject] || '# Document SST\n\n{{company_name}}';

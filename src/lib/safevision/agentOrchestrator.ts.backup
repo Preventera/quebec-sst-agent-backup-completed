@@ -1,0 +1,450 @@
+// src/lib/safevision/agentOrchestrator.ts
+// Pipeline d'orchestration agents pour génération de contenu SafeVision
+// Intégration avec votre architecture multi-agents existante
+
+import { llmClient } from '@/lib/llmClient';
+import orchestrationPrompts from '@/data/orchestrationPrompts.json';
+import safevisionData from '@/data/safevision-data.json';
+
+interface SafeVisionAgentCapabilities {
+  Hugo: 'Orchestrateur central SafeVision - Coordonne la génération de scripts vidéo selon scénarios LMRSST';
+  DiagSST: 'Analyseur conformité pour SafeVision - Identifie points critiques pour formation vidéo';
+  LexiNorm: 'Spécialiste réglementaire SafeVision - Valide références légales pour contenu vidéo';
+  ALSS: 'Concepteur pédagogique SafeVision - Adapte contenu formation selon audience cible';
+  Prioris: 'Stratège contenu SafeVision - Priorise messages clés selon impact formation';
+  DocuGen: 'Générateur scripts SafeVision - Produit scripts structurés pour production vidéo';
+  Sentinelle: 'Analyste risques SafeVision - Détecte sujets urgents nécessitant formation immédiate';
+  CoSS: 'Consultant engagement SafeVision - Optimise acceptabilité sociale du contenu';
+}
+
+type SafeVisionAgentType = keyof SafeVisionAgentCapabilities;
+
+interface SafeVisionContext {
+  scenarioId: number;
+  videoSpecs: {
+    duration: string;
+    format: 'micro-learning' | 'formation-complete' | 'alerte' | 'procédural';
+    audience: 'ouvriers' | 'superviseurs' | 'gestionnaires' | 'comite-sst';
+    sector: string;
+    urgency: 'normal' | 'urgent' | 'critique';
+  };
+  customization: {
+    companyProfile?: {
+      name: string;
+      size: number;
+      scian: string;
+      riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    };
+    specificRequirements?: string[];
+  };
+}
+
+interface AgentContribution {
+  agentName: SafeVisionAgentType;
+  phase: 'analysis' | 'content' | 'validation' | 'optimization';
+  contribution: string;
+  confidence: number;
+  safevisionElements: {
+    scriptSegments?: string[];
+    visualElements?: string[];
+    interactionPoints?: string[];
+    complianceReferences?: string[];
+  };
+  handoffTo?: SafeVisionAgentType;
+  estimatedDuration: string;
+}
+
+// Prompts système SafeVision pour chaque agent
+const SAFEVISION_AGENT_PROMPTS: Record<SafeVisionAgentType, string> = {
+  Hugo: `Tu es Hugo, orchestrateur SafeVision d'AgenticSST Québec.
+Tu coordonnes la génération de contenu vidéo de formation SST.
+Tu analyses le scénario LMRSST et diriges l'orchestration multi-agents pour créer des scripts vidéo impactants.
+Priorise l'efficacité pédagogique et l'engagement des apprenants.
+Format de sortie : Instructions claires pour autres agents + structure générale du script.`,
+
+  DiagSST: `Tu es DiagSST, analyste conformité SafeVision.
+Tu identifies les points critiques de conformité LMRSST qui doivent absolument apparaître dans la vidéo.
+Tu évalues les risques de non-conformité et détermines les éléments obligatoires selon la réglementation.
+Format de sortie : Liste prioritaire des éléments de conformité + niveau de criticité + références légales.`,
+
+  LexiNorm: `Tu es LexiNorm, validateur réglementaire SafeVision.
+Tu vérifies l'exactitude des références légales et assures la conformité du contenu vidéo.
+Tu fournis les citations précises LMRSST/CNESST et adaptes le langage réglementaire pour la vidéo.
+Format de sortie : Références validées + formulations simplifiées + alertes de non-conformité.`,
+
+  ALSS: `Tu es ALSS, concepteur pédagogique SafeVision.
+Tu adaptes le contenu technique en format vidéo engageant selon l'audience cible.
+Tu conçois la progression pédagogique et les éléments d'interactivité.
+Format de sortie : Structure pédagogique + techniques d'engagement + séquençage optimal.`,
+
+  Prioris: `Tu es Prioris, stratège contenu SafeVision.
+Tu priorises les messages selon leur impact sur la sécurité et l'efficacité de la formation.
+Tu optimises le temps vidéo en hiérarchisant les informations critiques vs complémentaires.
+Format de sortie : Hiérarchie des messages + allocation temps + indicateurs d'impact.`,
+
+  DocuGen: `Tu es DocuGen, générateur de scripts SafeVision.
+Tu transformes les analyses des autres agents en script vidéo structuré et production-ready.
+Tu intègres les éléments visuels, audio et interactifs dans un format Synthesia-compatible.
+Format de sortie : Script détaillé + indications techniques + éléments visuels.`,
+
+  Sentinelle: `Tu es Sentinelle, analyste risques SafeVision.
+Tu identifies les risques immédiats nécessitant une formation urgente via vidéo.
+Tu détectes les tendances d'accidents et adaptes le contenu pour prévenir les incidents.
+Format de sortie : Alertes prioritaires + statistiques pertinentes + messages préventifs.`,
+
+  CoSS: `Tu es CoSS, consultant engagement SafeVision.
+Tu optimises l'acceptabilité du contenu par les travailleurs et les comités SST.
+Tu adaptes le ton et l'approche pour maximiser l'adhésion à la formation.
+Format de sortie : Recommandations d'engagement + adaptation culturelle + stratégies d'acceptation.`
+};
+
+export class SafeVisionAgentOrchestrator {
+  private llmClient: any;
+  
+  constructor() {
+    this.llmClient = llmClient;
+  }
+
+  /**
+   * Orchestration principale pour génération contenu SafeVision
+   */
+  async orchestrateSafeVisionContent(context: SafeVisionContext): Promise<{
+    scriptGenerated: string;
+    agentContributions: AgentContribution[];
+    safevisionMetadata: any;
+    productionReady: boolean;
+  }> {
+    console.log(`🎬 Démarrage orchestration SafeVision - Scénario ${context.scenarioId}`);
+    
+    // 1. Récupération données scénario depuis safevision-data.json
+    const scenarioData = this.getScenarioData(context.scenarioId);
+    if (!scenarioData) {
+      throw new Error(`Scénario ${context.scenarioId} non trouvé dans safevision-data.json`);
+    }
+
+    // 2. Phase d'analyse - Agents d'analyse
+    const analysisAgents: SafeVisionAgentType[] = ['Hugo', 'DiagSST', 'Sentinelle'];
+    const analysisContributions = await this.runAgentPhase(
+      analysisAgents,
+      'analysis',
+      scenarioData,
+      context
+    );
+
+    // 3. Phase de contenu - Agents de création
+    const contentAgents: SafeVisionAgentType[] = ['LexiNorm', 'ALSS', 'Prioris'];
+    const contentContributions = await this.runAgentPhase(
+      contentAgents,
+      'content',
+      scenarioData,
+      context,
+      analysisContributions
+    );
+
+    // 4. Phase de génération - Agent DocuGen
+    const generationContributions = await this.runAgentPhase(
+      ['DocuGen'],
+      'generation',
+      scenarioData,
+      context,
+      [...analysisContributions, ...contentContributions]
+    );
+
+    // 5. Phase de validation - Agent CoSS
+    const validationContributions = await this.runAgentPhase(
+      ['CoSS'],
+      'validation',
+      scenarioData,
+      context,
+      [...analysisContributions, ...contentContributions, ...generationContributions]
+    );
+
+    const allContributions = [
+      ...analysisContributions,
+      ...contentContributions, 
+      ...generationContributions,
+      ...validationContributions
+    ];
+
+    // 6. Assemblage final du script
+    const finalScript = this.assembleScript(allContributions, scenarioData, context);
+    
+    // 7. Métadonnées SafeVision
+    const metadata = this.generateSafeVisionMetadata(allContributions, scenarioData, context);
+
+    console.log(`✅ Orchestration SafeVision complétée - ${allContributions.length} contributions`);
+
+    return {
+      scriptGenerated: finalScript,
+      agentContributions: allContributions,
+      safevisionMetadata: metadata,
+      productionReady: this.validateProductionReadiness(finalScript, metadata)
+    };
+  }
+
+  /**
+   * Exécution d'une phase d'agents
+   */
+  private async runAgentPhase(
+    agents: SafeVisionAgentType[],
+    phase: string,
+    scenarioData: any,
+    context: SafeVisionContext,
+    previousContributions: AgentContribution[] = []
+  ): Promise<AgentContribution[]> {
+    
+    const contributions: AgentContribution[] = [];
+    
+    for (const agentName of agents) {
+      try {
+        console.log(`🤖 Exécution ${agentName} - Phase ${phase}`);
+        
+        const contribution = await this.runSingleAgent(
+          agentName,
+          scenarioData,
+          context,
+          previousContributions,
+          phase
+        );
+        
+        contributions.push(contribution);
+        
+        // Délai entre agents pour éviter la surcharge
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error(`❌ Erreur agent ${agentName}:`, error);
+        
+        // Contribution fallback
+        contributions.push({
+          agentName,
+          phase: phase as any,
+          contribution: `Erreur lors de l'exécution de ${agentName}: ${error.message}`,
+          confidence: 0,
+          safevisionElements: {},
+          estimatedDuration: '0s'
+        });
+      }
+    }
+    
+    return contributions;
+  }
+
+  /**
+   * Exécution d'un agent individual
+   */
+  private async runSingleAgent(
+    agentName: SafeVisionAgentType,
+    scenarioData: any,
+    context: SafeVisionContext,
+    previousContributions: AgentContribution[],
+    phase: string
+  ): Promise<AgentContribution> {
+    
+    // Construction du prompt contextualisé
+    const prompt = this.buildAgentPrompt(agentName, scenarioData, context, previousContributions, phase);
+    
+    // Appel LLM avec prompt système spécialisé
+    const response = await this.llmClient.generateCompletion({
+      systemPrompt: SAFEVISION_AGENT_PROMPTS[agentName],
+      userPrompt: prompt,
+      maxTokens: 1000,
+      temperature: 0.3 // Plus déterministe pour la production
+    });
+
+    return this.parseAgentResponse(agentName, response, phase);
+  }
+
+  /**
+   * Construction prompt contextualisé pour chaque agent
+   */
+  private buildAgentPrompt(
+    agentName: SafeVisionAgentType,
+    scenarioData: any,
+    context: SafeVisionContext,
+    previousContributions: AgentContribution[],
+    phase: string
+  ): string {
+    
+    let prompt = `MISSION SAFEVISION: Génération contenu vidéo formation SST\n\n`;
+    
+    // Contexte scénario
+    prompt += `SCÉNARIO ${context.scenarioId}: ${scenarioData.title}\n`;
+    prompt += `Description: ${scenarioData.description}\n\n`;
+    
+    // Spécifications vidéo
+    prompt += `SPÉCIFICATIONS VIDÉO:\n`;
+    prompt += `- Durée: ${context.videoSpecs.duration}\n`;
+    prompt += `- Format: ${context.videoSpecs.format}\n`;
+    prompt += `- Audience: ${context.videoSpecs.audience}\n`;
+    prompt += `- Secteur: ${context.videoSpecs.sector}\n\n`;
+    
+    // Contexte entreprise si disponible
+    if (context.customization.companyProfile) {
+      prompt += `PROFIL ENTREPRISE:\n`;
+      prompt += `- Nom: ${context.customization.companyProfile.name}\n`;
+      prompt += `- Taille: ${context.customization.companyProfile.size} employés\n`;
+      prompt += `- SCIAN: ${context.customization.companyProfile.scian}\n`;
+      prompt += `- Niveau risque: ${context.customization.companyProfile.riskLevel}\n\n`;
+    }
+    
+    // Contributions agents précédents
+    if (previousContributions.length > 0) {
+      prompt += `CONTRIBUTIONS AGENTS PRÉCÉDENTS:\n`;
+      previousContributions.forEach(contrib => {
+        prompt += `${contrib.agentName} (${contrib.phase}): ${contrib.contribution.substring(0, 200)}...\n`;
+      });
+      prompt += '\n';
+    }
+    
+    // Instruction spécifique selon l'agent et la phase
+    prompt += this.getAgentSpecificInstruction(agentName, phase);
+    
+    return prompt;
+  }
+
+  /**
+   * Instructions spécifiques par agent et phase
+   */
+  private getAgentSpecificInstruction(agentName: SafeVisionAgentType, phase: string): string {
+    const instructions = {
+      analysis: {
+        Hugo: "Analyse globale du scénario et définition de la stratégie d'orchestration pour SafeVision.",
+        DiagSST: "Identification des éléments critiques de conformité LMRSST à inclure obligatoirement.",
+        Sentinelle: "Détection des risques urgents nécessitant une attention particulière dans la vidéo."
+      },
+      content: {
+        LexiNorm: "Validation et adaptation des références légales pour format vidéo accessible.",
+        ALSS: "Conception de l'approche pédagogique et des techniques d'engagement pour l'audience.",
+        Prioris: "Hiérarchisation des messages et optimisation de l'allocation du temps vidéo."
+      },
+      generation: {
+        DocuGen: "Génération du script final structuré, production-ready pour SafeVision/Synthesia."
+      },
+      validation: {
+        CoSS: "Validation de l'acceptabilité et optimisation de l'engagement utilisateur."
+      }
+    };
+    
+    return instructions[phase]?.[agentName] || "Contribue selon ton expertise pour l'intégration SafeVision.";
+  }
+
+  /**
+   * Parse et structure la réponse d'un agent
+   */
+  private parseAgentResponse(agentName: SafeVisionAgentType, response: any, phase: string): AgentContribution {
+    return {
+      agentName,
+      phase: phase as any,
+      contribution: response.content || response.text || "Réponse vide",
+      confidence: this.calculateConfidence(response),
+      safevisionElements: this.extractSafeVisionElements(response.content || response.text || ""),
+      estimatedDuration: this.estimateDuration(agentName, response),
+      handoffTo: this.determineHandoff(agentName, phase)
+    };
+  }
+
+  /**
+   * Assemblage du script final
+   */
+  private assembleScript(
+    contributions: AgentContribution[],
+    scenarioData: any,
+    context: SafeVisionContext
+  ): string {
+    
+    const docuGenContrib = contributions.find(c => c.agentName === 'DocuGen');
+    if (docuGenContrib) {
+      return docuGenContrib.contribution;
+    }
+    
+    // Fallback : assemblage manuel si DocuGen a échoué
+    let script = `# Script SafeVision - ${scenarioData.title}\n\n`;
+    script += `## Durée: ${context.videoSpecs.duration}\n`;
+    script += `## Audience: ${context.videoSpecs.audience}\n\n`;
+    
+    contributions.forEach(contrib => {
+      if (contrib.safevisionElements.scriptSegments) {
+        contrib.safevisionElements.scriptSegments.forEach(segment => {
+          script += `${segment}\n\n`;
+        });
+      }
+    });
+    
+    return script;
+  }
+
+  /**
+   * Génération métadonnées SafeVision
+   */
+  private generateSafeVisionMetadata(
+    contributions: AgentContribution[],
+    scenarioData: any,
+    context: SafeVisionContext
+  ) {
+    return {
+      scenarioId: context.scenarioId,
+      orchestrationTimestamp: new Date().toISOString(),
+      agentsInvolved: contributions.map(c => c.agentName),
+      totalAgentContributions: contributions.length,
+      averageConfidence: contributions.reduce((sum, c) => sum + c.confidence, 0) / contributions.length,
+      estimatedProductionTime: this.calculateTotalDuration(contributions),
+      safevisionCompatibility: {
+        synthesia_ready: true,
+        script_structured: true,
+        visual_elements_defined: contributions.some(c => c.safevisionElements.visualElements?.length > 0),
+        compliance_validated: contributions.some(c => c.agentName === 'LexiNorm'),
+        engagement_optimized: contributions.some(c => c.agentName === 'CoSS')
+      }
+    };
+  }
+
+  // Méthodes utilitaires
+  private getScenarioData(scenarioId: number) {
+    return safevisionData.scenarios[scenarioId.toString()];
+  }
+
+  private calculateConfidence(response: any): number {
+    const contentLength = (response.content || response.text || '').length;
+    return Math.min(95, Math.max(60, contentLength / 10));
+  }
+
+  private extractSafeVisionElements(content: string) {
+    return {
+      scriptSegments: content.match(/SCRIPT:|SEGMENT:/gi) ? [content] : [],
+      visualElements: content.match(/VISUEL|VISUAL|IMAGE/gi) ? [content.match(/VISUEL.*$/gim)?.[0] || ''] : [],
+      interactionPoints: content.match(/QUIZ|INTERACTION|QUESTION/gi) ? ['Quiz point détecté'] : [],
+      complianceReferences: content.match(/LMRSST|CNESST|Art\.\s*\d+/gi) || []
+    };
+  }
+
+  private estimateDuration(agentName: SafeVisionAgentType, response: any): string {
+    const baseDurations = {
+      Hugo: '15s', DiagSST: '20s', LexiNorm: '25s', ALSS: '30s',
+      Prioris: '15s', DocuGen: '45s', Sentinelle: '20s', CoSS: '10s'
+    };
+    return baseDurations[agentName];
+  }
+
+  private determineHandoff(agentName: SafeVisionAgentType, phase: string): SafeVisionAgentType | undefined {
+    const handoffRules = {
+      Hugo: 'DiagSST', DiagSST: 'LexiNorm', LexiNorm: 'ALSS',
+      ALSS: 'Prioris', Prioris: 'DocuGen', DocuGen: 'CoSS'
+    };
+    return handoffRules[agentName] as SafeVisionAgentType;
+  }
+
+  private calculateTotalDuration(contributions: AgentContribution[]): string {
+    const totalSeconds = contributions.reduce((sum, c) => {
+      const seconds = parseInt(c.estimatedDuration.replace('s', '')) || 0;
+      return sum + seconds;
+    }, 0);
+    return `${Math.floor(totalSeconds / 60)}min ${totalSeconds % 60}s`;
+  }
+
+  private validateProductionReadiness(script: string, metadata: any): boolean {
+    return script.length > 100 && 
+           metadata.safevisionCompatibility.script_structured &&
+           metadata.averageConfidence > 70;
+  }
+}

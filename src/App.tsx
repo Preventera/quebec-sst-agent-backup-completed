@@ -32,6 +32,7 @@ import HITLTest from "./pages/HITLTest";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
+import SafeVisionPage from "./pages/SafeVisionPage";
 
 const queryClient = new QueryClient();
 
@@ -94,6 +95,11 @@ const App = () => {
                     <Route path="/diagnostic" element={<Diagnostic />} />
                     <Route path="/documents" element={<Navigate to="/docugen" replace />} />
                     <Route path="/docugen" element={<DocuGen />} />
+                    
+                    {/* SafeVision Integration - NOUVELLE ROUTE SAFEVISION */}
+                    <Route path="/safevision" element={<SafeVisionPage />} />
+                    <Route path="/video" element={<Navigate to="/safevision" replace />} />
+                    <Route path="/formation-video" element={<Navigate to="/safevision" replace />} />
                     
                     {/* Fonctions Agiles */}
                     <Route path="/agile-functions" element={<AgileFunctionsHub />} />
