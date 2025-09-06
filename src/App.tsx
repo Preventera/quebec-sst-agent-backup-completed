@@ -37,6 +37,7 @@ import SafeVisionPage from "./pages/SafeVisionPage";
 import STORMDocuAnalyzerIntegration from "./components/STORMDocuAnalyzerIntegration";
 import SafeVisionModulesPage from "./components/SafeVision/SafeVisionModulesPage";
 import DocuAnalyzerPage from "./pages/DocuAnalyzerPage";
+import { PPAIGenerator } from '@/pages/PPAIGenerator';
 import CentreTelechargementSecurise from "./pages/CentreTelechargementSecurise";
 
 // NOUVEAU : Import Centre de Tests Hybride
@@ -90,6 +91,7 @@ const App = () => {
                     <Route path="/docuanalyzer" element={<DocuAnalyzerPage />} />
                     <Route path="/tests-hybrides-an1" element={<TestsHybridesSTORMAN1 />} />
                     <Route path="/storm-docuanalyzer" element={<STORMDocuAnalyzerIntegration />} />
+                    <Route path="/ppai/generator" element={<PPAIGenerator />} />
                     
                     {/* Apprentissage et Annotations */}
                     <Route path="/annotation" element={<AnnotationInterface />} />
