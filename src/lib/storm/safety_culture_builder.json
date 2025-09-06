@@ -1,0 +1,34 @@
+﻿{
+  "safety_culture_builder": {
+    "version": "2.0",
+    "framework": "evidence_based_behavioral_safety",
+    "methodology": "STORM_enhanced_research",
+    "target_agents": ["A1_enhanced", "A2_enhanced", "orchestrator"],
+    "enrichment_categories": [
+      {
+        "category": "behavioral_patterns",
+        "research_depth": "comprehensive",
+        "update_frequency": "daily",
+        "confidence_threshold": 0.85
+      },
+      {
+        "category": "performance_metrics",
+        "research_depth": "targeted",
+        "update_frequency": "weekly", 
+        "confidence_threshold": 0.80
+      },
+      {
+        "category": "intervention_strategies",
+        "research_depth": "deep_dive",
+        "update_frequency": "monthly",
+        "confidence_threshold": 0.90
+      }
+    ],
+    "integration_points": {
+      "vcs_observations": "real_time_enrichment",
+      "abc_analysis": "behavioral_context_enhancement",
+      "safe_self_scoring": "evidence_based_calibration",
+      "cnesst_data": "incident_pattern_enrichment"
+    }
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "title": "Template d'analyse de risques - Construction",
+    "description": "Matrice personnalisable selon le code SCIAN et les spécificités de l'entreprise",
+    "lastUpdated": "2025-07-12",
+    "version": "1.0",
+    "sector": "Construction de bâtiments",
+    "scianCode": "236xxx",
+    "customizable": true
+  },
+  "defaultWorkPhases": {
+    "construction": [
+      {
+        "id": "MOBILISATION",
+        "name": "Mobilisation et préparation du chantier",
+        "description": "Installation des équipements temporaires, délimitation du site"
+      },
+      {
+        "id": "DEMOLITION", 
+        "name": "Démolition et démantèlement",
+        "description": "Travaux de démolition, enlèvement de structures existantes"
+      },
+      {
+        "id": "INFRASTRUCTURE",
+        "name": "Travaux d'infrastructure",
+        "description": "Excavation, fondations, services souterrains"
+      },
+      {
+        "id": "SUPERSTRUCTURE",
+        "name": "Construction de la superstructure", 
+        "description": "Charpente, murs, toiture"
+      },
+      {
+        "id": "FINITION",
+        "name": "Travaux de finition",
+        "description": "Revêtements, systèmes mécaniques, électriques"
+      }
+    ]
+  },
+  "cnsstDangerCategories": [
+    {
+      "id": "MECANIQUES",
+      "name": "Dangers mécaniques",
+      "description": "Pièces en mouvement, écrasement, coincement, coupure, projection"
+    },
+    {
+      "id": "ELECTRIQUES",
+      "name": "Dangers électriques", 
+      "description": "Contact direct/indirect, arc électrique, électrocution"
+    },
+    {
+      "id": "CHIMIQUES",
+      "name": "Dangers chimiques",
+      "description": "Substances toxiques, corrosives, inflammables, explosives"
+    },
+    {
+      "id": "BIOLOGIQUES",
+      "name": "Dangers biologiques",
+      "description": "Micro-organismes, virus, bactéries, moisissures"
+    },
+    {
+      "id": "PHYSIQUES",
+      "name": "Dangers physiques",
+      "description": "Bruit, vibrations, températures extrêmes, radiations"
+    },
+    {
+      "id": "ERGONOMIQUES",
+      "name": "Dangers ergonomiques",
+      "description": "Manutention, postures, mouvements répétitifs"
+    },
+    {
+      "id": "CHUTES",
+      "name": "Risques de chutes",
+      "description": "Chutes de hauteur, chutes de plain-pied, dénivellations"
+    },
+    {
+      "id": "INCENDIE_EXPLOSION",
+      "name": "Incendie et explosion",
+      "description": "Combustibles, comburants, sources d'ignition"
+    },
+    {
+      "id": "PSYCHOSOCIAUX",
+      "name": "Dangers psychosociaux",
+      "description": "Stress, harcèlement, violence, charge de travail"
+    },
+    {
+      "id": "ENVIRONNEMENTAUX",
+      "name": "Dangers environnementaux",
+      "description": "Conditions météorologiques, terrain instable, espaces confinés"
+    }
+  ],
+  "customizationOptions": {
+    "byScian": {
+      "236110": "Construction résidentielle unifamiliale",
+      "236210": "Construction résidentielle multifamiliale", 
+      "236220": "Construction d'immeubles commerciaux et institutionnels",
+      "237110": "Construction d'installations d'alimentation en eau et d'égout",
+      "237120": "Construction d'installations pétrolières et gazières",
+      "237130": "Construction de réseaux électriques et de télécommunications"
+    },
+    "workPhaseCustomization": "Les phases peuvent être adaptées selon les spécificités du projet et de l'entreprise",
+    "taskCustomization": "Chaque phase peut inclure des tâches spécifiques au secteur SCIAN"
+  },
+  "riskAnalysisExamples": [
+    {
+      "id": "CONST_001",
+      "sector": "Construction",
+      "phase": "MOBILISATION",
+      "dangerousSituation": "Installation d'équipements temporaires: risque d'écrasement, renversement, chute",
+      "danger": "Équipement mobile en mouvement",
+      "risk": "Possibilité d'être dans la trajectoire d'un équipement",
+      "criticalDanger": "MECANIQUES",
+      "injuryDamage": "Écrasement, coincement",
+      "initialRisk": {
+        "probability": 4,
+        "severity": 5,
+        "score": 20
+      },
+      "controlMeasures": "Formation du personnel, méthodes de travail sécuritaires, communication des risques",
+      "criticalControlMeasures": "Installer des dispositifs de sécurité pour empêcher la chute d'objets. Délimiter les zones de sécurité. Assurer la stabilité du matériel entreposé selon les recommandations du fabricant.",
+      "applicableFrameworks": ["Formation", "Procédures", "Supervision"],
+      "residualRisk": {
+        "reduction": 0.5,
+        "score": 10
+      }
+    },
+    {
+      "id": "CONST_002",
+      "sector": "Construction",
+      "phase": "INFRASTRUCTURE",
+      "dangerousSituation": "Travaux d'excavation: pentes instables, présence d'eau",
+      "danger": "Sol instable, effondrement",
+      "risk": "Possibilité d'ensevelissement ou de chute",
+      "criticalDanger": "ENVIRONNEMENTAUX",
+      "injuryDamage": "Ensevelissement, fractures",
+      "initialRisk": {
+        "probability": 3,
+        "severity": 5,
+        "score": 15
+      },
+      "controlMeasures": "Surveillance géotechnique, étançonnement, drainage",
+      "criticalControlMeasures": "Maintenir des pentes d'excavation selon les normes. Assurer le drainage permanent. Respecter les distances de sécurité pour l'entreposage et la circulation.",
+      "applicableFrameworks": ["Géotechnique", "Surveillance", "Ingénierie"],
+      "residualRisk": {
+        "reduction": 0.6,
+        "score": 6
+      }
+    },
+    {
+      "id": "CONST_003",
+      "sector": "Construction",
+      "phase": "SUPERSTRUCTURE",
+      "dangerousSituation": "Travaux en hauteur: charpente, toiture",
+      "danger": "Chute de hauteur",
+      "risk": "Possibilité de chute lors des travaux élevés",
+      "criticalDanger": "CHUTES",
+      "injuryDamage": "Traumatismes graves, décès",
+      "initialRisk": {
+        "probability": 4,
+        "severity": 5,
+        "score": 20
+      },
+      "controlMeasures": "Systèmes antichute, plateformes de travail, formation",
+      "criticalControlMeasures": "Utiliser des dispositifs antichute homologués. Inspecter les équipements avant usage. Installer des garde-corps permanents. Former le personnel aux techniques de travail en hauteur.",
+      "applicableFrameworks": ["Protection antichute", "Formation", "Inspection"],
+      "residualRisk": {
+        "reduction": 0.7,
+        "score": 6
+      }
+    },
+    {
+      "id": "CONST_004",
+      "sector": "Construction",
+      "phase": "FINITION",
+      "dangerousSituation": "Installation électrique: contact avec conducteurs",
+      "danger": "Source d'énergie électrique",
+      "risk": "Possibilité d'électrocution ou d'électrisation",
+      "criticalDanger": "ELECTRIQUES",
+      "injuryDamage": "Électrocution, brûlures électriques",
+      "initialRisk": {
+        "probability": 3,
+        "severity": 5,
+        "score": 15
+      },
+      "controlMeasures": "Cadenassage, vérification d'absence de tension, équipements de protection",
+      "criticalControlMeasures": "Appliquer les procédures de cadenassage/étiquetage. Vérifier l'absence de tension avant intervention. Utiliser des outils isolés. Former le personnel aux risques électriques.",
+      "applicableFrameworks": ["Cadenassage", "Formation électrique", "EPI"],
+      "residualRisk": {
+        "reduction": 0.8,
+        "score": 3
+      }
+    }
+  ],
+  "templateInstructions": {
+    "usage": "Ce template doit être personnalisé selon le code SCIAN de l'entreprise",
+    "phaseCustomization": "Adapter les phases de travail aux spécificités du projet",
+    "dangerAssessment": "Utiliser les catégories de dangers CNESST appropriées",
+    "riskEvaluation": "Évaluer probabilité (1-5) × gravité (1-5) = indice de risque",
+    "controlHierarchy": "Appliquer la hiérarchie des mesures de prévention"
+  }
+}

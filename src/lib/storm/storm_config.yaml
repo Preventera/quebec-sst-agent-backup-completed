@@ -1,0 +1,78 @@
+﻿# Configuration STORM v2.0 - SafetyGraph BehaviorX
+# ===============================================
+
+storm_configuration:
+  version: "2.0"
+  environment: "production"
+  
+  # Configuration API
+  api:
+    perplexity:
+      model: "llama-3.1-sonar-large-128k-online"
+      max_tokens: 4000
+      temperature: 0.2
+      timeout: 30
+    
+    rate_limits:
+      requests_per_minute: 20
+      daily_limit: 1000
+      burst_limit: 5
+  
+  # Configuration recherche
+  research:
+    parallel_threads: 8
+    batch_size: 10
+    confidence_threshold: 0.8
+    max_sources_per_topic: 25
+    
+  # Intégration BehaviorX
+  behaviorx_integration:
+    orchestrator_sync: true
+    real_time_enrichment: true
+    agent_enhancement: 
+      - "A1_enhanced"
+      - "A2_enhanced" 
+      - "orchestrator"
+    
+    workflow_integration:
+      vcs_enrichment: true
+      abc_enhancement: true
+      cnesst_augmentation: true
+      memory_ai_sync: true
+  
+  # Configuration performance
+  performance:
+    cache_enabled: true
+    cache_ttl: 3600  # 1 heure
+    compression: true
+    async_processing: true
+    
+  # Monitoring
+  monitoring:
+    log_level: "INFO"
+    metrics_enabled: true
+    health_check_interval: 300  # 5 minutes
+    alert_thresholds:
+      error_rate: 0.05
+      response_time: 5.0
+      confidence_score: 0.7
+
+# Sources de recherche prioritaires
+research_sources:
+  academic:
+    - "scholar.google.com"
+    - "pubmed.ncbi.nlm.nih.gov"
+    - "sciencedirect.com"
+    - "ieee.org"
+  
+  institutional:
+    - "cdc.gov"
+    - "osha.gov"
+    - "cnesst.gouv.qc.ca"
+    - "who.int"
+  
+  sectorial:
+    - "nsc.org"
+    - "asse.org"
+    - "aiha.org"
+    - "iosh.org"

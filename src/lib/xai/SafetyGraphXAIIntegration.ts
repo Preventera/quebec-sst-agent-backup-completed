@@ -1,0 +1,1 @@
+export const safetyGraphXAI = { explainSafeVisionWithSafetyGraph: async () => ({ id: 'temp-xai', globalConfidence: 0.85, evidenceLinks: [], riskPredictions: [], sectorBenchmark: { entrepriseActuelle: { positionnement: 'Moyen' } }, actionableInsights: [] }) };

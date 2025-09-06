@@ -1,0 +1,19 @@
+﻿{
+  "research_templates": {
+    "behavioral_safety": {
+      "prompt_template": "Research evidence-based behavioral safety practices for: {topic}. Focus on quantifiable outcomes, implementation strategies, and ROI metrics. Include recent studies (2023-2025).",
+      "extraction_patterns": ["behavior change", "safety performance", "intervention effectiveness"],
+      "confidence_weight": 0.9
+    },
+    "leadership_safety": {
+      "prompt_template": "Analyze safety leadership research for: {topic}. Emphasize transformational leadership, engagement metrics, and organizational culture impact.",
+      "extraction_patterns": ["leadership effectiveness", "culture transformation", "engagement scores"],
+      "confidence_weight": 0.85
+    },
+    "communication_safety": {
+      "prompt_template": "Examine safety communication research on: {topic}. Focus on effectiveness metrics, feedback mechanisms, and incident reporting improvements.",
+      "extraction_patterns": ["communication effectiveness", "reporting culture", "feedback quality"],
+      "confidence_weight": 0.80
+    }
+  }
+}

@@ -1,0 +1,202 @@
+[
+  {
+    "id": "SCIAN-001",
+    "scianCategorie": "Transport et entreposage",
+    "scenarioPhase": "Manutention",
+    "activiteTravaux": "Chargement/déchargement",
+    "risque": "Troubles musculo-squelettiques",
+    "categorieProgramme": "PK-SMSST/Contrôle du risque",
+    "composanteSmsst": "Contrôle de la circulation",
+    "sujetSst": "Techniques de manutention",
+    "etapeWorkflow": "Formation et sensibilisation",
+    "actionRapide": "Former aux techniques de levage sécuritaire",
+    "but": "Prévenir les blessures au dos lors de la manutention",
+    "referentiels": ["RSST art. 166", "CSTC art. 285"],
+    "sousEtapes": [
+      "Évaluer le poids de la charge",
+      "Utiliser les aides mécaniques disponibles", 
+      "Maintenir le dos droit lors du levage"
+    ],
+    "explication": "Action essentielle pour prévenir 60% des TMS dans le transport"
+  },
+  {
+    "id": "SCIAN-002", 
+    "scianCategorie": "Transport et entreposage",
+    "scenarioPhase": "Conduite",
+    "activiteTravaux": "Transport longue distance",
+    "risque": "Fatigue au volant",
+    "categorieProgramme": "PK-SMSST/Hygiène du travail",
+    "composanteSmsst": "Gestion du temps de travail",
+    "sujetSst": "Prévention de la fatigue",
+    "etapeWorkflow": "Mesures administratives",
+    "actionRapide": "Respecter les temps de repos obligatoires",
+    "but": "Prévenir les accidents dus à la somnolence",
+    "referentiels": ["Code de la sécurité routière", "Règlement sur les heures de conduite"],
+    "sousEtapes": [
+      "Planifier les pauses aux 2 heures",
+      "Vérifier l'état de vigilance du conducteur",
+      "Utiliser les aires de repos désignées"
+    ],
+    "explication": "Réduction de 40% des accidents liés à la fatigue"
+  },
+  {
+    "id": "SCIAN-003",
+    "scianCategorie": "Transport et entreposage", 
+    "scenarioPhase": "Maintenance",
+    "activiteTravaux": "Entretien véhicules",
+    "risque": "Contact avec fluides dangereux",
+    "categorieProgramme": "PK-SMSST/Identification des risques",
+    "composanteSmsst": "Protection individuelle",
+    "sujetSst": "Équipements de protection",
+    "etapeWorkflow": "Protection individuelle",
+    "actionRapide": "Porter gants et lunettes de protection",
+    "but": "Éviter contact avec huiles et liquides corrosifs",
+    "referentiels": ["RSST art. 45", "SIMDUT 2015"],
+    "sousEtapes": [
+      "Vérifier l'intégrité des EPI",
+      "Utiliser les produits selon les FDS",
+      "Nettoyer les équipements après usage"
+    ],
+    "explication": "Protection essentielle contre dermatites et brûlures"
+  },
+  {
+    "id": "SCIAN-004",
+    "scianCategorie": "Transport et entreposage",
+    "scenarioPhase": "Entreposage", 
+    "activiteTravaux": "Stockage en hauteur",
+    "risque": "Chute d'objets",
+    "categorieProgramme": "PK-SMSST/Contrôle du risque",
+    "composanteSmsst": "Aménagement des lieux",
+    "sujetSst": "Stabilité du stockage",
+    "etapeWorkflow": "Contrôles techniques",
+    "actionRapide": "Sécuriser le stockage avec sangles",
+    "but": "Empêcher la chute d'objets sur les travailleurs",
+    "referentiels": ["RSST art. 51", "CSA Z259"],
+    "sousEtapes": [
+      "Vérifier la stabilité des palettes",
+      "Utiliser des butées de sécurité",
+      "Baliser les zones de circulation"
+    ],
+    "explication": "Prévention des traumatismes crâniens et fractures"
+  },
+  {
+    "id": "SCIAN-005",
+    "scianCategorie": "Transport et entreposage",
+    "scenarioPhase": "Chargement",
+    "activiteTravaux": "Utilisation chariot élévateur", 
+    "risque": "Écrasement",
+    "categorieProgramme": "PK-SMSST/Formation",
+    "composanteSmsst": "Certification des opérateurs",
+    "sujetSst": "Conduite d'équipements",
+    "etapeWorkflow": "Formation spécialisée",
+    "actionRapide": "Vérifier la certification de l'opérateur",
+    "but": "Assurer une conduite sécuritaire des équipements",
+    "referentiels": ["RSST art. 256", "ASP Transport"],
+    "sousEtapes": [
+      "Valider le permis de conduite interne",
+      "Effectuer l'inspection pré-utilisation",
+      "Respecter la capacité de charge"
+    ],
+    "explication": "Réduction de 70% des accidents de manutention"
+  },
+  {
+    "id": "SCIAN-006",
+    "scianCategorie": "Bâtiment et travaux publics",
+    "scenarioPhase": "Travaux en hauteur",
+    "activiteTravaux": "Travail sur toiture",
+    "risque": "Chute >3 m",
+    "categorieProgramme": "PK-SMSST/Contrôle du risque", 
+    "composanteSmsst": "Protection contre les chutes",
+    "sujetSst": "Systèmes d'arrêt de chute",
+    "etapeWorkflow": "Protection collective",
+    "actionRapide": "Installer garde-corps conformes",
+    "but": "Empêcher chutes mortelles de grande hauteur",
+    "referentiels": ["CSTC art. 2.9.1", "CSA Z259.1"],
+    "sousEtapes": [
+      "Vérifier résistance des ancrages",
+      "Inspecter harnais et longes",
+      "Former aux procédures de sauvetage"
+    ],
+    "explication": "Protection vitale contre 25% des décès en construction"
+  },
+  {
+    "id": "SCIAN-007",
+    "scianCategorie": "Fabrication de produits métalliques",
+    "scenarioPhase": "Soudage",
+    "activiteTravaux": "Soudage à l'arc",
+    "risque": "Rayonnement ultraviolet",
+    "categorieProgramme": "PK-SMSST/Hygiène du travail",
+    "composanteSmsst": "Protection individuelle",
+    "sujetSst": "Protection oculaire",
+    "etapeWorkflow": "Équipement spécialisé",
+    "actionRapide": "Utiliser masque de soudage automatique",
+    "but": "Protéger yeux et peau des rayons UV",
+    "referentiels": ["RSST art. 44", "CSA W117.2"],
+    "sousEtapes": [
+      "Choisir le bon niveau de filtration",
+      "Vérifier fonctionnement auto-obscurcissement",
+      "Protéger peau exposée"
+    ],
+    "explication": "Prévention cataractes et brûlures cutanées"
+  },
+  {
+    "id": "SCIAN-008",
+    "scianCategorie": "Industrie des aliments et boissons",
+    "scenarioPhase": "Transformation",
+    "activiteTravaux": "Découpe viande",
+    "risque": "Coupures profondes",
+    "categorieProgramme": "PK-SMSST/Contrôle du risque",
+    "composanteSmsst": "Protection individuelle",
+    "sujetSst": "Gants anti-coupure",
+    "etapeWorkflow": "Protection spécialisée",
+    "actionRapide": "Porter gants métalliques obligatoires", 
+    "but": "Éviter amputations et coupures graves",
+    "referentiels": ["RSST art. 45", "ACIA guide sécurité"],
+    "sousEtapes": [
+      "Choisir niveau de protection adapté",
+      "Maintenir couteaux bien aiguisés",
+      "Former aux techniques de coupe"
+    ],
+    "explication": "Réduction 85% blessures graves aux mains"
+  },
+  {
+    "id": "SCIAN-009",
+    "scianCategorie": "Industrie chimique",
+    "scenarioPhase": "Manipulation",
+    "activiteTravaux": "Transfert de produits",
+    "risque": "Exposition chimique",
+    "categorieProgramme": "PK-SMSST/Hygiène du travail",
+    "composanteSmsst": "Surveillance de l'exposition",
+    "sujetSst": "Atmosphères dangereuses",
+    "etapeWorkflow": "Mesures d'hygiène",
+    "actionRapide": "Mesurer concentrations dans l'air",
+    "but": "Maintenir exposition sous limites réglementaires",
+    "referentiels": ["RSST art. 44", "SIMDUT 2015"],
+    "sousEtapes": [
+      "Utiliser détecteurs de gaz",
+      "Enregistrer les mesures",
+      "Ajuster ventilation si nécessaire"
+    ],
+    "explication": "Prévention maladies professionnelles respiratoires"
+  },
+  {
+    "id": "SCIAN-010",
+    "scianCategorie": "Commerce de détail",
+    "scenarioPhase": "Service client", 
+    "activiteTravaux": "Caisse et manutention",
+    "risque": "Syndrome canal carpien",
+    "categorieProgramme": "PK-SMSST/Ergonomie",
+    "composanteSmsst": "Aménagement poste",
+    "sujetSst": "Ergonomie répétitive",
+    "etapeWorkflow": "Aménagement ergonomique",
+    "actionRapide": "Ajuster hauteur plan de travail",
+    "but": "Réduire contraintes répétitives poignets",
+    "referentiels": ["Guide IRSST ergonomie", "RSST art. 51"],
+    "sousEtapes": [
+      "Évaluer posture de travail",
+      "Installer repose-poignets",
+      "Organiser rotation des tâches"
+    ],
+    "explication": "Prévention TMS affectant 40% caissiers"
+  }
+]

@@ -1,0 +1,232 @@
+{
+  "scenarios": {
+    "52": {
+      "scenarioId": 52,
+      "title": "Capsules vidéo obligations LMRSST",
+      "description": "Formation interactive obligations légales employeurs selon LMRSST Art.51",
+      "agents": ["ALSS", "LexiNorm", "Hugo", "DiagSST"],
+      "orchestrationPrompt": "Créer modules formation vidéo obligations LMRSST adaptés par secteur d'activité avec références réglementaires précises",
+      "cnessContext": {
+        "articles_count": 196,
+        "scenario_specific_docs": [
+          {
+            "title": "LMRSST - Article 51 - Information et formation",
+            "summary": "L'employeur doit informer le travailleur des risques liés à son travail et lui assurer la formation, l'entraînement et la supervision nécessaires pour faire en sorte que le travailleur ait l'habileté et les connaissances requises pour accomplir de façon sécuritaire le travail qui lui est confié.",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1",
+            "type": "LMRSST",
+            "relevance_score": 95
+          },
+          {
+            "title": "RSST - Section II - Information sur les produits contrôlés",
+            "summary": "Règlement sur la santé et la sécurité du travail concernant l'information des travailleurs sur les substances dangereuses et les équipements de protection.",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%2013",
+            "type": "RSST",
+            "relevance_score": 85
+          },
+          {
+            "title": "Guide CNESST - Obligations de formation",
+            "summary": "Guide pratique sur les obligations de formation en santé et sécurité du travail pour les employeurs québécois, incluant les échéanciers et contenus minimums.",
+            "source": "https://www.cnesst.gouv.qc.ca/fr/prevention-securite/organiser-prevention/informer-former-travailleurs",
+            "type": "CNESST_GUIDE",
+            "relevance_score": 90
+          }
+        ],
+        "key_articles": [
+          {
+            "number": "51",
+            "source": "LMRSST",
+            "context": "Obligations information et formation employeur - Droit fondamental du travailleur"
+          },
+          {
+            "number": "88",
+            "source": "LMRSST",
+            "context": "Programme de prévention obligatoire pour entreprises 20+ employés"
+          },
+          {
+            "number": "123",
+            "source": "LMRSST",
+            "context": "Déclaration accidents du travail - Délais et procédures obligatoires"
+          }
+        ],
+        "key_topics": [
+          "LMRSST Art.51",
+          "Obligations employeur",
+          "Formation SST obligatoire",
+          "Information travailleurs",
+          "Droits fondamentaux travailleur",
+          "Supervision adéquate"
+        ],
+        "regulatory_framework": "LMRSST + RSST + Guides CNESST",
+        "last_update": "2025-08-28T07:53:00Z",
+        "coverage_sectors": ["Construction", "Manufacturier", "Services", "Transport", "Commerce"]
+      },
+      "sectorialData": {
+        "targetSCIAN": ["23", "31-33", "48-49", "44-45", "62"],
+        "riskLevel": "medium",
+        "companySize": "all_sizes",
+        "primarySector": "multi_sector",
+        "applicableRegulations": ["LMRSST", "RSST", "CNESST"]
+      },
+      "deliverables": [
+        "Script formation vidéo personnalisé LMRSST",
+        "Quiz validation connaissances obligations",
+        "Certificat conformité employeur",
+        "Check-list application pratique",
+        "Ressources complémentaires CNESST",
+        "Template programme formation continue"
+      ],
+      "videoConfig": {
+        "duration": "2-5min",
+        "format": "micro-learning",
+        "audienceType": "ouvriers",
+        "language": "fr_CA",
+        "accent": "québécois",
+        "avatar_style": "safety_trainer",
+        "visual_elements": [
+          "LMRSST articles overlay",
+          "Workplace safety icons",
+          "Quebec workplace visuals",
+          "Compliance checklists",
+          "Statistics real-time"
+        ],
+        "interactivity": true,
+        "assessment": "quiz_lmrsst",
+        "accessibility": "sous-titres_fr_ca",
+        "distribution": ["YouTube", "LinkedIn", "LMS", "Intranet", "ADAO"]
+      },
+      "scriptTemplate": {
+        "structure": [
+          "Introduction LMRSST",
+          "Obligations spécifiques employeur",
+          "Cas pratiques sectoriels",
+          "Quiz validation interactif",
+          "Ressources pour aller plus loin"
+        ],
+        "tone": "pédagogique_accessible",
+        "duration_breakdown": {
+          "introduction": "30s",
+          "contenu_principal": "3-4min",
+          "cas_pratiques": "60s",
+          "quiz": "30s",
+          "conclusion": "30s"
+        },
+        "key_messages": [
+          "Art.51 LMRSST - Information obligatoire",
+          "Formation nouveaux employés obligatoire",
+          "Responsabilités partagées employeur/employé",
+          "Sanctions en cas de non-conformité",
+          "Ressources CNESST gratuites disponibles"
+        ],
+        "personalization": {
+          "by_sector": true,
+          "by_company_size": true,
+          "by_risk_level": true,
+          "by_employee_experience": true
+        }
+      }
+    },
+    "116": {
+      "scenarioId": 116,
+      "title": "Comité SST chantier temporaire",
+      "description": "Guide mise en place comité SST selon CSTC pour chantiers construction temporaires",
+      "agents": ["CoSS", "DiagSST", "LexiNorm", "Hugo"],
+      "orchestrationPrompt": "Accompagnement mise en place comité SST temporaire selon CSTC avec procédures spécifiques construction",
+      "cnessContext": {
+        "articles_count": 196,
+        "scenario_specific_docs": [
+          {
+            "title": "CSTC - Section 3.23 - Comité de chantier",
+            "summary": "Code de sécurité pour les travaux de construction - Obligations et procédures pour la mise en place d'un comité de chantier temporaire, représentation paritaire et fréquence des réunions.",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%204",
+            "type": "CSTC",
+            "relevance_score": 98
+          },
+          {
+            "title": "LMRSST Art.51 - Comité SST entreprises 20+ employés",
+            "summary": "Obligations générales de formation d'un comité de santé et sécurité pour les entreprises de 20 employés et plus, applicable aux chantiers de construction.",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1",
+            "type": "LMRSST",
+            "relevance_score": 92
+          }
+        ],
+        "key_articles": [
+          {
+            "number": "51",
+            "source": "LMRSST",
+            "context": "Comité SST obligatoire entreprises 20+ employés"
+          },
+          {
+            "number": "3.23",
+            "source": "CSTC",
+            "context": "Comité de chantier temporaire - Procédures spécifiques construction"
+          }
+        ],
+        "key_topics": [
+          "Comité SST obligatoire",
+          "CSTC Construction",
+          "Chantiers temporaires",
+          "Représentation paritaire",
+          "Procès-verbaux obligatoires"
+        ],
+        "regulatory_framework": "LMRSST + CSTC + Guides CNESST Construction"
+      },
+      "sectorialData": {
+        "targetSCIAN": ["23"],
+        "riskLevel": "high",
+        "companySize": "20+",
+        "primarySector": "construction",
+        "applicableRegulations": ["LMRSST", "CSTC", "CNESST"]
+      },
+      "deliverables": [
+        "Guide mise en place comité SST",
+        "Templates procès-verbaux réunions",
+        "Formation représentants comité",
+        "Procédures CSTC chantier temporaire",
+        "Outils suivi conformité"
+      ],
+      "videoConfig": {
+        "duration": "1-3min",
+        "format": "procédural",
+        "audienceType": "responsables_chantier",
+        "avatar_style": "construction_supervisor",
+        "visual_elements": [
+          "Construction site 3D",
+          "Safety committee meeting",
+          "Hard hat animations",
+          "CSTC compliance graphics"
+        ]
+      },
+      "scriptTemplate": {
+        "structure": [
+          "Contexte réglementaire CSTC",
+          "Procédure mise en place comité",
+          "Rôles et responsabilités",
+          "Suivi et documentation"
+        ],
+        "tone": "professionnel_directif",
+        "key_messages": [
+          "Obligation comité 20+ employés",
+          "Représentation paritaire obligatoire",
+          "Fréquence réunions selon CSTC",
+          "Documentation requise"
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "version": "2.0",
+    "last_updated": "2025-09-01T14:30:00Z",
+    "source": "AgenticSST Quebec",
+    "integration": "SafeVision SST",
+    "total_scenarios": 135,
+    "available_in_json": 2,
+    "cnesst_documents": 196,
+    "supported_languages": ["fr_CA", "en_CA"],
+    "api_compatibility": {
+      "safevision_pipeline": "/api/v1/video/generate",
+      "synthesia_ready": true,
+      "adao_distribution": true,
+      "analytics_tracking": true
+    }
+  }
+}

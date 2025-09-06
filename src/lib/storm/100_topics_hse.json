@@ -1,0 +1,51 @@
+﻿{
+  "storm_topics_config": {
+    "version": "2.0",
+    "total_topics": 100,
+    "categories": 10,
+    "topics_per_category": 10,
+    "evidence_based": true,
+    "last_updated": "2025-07-08",
+    "integration": {
+      "behaviorx_agents": ["A1", "A2", "AN1", "R1", "R3", "R6", "R10"],
+      "orchestrator_compatible": true,
+      "real_time_enrichment": true
+    },
+    "topics_structure": {
+      "leadership": {
+        "description": "Leadership et management HSE",
+        "priority": 1,
+        "agent_impact": ["SC", "R1", "R5"],
+        "topics": [
+          "transformational_safety_leadership",
+          "management_commitment_measurement",
+          "supervisor_safety_engagement",
+          "authentic_leadership_safety",
+          "safety_leadership_development",
+          "decision_making_risk_based",
+          "authority_accountability_balance",
+          "role_modeling_safety_behavior",
+          "visionary_safety_leadership",
+          "collaborative_leadership_style"
+        ]
+      },
+      "communication": {
+        "description": "Communication et prévention",
+        "priority": 1,
+        "agent_impact": ["R6", "R10", "A1"],
+        "topics": [
+          "safety_communication_effectiveness",
+          "incident_reporting_culture",
+          "feedback_loops_prevention",
+          "multilingual_safety_communication",
+          "crisis_communication_protocols",
+          "stakeholder_safety_engagement",
+          "transparent_risk_communication",
+          "safety_dialogue_facilitation",
+          "non_violent_communication_safety",
+          "listening_safety_concerns"
+        ]
+      }
+    }
+  }
+}

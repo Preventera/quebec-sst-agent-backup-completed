@@ -20,7 +20,10 @@ import {
   BarChart3,
   FileSpreadsheet,
   Zap,
-  ChevronDown
+  ChevronDown,
+  Video,
+  Search,
+  Target,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -57,7 +60,13 @@ const Header = () => {
     { name: "Prompts", href: "/prompts", icon: Lightbulb },
     { name: "Users", href: "/users", icon: UserCog },
     { name: "FAQ", href: "/faq", icon: BookOpen },
-  ];
+    // NOUVELLE SECTION ANALYSES SST
+  { name: "Tests Hybrides AN1", href: "/tests-hybrides-an1", icon: Target },
+  { name: "STORM DocuAnalyzer", href: "/storm-docuanalyzer", icon: Search },
+  { name: "SafeVision", href: "/safevision", icon: Video },
+  { name: "DocuAnalyzer", href: "/docuanalyzer", icon: FileText },
+];
+
 
   const handleSignOut = async () => {
     // Temporairement désactivé - sera réactivé quand Supabase sera configuré

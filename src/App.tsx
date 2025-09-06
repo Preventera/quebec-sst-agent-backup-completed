@@ -29,10 +29,19 @@ import FAQ from "./pages/FAQ";
 import CrawlingDashboard from "./pages/CrawlingDashboard";
 import Certifications from "./pages/Certifications";
 import HITLTest from "./pages/HITLTest";
+import TestsHybridesSTORMAN1 from "./components/TestsHybridesSTORMAN1";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Header from "./components/Header";
 import SafeVisionPage from "./pages/SafeVisionPage";
+import STORMDocuAnalyzerIntegration from "./components/STORMDocuAnalyzerIntegration";
+import SafeVisionModulesPage from "./components/SafeVision/SafeVisionModulesPage";
+import DocuAnalyzerPage from "./pages/DocuAnalyzerPage";
+import CentreTelechargementSecurise from "./pages/CentreTelechargementSecurise";
+
+// NOUVEAU : Import Centre de Tests Hybride
+import CentreTestsHybridePage from "./pages/CentreTestsHybridePage";
+import TestsHybridesDataDriven from "./components/TestsHybridesSTORMAN1";
 
 const queryClient = new QueryClient();
 
@@ -73,6 +82,15 @@ const App = () => {
                     <Route path="/tests" element={<Tests />} />
                     <Route path="/logs" element={<ConversationLogs />} />
                     
+                    {/* NOUVEAU : Centre de Tests Hybride - Mode Automatique */}
+                    <Route path="/centre-tests-hybride" element={<CentreTestsHybridePage />} />
+                    <Route path="/demo-auto" element={<Navigate to="/centre-tests-hybride" replace />} />
+                    <Route path="/tests-automatiques" element={<Navigate to="/centre-tests-hybride" replace />} />
+                    <Route path="/mode-automatique" element={<Navigate to="/centre-tests-hybride" replace />} />
+                    <Route path="/docuanalyzer" element={<DocuAnalyzerPage />} />
+                    <Route path="/tests-hybrides-an1" element={<TestsHybridesSTORMAN1 />} />
+                    <Route path="/storm-docuanalyzer" element={<STORMDocuAnalyzerIntegration />} />
+                    
                     {/* Apprentissage et Annotations */}
                     <Route path="/annotation" element={<AnnotationInterface />} />
                     
@@ -98,8 +116,14 @@ const App = () => {
                     
                     {/* SafeVision Integration - NOUVELLE ROUTE SAFEVISION */}
                     <Route path="/safevision" element={<SafeVisionPage />} />
+                    <Route path="/safevision/modules" element={<SafeVisionModulesPage />} />
                     <Route path="/video" element={<Navigate to="/safevision" replace />} />
                     <Route path="/formation-video" element={<Navigate to="/safevision" replace />} />
+
+                    {/* STORM et Tests Hybrides - NOUVELLES INTÉGRATIONS */}
+                    <Route path="/storm-docuanalyzer" element={<STORMDocuAnalyzerIntegration />} />
+                    <Route path="/tests-hybrides-an1" element={<TestsHybridesDataDriven />} />
+                    <Route path="/docuanalyzer" element={<DocuAnalyzerPage />} />
                     
                     {/* Fonctions Agiles */}
                     <Route path="/agile-functions" element={<AgileFunctionsHub />} />
@@ -123,9 +147,12 @@ const App = () => {
                     
                     {/* Auth */}
                     <Route path="/auth" element={<Auth />} />
-                    
-                    {/* Route catch-all */}
-                    <Route path="*" element={<NotFound />} />
+                  
+                  {/* Centre de Téléchargement Sécurisé */}
+                    <Route path="/telechargements" element={<CentreTelechargementSecurise />} />
+
+                  {/* Route catch-all */}
+                  <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
               </div>

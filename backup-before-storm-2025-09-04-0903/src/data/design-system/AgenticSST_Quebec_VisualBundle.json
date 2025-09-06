@@ -1,0 +1,771 @@
+{
+  "$schema": "https://agentic-sst.quebec/visual-schema/v2.0",
+  "package": "AgenticSST-Quebec-VisualBundle",
+  "version": "2.0.0",
+  "generated_at": "2025-09-02T21:00:00Z",
+  "i18n": {
+    "default": "fr-CA",
+    "supported": ["fr-CA", "en-CA"]
+  },
+  "visual_standard": {
+    "tokens": {
+      "colors": {
+        "primary": "#1E40AF",
+        "secondary": "#059669",
+        "danger": "#DC2626",
+        "warning": "#D97706",
+        "success": "#10B981",
+        "info": "#3B82F6",
+        "neutral_50": "#F9FAFB",
+        "neutral_100": "#F3F4F6",
+        "neutral_500": "#6B7280",
+        "neutral_700": "#374151",
+        "neutral_900": "#111827"
+      },
+      "spacing": {
+        "xs": "0.25rem",
+        "sm": "0.5rem",
+        "md": "1rem",
+        "lg": "1.5rem",
+        "xl": "2rem"
+      },
+      "typography": {
+        "heading_1": "1.875rem",
+        "heading_2": "1.5rem",
+        "heading_3": "1.25rem",
+        "body": "1rem",
+        "caption": "0.875rem"
+      },
+      "print": {
+        "page_margin": "2cm",
+        "header_height": "3cm",
+        "footer_height": "2cm"
+      }
+    },
+    "components": {
+      "header": {
+        "type": "document_header",
+        "props": ["title", "document_id", "generated_at", "status"],
+        "layout": "flex_row",
+        "required": true
+      },
+      "meta": {
+        "type": "metadata_section",
+        "props": ["company_name", "sector", "responsible_person", "creation_date"],
+        "layout": "grid_2x2",
+        "required": true
+      },
+      "checklist": {
+        "type": "interactive_checklist",
+        "props": ["items", "completion_status", "required_signatures"],
+        "layout": "vertical_list",
+        "interactive": true
+      },
+      "table": {
+        "type": "data_table",
+        "props": ["headers", "rows", "sortable", "filterable"],
+        "layout": "responsive_table",
+        "print_behavior": "page_break_avoid"
+      },
+      "timeline": {
+        "type": "process_timeline",
+        "props": ["steps", "current_step", "completion_dates"],
+        "layout": "horizontal_timeline",
+        "visual_indicators": true
+      },
+      "signatures": {
+        "type": "signature_block",
+        "props": ["required_roles", "signature_method", "validation_status"],
+        "method": "electronic",
+        "required": true
+      },
+      "attachments": {
+        "type": "file_attachments",
+        "props": ["files", "max_size", "allowed_types"],
+        "validation": "automatic"
+      },
+      "legal_refs": {
+        "type": "legal_references",
+        "props": ["code", "article", "url", "description"],
+        "format": "structured_object"
+      }
+    },
+    "render_hints": {
+      "layout_priority": ["header", "meta", "legal_refs", "content", "signatures"],
+      "card_spacing": "md",
+      "section_dividers": true,
+      "sticky_header": true,
+      "conditional_visibility": {
+        "expert_mode": ["advanced_options", "debug_info"],
+        "print_mode": ["signatures", "legal_refs", "meta"]
+      }
+    },
+    "function_map": {
+      "notification_non_conformites_v1": {
+        "badge_color": "danger",
+        "severity": "high",
+        "icon": "alert-triangle"
+      },
+      "declaration_incidents_v1": {
+        "badge_color": "danger",
+        "severity": "critical",
+        "icon": "alert-circle"
+      },
+      "inspection_equipements_cstc_v1": {
+        "badge_color": "warning",
+        "severity": "medium",
+        "icon": "clipboard-check"
+      },
+      "plans_prevention_v1": {
+        "badge_color": "primary",
+        "severity": "medium",
+        "icon": "shield"
+      }
+    }
+  },
+  "blueprints": [
+    {
+      "id": "notification_non_conformites_v1",
+      "name": "Avis de non-conformité",
+      "version": "1.2",
+      "sectors": ["construction", "manufacturier", "municipal"],
+      "legislation": ["LMRSST", "RSST", "CSTC"],
+      "components": ["header", "meta", "checklist", "signatures", "legal_refs"],
+      "form_refs": ["ASP_NC_001", "CNESST_NC_FORM"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "identification",
+            "title": "Identification de la non-conformité",
+            "fields": [
+              {
+                "id": "nc_type",
+                "label": "Type de non-conformité",
+                "type": "select",
+                "required": true,
+                "options": ["Equipement défaillant", "Procédure non respectée", "EPI manquant", "Formation insuffisante"]
+              },
+              {
+                "id": "severity_level",
+                "label": "Niveau de gravité",
+                "type": "select",
+                "required": true,
+                "options": ["Faible", "Modérée", "Élevée", "Critique"]
+              },
+              {
+                "id": "location",
+                "label": "Lieu de la non-conformité",
+                "type": "text",
+                "placeholder": "[SITE_ID] - [ZONE_SPECIFIQUE]",
+                "required": true
+              }
+            ]
+          },
+          {
+            "id": "corrective_actions",
+            "title": "Actions correctives",
+            "fields": [
+              {
+                "id": "immediate_actions",
+                "label": "Actions immédiates prises",
+                "type": "textarea",
+                "required": true
+              },
+              {
+                "id": "planned_actions",
+                "label": "Actions planifiées",
+                "type": "timeline",
+                "required": true
+              }
+            ]
+          }
+        ]
+      },
+      "hitl_rules": ["severity_critical", "legal_compliance_required"],
+      "legal_references": [
+        {
+          "code": "LMRSST",
+          "label": "Art. 51 - Obligations de l'employeur",
+          "url": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1"
+        }
+      ]
+    },
+    {
+      "id": "declaration_incidents_v1",
+      "name": "Déclaration d'incidents CNESST",
+      "version": "1.1",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST", "CNESST"],
+      "components": ["header", "meta", "table", "signatures", "attachments"],
+      "form_refs": ["CNESST_8504", "CNESST_DECLARATION_24H"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "incident_details",
+            "title": "Détails de l'incident",
+            "fields": [
+              {
+                "id": "incident_date",
+                "label": "Date de l'incident",
+                "type": "date",
+                "required": true
+              },
+              {
+                "id": "incident_time",
+                "label": "Heure de l'incident",
+                "type": "time",
+                "required": true
+              },
+              {
+                "id": "affected_worker",
+                "label": "Travailleur affecté",
+                "type": "text",
+                "placeholder": "[TRAVAILLEUR_ID]",
+                "anonymized": true,
+                "required": true
+              },
+              {
+                "id": "incident_description",
+                "label": "Description de l'incident",
+                "type": "textarea",
+                "required": true,
+                "min_length": 100
+              }
+            ]
+          },
+          {
+            "id": "medical_response",
+            "title": "Intervention médicale",
+            "fields": [
+              {
+                "id": "medical_attention",
+                "label": "Soins médicaux prodigués",
+                "type": "select",
+                "options": ["Premiers soins", "Transport hôpital", "Médecin sur place", "Aucun soin requis"]
+              },
+              {
+                "id": "return_to_work",
+                "label": "Retour au travail prévu",
+                "type": "date"
+              }
+            ]
+          }
+        ]
+      },
+      "hitl_rules": ["severity_critical", "fatality_incident", "cnesst_notification_required"],
+      "export_profile": "CNESST_8504"
+    },
+    {
+      "id": "inspection_equipements_cstc_v1",
+      "name": "Inspection équipements CSTC",
+      "version": "1.0",
+      "sectors": ["construction"],
+      "legislation": ["CSTC"],
+      "components": ["header", "meta", "checklist", "table", "signatures"],
+      "form_refs": ["CSTC_INSPECTION_FORM", "ASP_CONSTRUCTION_EQUIP"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "equipment_identification",
+            "title": "Identification de l'équipement",
+            "fields": [
+              {
+                "id": "equipment_type",
+                "label": "Type d'équipement",
+                "type": "select",
+                "required": true,
+                "options": ["Grue", "Échafaudage", "Équipement protection chute", "Machinerie lourde", "Outils électriques"]
+              },
+              {
+                "id": "equipment_id",
+                "label": "Numéro d'identification",
+                "type": "text",
+                "required": true
+              },
+              {
+                "id": "last_inspection",
+                "label": "Dernière inspection",
+                "type": "date"
+              }
+            ]
+          },
+          {
+            "id": "inspection_checklist",
+            "title": "Liste de vérification",
+            "component": "checklist",
+            "items": [
+              "État général satisfaisant",
+              "Dispositifs de sécurité fonctionnels",
+              "Certifications à jour",
+              "Manuel d'utilisation disponible",
+              "Formation opérateurs complétée"
+            ]
+          }
+        ]
+      },
+      "legal_references": [
+        {
+          "code": "CSTC",
+          "label": "Art. 2.9.1 - Inspection des équipements",
+          "url": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%204"
+        }
+      ]
+    },
+    {
+      "id": "registre_incidents_v1",
+      "name": "Registre des incidents et accidents",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST"],
+      "components": ["header", "meta", "table", "signatures"],
+      "form_refs": ["LMRSST_ART123_REGISTRE", "CNESST_REGISTRE_STANDARD"],
+      "content_structure": {
+        "table_structure": {
+          "headers": ["Date", "Heure", "Travailleur", "Lieu", "Nature", "Mesures prises", "Suivi"],
+          "row_template": {
+            "date": {"type": "date", "required": true},
+            "time": {"type": "time", "required": true},
+            "worker": {"type": "text", "placeholder": "[TRAVAILLEUR_ID]", "anonymized": true},
+            "location": {"type": "text", "placeholder": "[SITE_ID]"},
+            "nature": {"type": "textarea", "max_length": 200},
+            "actions_taken": {"type": "textarea", "max_length": 300},
+            "follow_up": {"type": "select", "options": ["En cours", "Complété", "Reporté"]}
+          }
+        }
+      },
+      "legal_references": [
+        {
+          "code": "LMRSST",
+          "label": "Art. 123 - Registre des accidents",
+          "url": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1"
+        }
+      ]
+    },
+    {
+      "id": "plans_prevention_v1",
+      "name": "Plan de prévention",
+      "version": "1.1",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST"],
+      "components": ["header", "meta", "timeline", "table", "signatures"],
+      "form_refs": ["LMRSST_ART90_PREVENTION", "CNESST_PLAN_PREVENTION"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "risk_assessment",
+            "title": "Évaluation des risques",
+            "component": "table",
+            "headers": ["Risque identifié", "Probabilité", "Gravité", "Mesures préventives", "Responsable", "Échéance"]
+          },
+          {
+            "id": "training_program",
+            "title": "Programme de formation",
+            "component": "timeline",
+            "timeline_items": [
+              "Formation d'accueil nouveaux employés",
+              "Formation continue SST",
+              "Formation spécialisée par poste",
+              "Recyclage et mise à jour"
+            ]
+          }
+        ]
+      },
+      "hitl_rules": ["high_risk_activity", "regulatory_compliance_required"]
+    },
+    {
+      "id": "suivi_formations_v1",
+      "name": "Suivi des formations SST",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST", "RSST"],
+      "components": ["header", "meta", "table", "timeline"],
+      "content_structure": {
+        "table_structure": {
+          "headers": ["Employé", "Formation", "Date", "Durée", "Formateur", "Certification", "Expiration", "Statut"],
+          "filterable": true,
+          "sortable": true
+        }
+      }
+    },
+    {
+      "id": "gestion_accidents_v1",
+      "name": "Gestion des accidents de travail",
+      "version": "1.2",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST", "CNESST"],
+      "components": ["header", "meta", "timeline", "attachments", "signatures"],
+      "hitl_rules": ["severity_high", "fatality_incident", "permanent_disability"]
+    },
+    {
+      "id": "alertes_proactives_v1",
+      "name": "Alertes proactives de sécurité",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "components": ["header", "meta", "checklist"],
+      "automated": true,
+      "trigger_conditions": ["risk_threshold_exceeded", "deadline_approaching", "compliance_gap_detected"]
+    },
+    {
+      "id": "comite_sst_pv_v1",
+      "name": "Procès-verbal comité SST",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST"],
+      "components": ["header", "meta", "table", "signatures"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "meeting_details",
+            "title": "Détails de la réunion",
+            "fields": [
+              {"id": "meeting_date", "type": "date", "required": true},
+              {"id": "attendees", "type": "multi_select", "required": true},
+              {"id": "agenda_items", "type": "textarea", "required": true}
+            ]
+          },
+          {
+            "id": "decisions",
+            "title": "Décisions et recommandations",
+            "component": "table",
+            "headers": ["Sujet", "Décision", "Responsable", "Échéance", "Statut"]
+          }
+        ]
+      }
+    },
+    {
+      "id": "toolbox_meeting_v1",
+      "name": "Causerie sécurité (Toolbox)",
+      "version": "1.0",
+      "sectors": ["construction", "manufacturier"],
+      "components": ["header", "meta", "checklist", "signatures"],
+      "content_structure": {
+        "sections": [
+          {
+            "id": "meeting_info",
+            "title": "Information de la causerie",
+            "fields": [
+              {"id": "topic", "label": "Sujet principal", "type": "text", "required": true},
+              {"id": "presenter", "label": "Animateur", "type": "text", "required": true},
+              {"id": "duration", "label": "Durée", "type": "number", "unit": "minutes"}
+            ]
+          },
+          {
+            "id": "attendance",
+            "title": "Présences",
+            "component": "checklist",
+            "dynamic_list": "team_members"
+          }
+        ]
+      }
+    },
+    {
+      "id": "refus_travail_v1",
+      "name": "Droit de refus de travail",
+      "version": "1.1",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST"],
+      "components": ["header", "meta", "timeline", "signatures", "legal_refs"],
+      "hitl_rules": ["legal_procedure_required", "management_approval_required"],
+      "urgent": true,
+      "content_structure": {
+        "sections": [
+          {
+            "id": "refusal_details",
+            "title": "Détails du refus",
+            "fields": [
+              {"id": "danger_description", "type": "textarea", "required": true},
+              {"id": "immediate_risk", "type": "boolean", "required": true},
+              {"id": "worker_id", "type": "text", "placeholder": "[TRAVAILLEUR_ID]", "anonymized": true}
+            ]
+          },
+          {
+            "id": "resolution_process",
+            "title": "Processus de résolution",
+            "component": "timeline",
+            "automated_steps": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "audit_sst_v1",
+      "name": "Audit de conformité SST",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "components": ["header", "meta", "checklist", "table", "signatures"],
+      "comprehensive": true,
+      "scoring_system": "percentage_based"
+    },
+    {
+      "id": "kpi_dashboard_v1",
+      "name": "Tableau de bord KPI SST",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "components": ["header", "meta", "table"],
+      "real_time": true,
+      "metrics": ["accident_rate", "training_completion", "compliance_score", "near_miss_reports"]
+    },
+    {
+      "id": "apr_evaluation_v1",
+      "name": "Analyse préliminaire des risques (APR)",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "components": ["header", "meta", "table", "signatures"],
+      "risk_matrix": "5x5_standard"
+    },
+    {
+      "id": "fit_test_respiratoire_v1",
+      "name": "Test d'ajustement respiratoire",
+      "version": "1.0",
+      "sectors": ["manufacturier", "construction"],
+      "legislation": ["RSST"],
+      "components": ["header", "meta", "checklist", "signatures"],
+      "certification_required": true
+    },
+    {
+      "id": "accueil_securite_v1",
+      "name": "Accueil sécurité nouveaux employés",
+      "version": "1.0",
+      "sectors": ["tous"],
+      "components": ["header", "meta", "checklist", "signatures"],
+      "mandatory": true,
+      "tracking_required": true
+    },
+    {
+      "id": "enquete_accident_v1",
+      "name": "Enquête d'accident approfondie",
+      "version": "1.2",
+      "sectors": ["tous"],
+      "legislation": ["LMRSST", "CNESST"],
+      "components": ["header", "meta", "timeline", "table", "attachments", "signatures"],
+      "form_refs": ["CNESST_8504_ENQUETE"],
+      "hitl_rules": ["severity_high", "fatality_incident", "investigator_required"],
+      "comprehensive": true
+    }
+  ],
+  "form_source_map": [
+    {
+      "emetteur": "CNESST",
+      "formulaire_id": "8504",
+      "libelle": "Enquête sur un accident du travail",
+      "secteur": "tous",
+      "function_id_cible": "enquete_accident_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 62"}]
+    },
+    {
+      "emetteur": "ASP Construction",
+      "formulaire_id": "ASP_NC_001",
+      "libelle": "Avis de non-conformité chantier",
+      "secteur": "construction",
+      "function_id_cible": "notification_non_conformites_v1",
+      "refs_legales": [{"code": "CSTC", "article": "Art. 2.4.1"}]
+    },
+    {
+      "emetteur": "CNESST",
+      "formulaire_id": "DECLARATION_24H",
+      "libelle": "Déclaration d'incident 24 heures",
+      "secteur": "tous",
+      "function_id_cible": "declaration_incidents_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 62"}]
+    },
+    {
+      "emetteur": "CNESST",
+      "formulaire_id": "REGISTRE_ART123",
+      "libelle": "Registre des accidents Art. 123",
+      "secteur": "tous",
+      "function_id_cible": "registre_incidents_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 123"}]
+    },
+    {
+      "emetteur": "APSAM",
+      "formulaire_id": "MUNICIPAL_INSPECTION",
+      "libelle": "Fiche inspection municipale",
+      "secteur": "municipal",
+      "function_id_cible": "inspection_equipements_cstc_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 51"}]
+    },
+    {
+      "emetteur": "ASSTSAS",
+      "formulaire_id": "SOCIAL_INCIDENT",
+      "libelle": "Rapport incident services sociaux",
+      "secteur": "services_sociaux",
+      "function_id_cible": "gestion_accidents_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 62"}]
+    },
+    {
+      "emetteur": "ASFETM",
+      "formulaire_id": "MANUF_TRAINING",
+      "libelle": "Suivi formation manufacturier",
+      "secteur": "manufacturier",
+      "function_id_cible": "suivi_formations_v1",
+      "refs_legales": [{"code": "RSST", "article": "Art. 45"}]
+    },
+    {
+      "emetteur": "Via Prévention",
+      "formulaire_id": "TRANSPORT_AUDIT",
+      "libelle": "Audit conformité transport",
+      "secteur": "transport",
+      "function_id_cible": "audit_sst_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 51"}]
+    },
+    {
+      "emetteur": "Multiprévention",
+      "formulaire_id": "MULTI_PREV_APR",
+      "libelle": "Analyse préliminaire des risques",
+      "secteur": "manufacturier",
+      "function_id_cible": "apr_evaluation_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 51"}]
+    },
+    {
+      "emetteur": "Auto Prévention",
+      "formulaire_id": "AUTO_TOOLBOX",
+      "libelle": "Causerie sécurité automobile",
+      "secteur": "manufacturier",
+      "function_id_cible": "toolbox_meeting_v1",
+      "refs_legales": [{"code": "LMRSST", "article": "Art. 51"}]
+    }
+  ],
+  "access_control": {
+    "roles": [
+      {
+        "id": "employeur",
+        "name": "Employeur",
+        "permissions": ["read", "create", "update"],
+        "restrictions": ["cannot_delete_legal_documents", "cannot_override_hitl"]
+      },
+      {
+        "id": "rss",
+        "name": "Responsable Santé-Sécurité",
+        "permissions": ["read", "create", "update", "delete", "approve"],
+        "special_access": ["hitl_override", "legal_compliance_validation"]
+      },
+      {
+        "id": "coss",
+        "name": "Coordonnateur Santé-Sécurité",
+        "permissions": ["read", "create", "update"],
+        "sector_restrictions": ["construction_only"]
+      },
+      {
+        "id": "alss",
+        "name": "Agent de Liaison Santé-Sécurité",
+        "permissions": ["read", "create", "update"],
+        "company_size_restrictions": ["small_companies_only"]
+      },
+      {
+        "id": "employe",
+        "name": "Employé",
+        "permissions": ["read", "create_incident_reports"],
+        "restrictions": ["read_only_most_documents"]
+      },
+      {
+        "id": "admin",
+        "name": "Administrateur système",
+        "permissions": ["all"],
+        "system_access": true
+      }
+    ]
+  },
+  "hitl_rules": [
+    {
+      "rule_id": "severity_critical",
+      "condition": "severity === 'critical' || incident_type === 'fatality'",
+      "required_role": "rss",
+      "action": "mandatory_review",
+      "timeout_hours": 2
+    },
+    {
+      "rule_id": "legal_compliance_required",
+      "condition": "involves_legal_obligation === true",
+      "required_role": "rss",
+      "action": "legal_review_required",
+      "timeout_hours": 24
+    },
+    {
+      "rule_id": "high_risk_activity",
+      "condition": "risk_level >= 15 || confined_space === true",
+      "required_role": "rss",
+      "action": "specialist_approval_required",
+      "timeout_hours": 8
+    },
+    {
+      "rule_id": "cnesst_notification_required",
+      "condition": "requires_cnesst_declaration === true",
+      "required_role": "rss",
+      "action": "validate_before_submission",
+      "timeout_hours": 4
+    },
+    {
+      "rule_id": "refusal_right_invoked",
+      "condition": "document_type === 'refus_travail_v1'",
+      "required_role": "rss",
+      "action": "immediate_intervention_required",
+      "timeout_hours": 1
+    }
+  ],
+  "export_profiles": {
+    "CNESST_8504": {
+      "target_format": "PDF",
+      "template": "official_cnesst_template",
+      "field_mapping": {
+        "incident_date": "Date_Accident",
+        "incident_time": "Heure_Accident",
+        "affected_worker": "Nom_Travailleur",
+        "incident_description": "Description_Evenement",
+        "employer_name": "Nom_Employeur",
+        "workplace_address": "Adresse_Etablissement"
+      },
+      "required_signatures": ["employeur", "rss"],
+      "submission_endpoint": "https://www.cnesst.gouv.qc.ca/api/declarations"
+    },
+    "CNESST_Registre": {
+      "target_format": "PDF",
+      "template": "registre_template",
+      "field_mapping": {
+        "date": "Date",
+        "time": "Heure",
+        "worker": "Travailleur",
+        "location": "Lieu",
+        "nature": "Nature_Accident",
+        "actions_taken": "Mesures_Prises"
+      },
+      "required_signatures": ["responsible_person"]
+    },
+    "ASP_Report": {
+      "target_format": "PDF",
+      "template": "asp_sectorial_template",
+      "sector_specific": true,
+      "field_mapping": {
+        "company_name": "Nom_Entreprise",
+        "sector": "Secteur_Activite",
+        "nc_type": "Type_Non_Conformite",
+        "severity_level": "Niveau_Gravite"
+      }
+    },
+    "Internal_Dashboard": {
+      "target_format": "XLSX",
+      "template": "kpi_dashboard_template",
+      "real_time": true,
+      "charts_included": true
+    },
+    "Audit_Trail": {
+      "target_format": "CSV",
+      "template": "audit_log_template",
+      "includes": ["timestamps", "user_actions", "document_changes", "approvals"]
+    },
+    "Legal_Archive": {
+      "target_format": "PDF",
+      "template": "legal_compliant_archive",
+      "long_term_storage": true,
+      "digital_signature": "advanced_electronic_signature",
+      "retention_years": 30
+    }
+  },
+  "validation": {
+    "schema_version": "2.0",
+    "last_validated": "2025-09-02T21:00:00Z",
+    "compliance_check": "passed",
+    "missing_references": [],
+    "id_conflicts": [],
+    "coverage_percentage": 95
+  }
+}

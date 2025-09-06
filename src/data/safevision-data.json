@@ -211,19 +211,347 @@
           "Documentation requise"
         ]
       }
+    },
+    "MFG_001": {
+      "scenarioId": "MFG_001",
+      "title": "Formation cadenassage industriel renforcé",
+      "description": "Procédures cadenassage basées sur analyse Agent AN1 - ROI 3.1:1",
+      "category": "Agent AN1 Manufacturing",
+      "agents": ["Hugo", "ALSS", "LexiNorm", "Prioris", "DocuGen"],
+      "orchestrationPrompt": "Créer formation cadenassage spécialisée manufacturier basée sur recommandations Agent AN1 avec ROI quantifié",
+      "cnessContext": {
+        "articles_count": 67,
+        "scenario_specific_docs": [
+          {
+            "title": "RSST - Section 3.4 - Cadenassage des machines",
+            "summary": "Procédures obligatoires de cadenassage pour l'entretien et la réparation de machines industrielles selon RSST",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%2013",
+            "type": "RSST",
+            "relevance_score": 98
+          },
+          {
+            "title": "LMRSST Art. 185 - Équipements protection",
+            "summary": "Obligations employeur concernant la fourniture et l'utilisation d'équipements de protection individuels",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1",
+            "type": "LMRSST", 
+            "relevance_score": 92
+          }
+        ],
+        "key_articles": [
+          {
+            "number": "185",
+            "source": "LMRSST",
+            "context": "Équipements protection - Fourniture obligatoire employeur"
+          },
+          {
+            "number": "3.4",
+            "source": "RSST",
+            "context": "Cadenassage machines - Procédures sécuritaires obligatoires"
+          }
+        ],
+        "key_topics": [
+          "Cadenassage industriel",
+          "Sécurité machines",
+          "Procédures maintenance",
+          "Contact objets tranchants",
+          "Dysfonctionnement équipements"
+        ],
+        "regulatory_framework": "LMRSST + RSST + Guides CNESST Manufacturier",
+        "an1_analysis": {
+          "risk_factors": "Contact objets tranchants (23% accidents manufacturier)",
+          "sector_benchmark": "2e quartile manufacturier",
+          "roi_calculation": "3.1:1 - Réduction 35% incidents machines"
+        }
+      },
+      "sectorialData": {
+        "targetSCIAN": ["31-33"],
+        "riskLevel": "high",
+        "companySize": "26-150",
+        "primarySector": "manufacturing",
+        "applicableRegulations": ["LMRSST", "RSST", "CNESST"]
+      },
+      "deliverables": [
+        "Procédures cadenassage renforcées",
+        "Check-list pré-maintenance machines",
+        "Formation opérateurs spécialisée",
+        "Audit conformité cadenassage",
+        "Kit urgence déblocage sécurisé"
+      ],
+      "videoConfig": {
+        "duration": "4-6min",
+        "format": "procédural_détaillé",
+        "audienceType": "opérateurs_machines",
+        "language": "fr_CA",
+        "accent": "québécois",
+        "avatar_style": "manufacturing_supervisor",
+        "visual_elements": [
+          "Industrial machinery 3D",
+          "Lockout procedures animation",
+          "Safety equipment close-ups",
+          "Manufacturing floor visuals"
+        ],
+        "interactivity": true,
+        "assessment": "quiz_cadenassage",
+        "priority": "HAUTE",
+        "context": "an1",
+        "roi": "3.1:1"
+      },
+      "scriptTemplate": {
+        "structure": [
+          "Risques spécifiques manufacturier",
+          "Procédures cadenassage étape par étape", 
+          "Vérifications obligatoires",
+          "Cas d'urgence et déblocage",
+          "Validation procédures"
+        ],
+        "tone": "technique_précis",
+        "key_messages": [
+          "23% accidents = contact objets tranchants",
+          "Cadenassage obligatoire avant maintenance",
+          "Vérification énergie résiduelle",
+          "Procédures déblocage d'urgence",
+          "ROI 3.1:1 - Économies 35% incidents"
+        ]
+      }
+    },
+    "MFG_002": {
+      "scenarioId": "MFG_002",
+      "title": "Formation continue opérateurs",
+      "description": "Module formation basé sur analyse Agent AN1 - ROI 2.2:1",
+      "category": "Agent AN1 Manufacturing",
+      "agents": ["Hugo", "DiagSST", "ALSS", "Prioris"],
+      "orchestrationPrompt": "Développer programme formation continue opérateurs manufacturier selon recommandations Agent AN1",
+      "cnessContext": {
+        "articles_count": 38,
+        "scenario_specific_docs": [
+          {
+            "title": "LMRSST Art. 51 - Formation continue obligatoire",
+            "summary": "Obligations employeur formation continue des travailleurs selon évolution technologique et réglementaire",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1",
+            "type": "LMRSST",
+            "relevance_score": 95
+          }
+        ],
+        "key_topics": [
+          "Formation continue",
+          "Amélioration procédures",
+          "Mise à jour compétences",
+          "Évolution technologique"
+        ],
+        "an1_analysis": {
+          "improvement_potential": "Amélioration procédures 25%",
+          "training_gaps": "Formation déficiente opérateurs expérimentés",
+          "roi_calculation": "2.2:1 - Réduction 20% incidents"
+        }
+      },
+      "sectorialData": {
+        "targetSCIAN": ["31-33"],
+        "riskLevel": "medium",
+        "companySize": "26-150",
+        "primarySector": "manufacturing",
+        "applicableRegulations": ["LMRSST", "RSST"]
+      },
+      "deliverables": [
+        "Programme formation continue",
+        "Modules spécialisés par poste",
+        "Évaluations compétences",
+        "Suivi progression individuelle",
+        "Certifications internes"
+      ],
+      "videoConfig": {
+        "duration": "6-8min",
+        "format": "formation_modulaire",
+        "audienceType": "opérateurs_expérimentés",
+        "priority": "MOYENNE",
+        "context": "an1",
+        "roi": "2.2:1"
+      },
+      "scriptTemplate": {
+        "key_messages": [
+          "Formation = investissement rentable",
+          "Amélioration continue des procédures",
+          "Adaptation nouvelles technologies",
+          "ROI 2.2:1 - Économies 20% incidents"
+        ]
+      }
+    },
+    "CONST_001": {
+      "scenarioId": "CONST_001",
+      "title": "Formation échafaudages sécurisés PME",
+      "description": "Module construction basé sur analyse Agent AN1 - ROI 4.2:1",
+      "category": "Agent AN1 Construction",
+      "agents": ["Hugo", "ALSS", "LexiNorm", "Sentinelle", "DocuGen"],
+      "orchestrationPrompt": "Créer formation échafaudages spécialisée PME construction selon analyse Agent AN1",
+      "cnessContext": {
+        "articles_count": 45,
+        "scenario_specific_docs": [
+          {
+            "title": "CSTC Section 2.9 - Travail en hauteur",
+            "summary": "Code sécurité travaux construction - Échafaudages obligatoires pour travaux >3m hauteur",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%204",
+            "type": "CSTC",
+            "relevance_score": 98
+          },
+          {
+            "title": "LMRSST Art. 51 - Formation obligatoire",
+            "summary": "Formation échafaudages obligatoire selon LMRSST pour travaux construction hauteur",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/lc/S-2.1",
+            "type": "LMRSST",
+            "relevance_score": 95
+          }
+        ],
+        "key_articles": [
+          {
+            "number": "51",
+            "source": "LMRSST",
+            "context": "Formation obligatoire échafaudages >3m"
+          },
+          {
+            "number": "2.9",
+            "source": "CSTC",
+            "context": "Travail hauteur - Équipements protection obligatoires"
+          }
+        ],
+        "key_topics": [
+          "Échafaudages sécurisés",
+          "Chutes hauteur",
+          "EPI construction",
+          "Inspection quotidienne",
+          "Formation certifiée"
+        ],
+        "an1_analysis": {
+          "critical_risk": "Chutes hauteur (34% accidents construction)",
+          "sector_position": "3e quartile PME construction", 
+          "roi_calculation": "4.2:1 - Réduction 45% incidents hauteur"
+        }
+      },
+      "sectorialData": {
+        "targetSCIAN": ["236"],
+        "riskLevel": "very_high",
+        "companySize": "1-25",
+        "primarySector": "construction",
+        "applicableRegulations": ["LMRSST", "CSTC", "CNESST"]
+      },
+      "deliverables": [
+        "Formation échafaudages certifiante",
+        "Procédures inspection quotidienne",
+        "Check-list montage/démontage",
+        "EPI hauteur spécialisés",
+        "Certification CSTC compliance"
+      ],
+      "videoConfig": {
+        "duration": "6-8min", 
+        "format": "sécurité_critique",
+        "audienceType": "ouvriers_construction",
+        "language": "fr_CA",
+        "accent": "québécois",
+        "avatar_style": "construction_safety_expert",
+        "visual_elements": [
+          "Construction site 3D realistic",
+          "Scaffolding assembly animation",
+          "Fall protection equipment",
+          "Height work procedures"
+        ],
+        "interactivity": true,
+        "assessment": "certification_echafaudages",
+        "priority": "CRITIQUE",
+        "context": "an1",
+        "roi": "4.2:1"
+      },
+      "scriptTemplate": {
+        "structure": [
+          "Statistiques accidents construction",
+          "Réglementation CSTC échafaudages",
+          "Montage sécurisé étape par étape",
+          "Inspection quotidienne obligatoire",
+          "EPI hauteur et procédures urgence"
+        ],
+        "tone": "sécurité_absolue",
+        "key_messages": [
+          "34% accidents = chutes hauteur construction",
+          "Échafaudages obligatoires >3m (CSTC 2.9)",
+          "Inspection quotidienne avant utilisation",
+          "Formation certifiée obligatoire",
+          "ROI 4.2:1 - Économies 45% incidents"
+        ]
+      }
+    },
+    "CONST_002": {
+      "scenarioId": "CONST_002",
+      "title": "Audit équipements protection trimestriel",
+      "description": "Procédures audit basées sur analyse Agent AN1 - ROI 2.8:1",
+      "category": "Agent AN1 Construction",
+      "agents": ["DiagSST", "ALSS", "Prioris", "DocuGen"],
+      "orchestrationPrompt": "Développer système audit EPI construction selon recommandations Agent AN1",
+      "cnessContext": {
+        "articles_count": 32,
+        "scenario_specific_docs": [
+          {
+            "title": "CSTC Section 2.10 - Équipements protection individuelle",
+            "summary": "Code sécurité construction - Obligations vérification et entretien EPI sur chantiers",
+            "source": "https://www.legisquebec.gouv.qc.ca/fr/document/rc/S-2.1,%20r.%204",
+            "type": "CSTC",
+            "relevance_score": 96
+          }
+        ],
+        "key_topics": [
+          "Audit EPI",
+          "Équipements protection",
+          "Défaillance équipements",
+          "Inspection trimestrielle",
+          "Conformité CSTC"
+        ],
+        "an1_analysis": {
+          "equipment_failure": "Défaillance EPI dans 67% accidents secteur",
+          "audit_frequency": "Audit trimestriel vs inspection quotidienne",
+          "roi_calculation": "2.8:1 - Réduction 25% incidents"
+        }
+      },
+      "sectorialData": {
+        "targetSCIAN": ["236"],
+        "riskLevel": "high", 
+        "companySize": "1-25",
+        "primarySector": "construction",
+        "applicableRegulations": ["CSTC", "LMRSST"]
+      },
+      "deliverables": [
+        "Protocole audit EPI trimestriel",
+        "Check-list inspection équipements",
+        "Registre conformité CSTC",
+        "Procédures remplacement",
+        "Formation responsables audit"
+      ],
+      "videoConfig": {
+        "duration": "3-4min",
+        "format": "audit_procédural",
+        "audienceType": "responsables_chantier",
+        "priority": "HAUTE",
+        "context": "an1", 
+        "roi": "2.8:1"
+      },
+      "scriptTemplate": {
+        "key_messages": [
+          "67% accidents = défaillance EPI",
+          "Audit trimestriel obligatoire",
+          "Conformité CSTC Section 2.10",
+          "ROI 2.8:1 - Économies 25% incidents"
+        ]
+      }
     }
   },
   "metadata": {
-    "version": "2.0",
-    "last_updated": "2025-09-01T14:30:00Z",
+    "version": "3.0",
+    "last_updated": "2025-09-06T07:53:00Z",
     "source": "AgenticSST Quebec",
-    "integration": "SafeVision SST",
-    "total_scenarios": 135,
-    "available_in_json": 2,
+    "integration": "SafeVision SST + Agent AN1",
+    "total_scenarios": 139,
+    "available_in_json": 6,
+    "an1_scenarios": 4,
     "cnesst_documents": 196,
     "supported_languages": ["fr_CA", "en_CA"],
     "api_compatibility": {
       "safevision_pipeline": "/api/v1/video/generate",
+      "agent_an1_integration": "/api/v1/an1/recommendations",
       "synthesia_ready": true,
       "adao_distribution": true,
       "analytics_tracking": true

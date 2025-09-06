@@ -1,0 +1,341 @@
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+// Import direct de TOUTES vos pages existantes
+const Index = React.lazy(() => import("./pages/Index"));
+const Analytics = React.lazy(() => import("./pages/Analytics"));
+const AnnotationInterface = React.lazy(() => import("./pages/AnnotationInterface"));
+const AssistantVocal = React.lazy(() => import("./pages/AssistantVocal"));
+const Auth = React.lazy(() => import("./pages/Auth"));
+const ComplianceDetails = React.lazy(() => import("./pages/ComplianceDetails"));
+const ConversationLogs = React.lazy(() => import("./pages/ConversationLogs"));
+const CrawlingDashboard = React.lazy(() => import("./pages/CrawlingDashboard"));
+const Diagnostic = React.lazy(() => import("./pages/Diagnostic"));
+const DocuGen = React.lazy(() => import("./pages/DocuGen"));
+const FAQ = React.lazy(() => import("./pages/FAQ"));
+const LearningDashboard = React.lazy(() => import("./pages/LearningDashboard"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
+const PresentationScript = React.lazy(() => import("./pages/PresentationScript"));
+const PromptAdmin = React.lazy(() => import("./pages/PromptAdmin"));
+const PromptCatalog = React.lazy(() => import("./pages/PromptCatalog"));
+const PromptManagement = React.lazy(() => import("./pages/PromptManagement"));
+const SSTKnowledgeBase = React.lazy(() => import("./pages/SSTKnowledgeBase"));
+const Tests = React.lazy(() => import("./pages/Tests"));
+const UserManagement = React.lazy(() => import("./pages/UserManagement"));
+
+// Configuration QueryClient
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+      retry: (failureCount, error: any) => {
+        if (error?.status === 404 || error?.status === 403) {
+          return false;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
+
+// Header professionnel avec navigation complète
+const AppHeader: React.FC = () => (
+  <header className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-lg sticky top-0 z-50">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center py-4">
+        <div className="flex items-center space-x-4">
+          <a href="/" className="text-xl font-bold hover:text-blue-200 transition-colors">
+            🚀 AgenticSST Québec™
+          </a>
+          <div className="hidden sm:flex items-center space-x-2 text-sm">
+            <span className="bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
+              ✅ PHASE 2 COMPLETE
+            </span>
+            <span className="bg-blue-500 text-white px-2 py-1 rounded text-xs font-medium">
+              📊 ANALYTICS ACTIF
+            </span>
+          </div>
+        </div>
+        
+        <nav className="hidden lg:flex space-x-1">
+          <a href="/" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            🏠 Accueil
+          </a>
+          <a href="/analytics" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm font-medium bg-blue-800">
+            📊 Analytics
+          </a>
+          <a href="/assistant-vocal" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            🎙️ Assistant
+          </a>
+          <a href="/diagnostic" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            🔍 Diagnostic
+          </a>
+          <a href="/prompts" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            ✍️ Prompts
+          </a>
+          <a href="/learning" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            📚 Learning
+          </a>
+          <a href="/docugen" className="px-3 py-2 rounded hover:bg-blue-700 transition-colors text-sm">
+            📄 DocuGen
+          </a>
+        </nav>
+
+        <div className="flex items-center space-x-2">
+          <button className="lg:hidden p-2 rounded hover:bg-blue-700 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <div className="hidden sm:flex items-center space-x-2 text-sm">
+            <span className="text-blue-200">Conformité LMRSST</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+);
+
+// Wrapper avec Suspense amélioré
+const RouteWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <React.Suspense 
+    fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-6"></div>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">AgenticSST Québec™</h2>
+          <p className="text-gray-500">Chargement de votre module...</p>
+        </div>
+      </div>
+    }
+  >
+    {children}
+  </React.Suspense>
+);
+
+const App: React.FC = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <div className="min-h-screen bg-background font-sans antialiased">
+          <AppHeader />
+          
+          <Routes>
+            {/* 🏠 Page d'accueil */}
+            <Route 
+              path="/" 
+              element={
+                <RouteWrapper>
+                  <Index />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 📊 Analytics Business - NOUVELLE FONCTIONNALITÉ ! */}
+            <Route 
+              path="/analytics" 
+              element={
+                <RouteWrapper>
+                  <Analytics />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 🗣️ Assistant et IA */}
+            <Route 
+              path="/assistant-vocal" 
+              element={
+                <RouteWrapper>
+                  <AssistantVocal />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 🧪 Tests et Développement */}
+            <Route 
+              path="/tests" 
+              element={
+                <RouteWrapper>
+                  <Tests />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/logs" 
+              element={
+                <RouteWrapper>
+                  <ConversationLogs />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 📚 Apprentissage et Annotations */}
+            <Route 
+              path="/annotation" 
+              element={
+                <RouteWrapper>
+                  <AnnotationInterface />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/learning" 
+              element={
+                <RouteWrapper>
+                  <LearningDashboard />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* ✍️ Gestion des Prompts */}
+            <Route 
+              path="/prompts" 
+              element={
+                <RouteWrapper>
+                  <PromptManagement />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/prompts/catalog" 
+              element={
+                <RouteWrapper>
+                  <PromptCatalog />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/prompts/admin" 
+              element={
+                <RouteWrapper>
+                  <PromptAdmin />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 🔍 Diagnostic et Conformité */}
+            <Route 
+              path="/diagnostic" 
+              element={
+                <RouteWrapper>
+                  <Diagnostic />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/compliance-details/:metricType" 
+              element={
+                <RouteWrapper>
+                  <ComplianceDetails />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 📄 Documents et Génération */}
+            <Route 
+              path="/documents" 
+              element={<Navigate to="/docugen" replace />} 
+            />
+            <Route 
+              path="/docugen" 
+              element={
+                <RouteWrapper>
+                  <DocuGen />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 📖 Base de connaissances SST */}
+            <Route 
+              path="/sst-knowledge" 
+              element={
+                <RouteWrapper>
+                  <SSTKnowledgeBase />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/knowledge" 
+              element={<Navigate to="/sst-knowledge" replace />} 
+            />
+            
+            {/* 🕷️ Crawling et Données */}
+            <Route 
+              path="/crawling" 
+              element={
+                <RouteWrapper>
+                  <CrawlingDashboard />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 🔐 Authentification et Administration */}
+            <Route 
+              path="/auth" 
+              element={
+                <RouteWrapper>
+                  <Auth />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <RouteWrapper>
+                  <UserManagement />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 📋 Utilitaires et Support */}
+            <Route 
+              path="/faq" 
+              element={
+                <RouteWrapper>
+                  <FAQ />
+                </RouteWrapper>
+              } 
+            />
+            <Route 
+              path="/presentation" 
+              element={
+                <RouteWrapper>
+                  <PresentationScript />
+                </RouteWrapper>
+              } 
+            />
+            
+            {/* 404 - Route non trouvée */}
+            <Route 
+              path="*" 
+              element={
+                <RouteWrapper>
+                  <NotFound />
+                </RouteWrapper>
+              } 
+            />
+          </Routes>
+          
+          {/* Footer informatif */}
+          <footer className="bg-gray-800 text-white py-4 mt-12">
+            <div className="max-w-7xl mx-auto px-4 text-center">
+              <div className="flex items-center justify-center space-x-6 text-sm">
+                <span>🚀 AgenticSST Québec™</span>
+                <span>•</span>
+                <span>Phase 2 Enterprise</span>
+                <span>•</span>
+                <span className="text-green-400">✅ Analytics Activé</span>
+                <span>•</span>
+                <span>{new Date().toLocaleDateString('fr-CA')}</span>
+              </div>
+            </div>
+          </footer>
+        </div>
+      </BrowserRouter>
+    </QueryClientProvider>
+  );
+};
+
+export default App;

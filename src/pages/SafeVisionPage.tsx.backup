@@ -14,7 +14,9 @@ import {
   FileText,
   Zap,
   Bot,
-  Target
+  Target,
+  Send,
+  Download
 } from 'lucide-react';
 
 const SafeVisionPage = () => {
@@ -55,6 +57,74 @@ const SafeVisionPage = () => {
   ];
 
   const [agentStates, setAgentStates] = useState(agents);
+
+  // Fonction pour envoyer le script à Synthesia
+  const sendToSynthesia = async (scriptContent) => {
+    try {
+      // Préparer les métadonnées
+      const synthesiaData = {
+        title: `Script SafeVision SST - ${new Date().toLocaleDateString('fr-CA')}`,
+        script: scriptContent,
+        duration: scenarios[selectedScenario].estimatedDuration,
+        audience: "Responsables SST Québec",
+        agents: scenarios[selectedScenario].agents,
+        generated_by: "AgenticSST Québec™",
+        scenario: scenarios[selectedScenario].title
+      };
+
+      console.log('📤 Préparation envoi Synthesia...', synthesiaData);
+      
+      // Simuler délai traitement
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Construire URL Synthesia avec paramètres
+      const synthesiaURL = `https://app.synthesia.io/create?` + 
+        `title=${encodeURIComponent(synthesiaData.title)}&` +
+        `language=fr-CA&` +
+        `voice=professional&` +
+        `duration=${encodeURIComponent(synthesiaData.duration)}`;
+      
+      // Copier le script dans le presse-papiers
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(scriptContent);
+      }
+      
+      // Ouvrir Synthesia
+      window.open(synthesiaURL, '_blank', 'width=1200,height=800,scrollbars=yes');
+      
+      // Notification succès
+      alert(`✅ Script envoyé vers Synthesia !
+      
+📋 Le script a été copié dans votre presse-papiers
+🔗 Synthesia s'ouvre dans une nouvelle fenêtre
+📝 Collez le script (Ctrl+V) dans l'éditeur Synthesia
+🎬 Scénario: ${synthesiaData.scenario}
+⏱️ Durée estimée: ${synthesiaData.duration}`);
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Erreur envoi Synthesia:', error);
+      alert(`❌ Erreur lors de l'envoi vers Synthesia
+      
+🔧 Vérifiez votre connexion internet
+💡 Le script reste disponible dans l'interface
+📋 Vous pouvez copier manuellement le script ci-dessous`);
+      return false;
+    }
+  };
+
+  // Fonction pour télécharger le script
+  const downloadScript = () => {
+    const blob = new Blob([generatedScript], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Script_SafeVision_Scenario${selectedScenario}_${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const simulateOrchestration = async () => {
     setIsOrchestrating(true);
@@ -322,11 +392,21 @@ const SafeVisionPage = () => {
                 Script SafeVision Généré
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  <Video className="h-4 w-4 mr-2" />
+                <Button 
+                  onClick={() => sendToSynthesia(generatedScript)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2"
+                  size="sm"
+                >
+                  <Send className="h-4 w-4" />
                   Envoyer à Synthesia
                 </Button>
-                <Button variant="outline" size="sm">
+                <Button 
+                  onClick={downloadScript}
+                  variant="outline" 
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
                   Télécharger Script
                 </Button>
               </div>
